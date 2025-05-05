@@ -1,0 +1,265 @@
+/* RequestWizard Container */
+.request-wizard .request-wizard {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Wizard Header */
+.request-wizard .wizard-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.request-wizard .wizard-header h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-dark);
+}
+
+/* Progress Bar */
+.request-wizard .progress-bar {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 600px;
+  position: relative;
+}
+
+.request-wizard .progress-bar::before {
+  content: "";
+  position: absolute;
+  top: 25px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--border-color);
+  z-index: 1;
+}
+
+.request-wizard .progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.request-wizard .step-number {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--bg-light);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--text-medium);
+  margin-bottom: 0.5rem;
+}
+
+.request-wizard .step-label {
+  font-size: 0.875rem;
+  color: var(--text-medium);
+  white-space: nowrap;
+}
+
+.request-wizard .progress-step.active .step-number {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.request-wizard .progress-step.active .step-label {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.request-wizard .progress-step.completed .step-number {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: white;
+}
+
+/* Wizard Content */
+.request-wizard .wizard-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Shared Form Styles */
+.request-wizard .form-section {
+  margin-bottom: 2rem;
+}
+
+.request-wizard .form-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+
+.request-wizard .section-description {
+  color: var(--text-medium);
+  margin-bottom: 1.5rem;
+}
+
+.request-wizard .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.request-wizard .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.request-wizard .form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.request-wizard .form-row .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Shared Input Styles */
+.request-wizard input[type="text"],
+.request-wizard input[type="email"],
+.request-wizard input[type="number"],
+.request-wizard input[type="date"],
+.request-wizard input[type="time"],
+.request-wizard select,
+.request-wizard textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.request-wizardinput:focus,
+.request-wizard select:focus,
+.request-wizard textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+}
+
+.request-wizardinput.error,
+.request-wizard select.error,
+.request-wizard textarea.error {
+  border-color: var(--danger-color);
+}
+
+.request-wizard .error-message {
+  color: var(--danger-color);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Shared Button Styles */
+.request-wizard .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.request-wizard .btn-outlined {
+  border: 2px solid var(--primary-light);
+  background: white;
+  color: var(--text-dark);
+}
+
+.request-wizard .btn-outlined:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.request-wizard .btn-primary {
+  border: none;
+  background: var(--primary-color);
+  color: white;
+}
+
+.request-wizard .btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.request-wizard .btn-primary:disabled {
+  background: var(--border-color);
+  cursor: not-allowed;
+}
+
+/* Wizard Actions */
+.request-wizard .wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .request-wizard {
+    padding: 1.5rem;
+  }
+
+  .request-wizard .wizard-content {
+    padding: 1.5rem;
+  }
+
+  .request-wizard .progress-bar {
+    max-width: 100%;
+  }
+
+  .request-wizard .step-label {
+    font-size: 0.75rem;
+  }
+
+  .request-wizard .form-row {
+    flex-direction: column;
+  }
+
+  .request-wizard .wizard-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .request-wizard .wizard-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+.request-wizard .step-number {
+    width: 40px;
+    height: 40px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .request-wizard {
+    background-color: var(--background-dark);
+  }
+
+  .request-wizard .wizard-content {
+    background-color: var(--surface-dark);
+  }
+
+  .request-wizard .step-number {
+    background-color: var(--surface-dark);
+  }
+}

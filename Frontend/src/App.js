@@ -17,6 +17,7 @@ import ResetPassword from "./components/auth/ResetPassword";
 import ServicesManagement from "./components/admin/ServicesManagement";
 import AdminLayout from "./components/admin/AdminLayout";
 import DashboardPage from "./components/admin/AdminDashboard";
+import RequestWizardTester from "./components/requests/RequestWizardTester";
 
 function App() {
   return (
@@ -76,6 +77,18 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Requests Routes */}
+            <Route
+              path="/request-test"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <RequestWizardTester />
+                </ProtectedRoute>
+              }
+            />
+            
+
           </Routes>
           <Footer />
         </div>

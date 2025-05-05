@@ -32,6 +32,23 @@
 @import "./components/admin/UserManagement.css";
 
 
+/* Request Wizard Styles */
+@import "./components/requests/RequestWizard.css";
+@import "./components/requests/RequestWizardTester.css";
+@import "./components/requests/RequestList.css";
+@import "./components/requests/LocationDetails.css";
+@import "./components/requests/ServiceSelection.css";
+@import "./components/requests/Requirements.css";
+@import "./components/requests/SchedulePreference.css";
+@import "./components/requests/RequestSummary.css";
+@import "./components/requests/OffersList.css";
+
+
+
+
+
+
+
 
 /* Account Management Styles */
 @import "./components/account/AccountSettings.css";
