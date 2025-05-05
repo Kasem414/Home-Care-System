@@ -18,6 +18,8 @@ import ServicesManagement from "./components/admin/ServicesManagement";
 import AdminLayout from "./components/admin/AdminLayout";
 import DashboardPage from "./components/admin/AdminDashboard";
 import RequestWizardTester from "./components/requests/RequestWizardTester";
+import RequestsPage from "./pages/Requests/RequestsPage";
+import RequestDetailsPage from "./pages/Requests/RequestDetailsPage";
 
 function App() {
   return (
@@ -28,9 +30,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/services" element={<ServicesPage />} />
-            
-           
-           
+
             {/* Account Routes */}
             <Route
               path="/account/settings"
@@ -52,7 +52,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-           
+
             <Route
               path="/admin"
               element={
@@ -87,8 +87,24 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
 
+            <Route
+              path="/requests"
+              element={
+                <ProtectedRoute>
+                  <RequestsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/requests/:requestId"
+              element={
+                <ProtectedRoute>
+                  <RequestDetailsPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
           <Footer />
         </div>

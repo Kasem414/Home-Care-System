@@ -21,6 +21,7 @@
 @import "./pages/Auth.css";
 @import "./pages/Services.css";
 @import "./pages/Account.css";
+@import "./pages/Requests.css";
 
 /* Admin Pages Styles */
 @import "./components/admin/AdminLayout.css";
@@ -42,6 +43,7 @@
 @import "./components/requests/SchedulePreference.css";
 @import "./components/requests/RequestSummary.css";
 @import "./components/requests/OffersList.css";
+@import "./components/requests/RequestDetails.css";
 
 
 

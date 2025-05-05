@@ -94,10 +94,22 @@ const Navbar = () => {
                 isActive("/provider/dashboard") ? "active" : ""
               }`}
             >
-              Providers
+              Provider Dash
             </Link>
             <Link to="/request-test" className="navbar-item highlight">
               Request Service
+            </Link>
+            <Link
+              to="/requests"
+              className={`navbar-item ${isActive("/requests") ? "active" : ""}`}
+            >
+              Requests
+            </Link>
+            <Link
+              to="/offers"
+              className={`navbar-item ${isActive("/offers") ? "active" : ""}`}
+            >
+              Offers
             </Link>
             <Link
               to="/admin"
@@ -105,12 +117,12 @@ const Navbar = () => {
             >
               Admin
             </Link>
-            <Link
+            {/* <Link
               to="/contact"
               className={`navbar-item ${isActive("/contact") ? "active" : ""}`}
             >
               Contact
-            </Link>
+            </Link> */}
           </div>
 
           <div className="navbar-end">
