@@ -1,0 +1,101 @@
+:root {
+  /* Color Palette */
+  --primary-color: #6366f1; /* Modern indigo */
+  --primary-dark: #4f46e5; /* Darker indigo */
+  --primary-light: #818cf8; /* Lighter indigo */
+  --accent-color: #f472b6; /* Soft pink */
+  --accent-dark: #db2777; /* Deep pink */
+  --accent-light: #f9a8d4; /* Light pink */
+
+  --text-dark: #1f2937; /* Rich dark gray */
+  --text-medium: #4b5563; /* Medium gray */
+  --text-light: #6b7280; /* Light gray */
+
+  --bg-white: #ffffff; /* Pure white */
+  --bg-light: #f9fafb; /* Very light gray */
+  --bg-gray: #f3f4f6; /* Light gray */
+  --bg-dark: #111827; /* Deep dark */
+
+  --border-color: #e5e7eb; /* Soft gray */
+  --border-light: #f3f4f6; /* Very light gray */
+
+  /* Status Colors */
+  --success-color: #10b981; /* Emerald green */
+  --success-color-light: #d1fae5; /* Light emerald */
+  --success-color-dark: #059669; /* Dark emerald */
+
+  --warning-color: #f59e0b; /* Amber */
+  --warning-color-light: #fef3c7; /* Light amber */
+  --warning-color-dark: #d97706; /* Dark amber */
+
+  --danger-color: #ef4444; /* Red */
+  --danger-color-light: #fee2e2; /* Light red */
+  --danger-color-dark: #dc2626; /* Dark red */
+
+  --info-color: #3b82f6; /* Blue */
+  --info-color-light: #dbeafe; /* Light blue */
+  --info-color-dark: #2563eb; /* Dark blue */
+
+  /* Typography */
+  --font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-md: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem; /* 36px */
+  --font-size-5xl: 3rem; /* 48px */
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 1rem; /* 16px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-xl: 2rem; /* 32px */
+  --spacing-2xl: 3rem; /* 48px */
+  --spacing-3xl: 4rem; /* 64px */
+
+  /* Borders */
+  --border-radius-sm: 0.125rem; /* 2px */
+  --border-radius-md: 0.25rem; /* 4px */
+  --border-radius-lg: 0.5rem; /* 8px */
+  --border-radius-xl: 1rem; /* 16px */
+  --border-radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Transitions */
+  --transition-fast: 150ms;
+  --transition-normal: 300ms;
+  --transition-slow: 500ms;
+
+  /* Layout */
+  --container-max-width: 1200px;
+  --header-height: 70px;
+  --footer-height: 300px;
+
+  /* Z-index levels */
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+}

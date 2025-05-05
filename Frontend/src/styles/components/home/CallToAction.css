@@ -1,0 +1,230 @@
+.cta-section {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  position: relative;
+  padding: 6rem 0;
+  overflow: hidden;
+}
+
+.cta-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23ffffff' fill-opacity='0.2'/%3E%3C/svg%3E");
+  background-size: 30px 30px;
+  opacity: 0.6;
+}
+
+.cta-section .cta-container {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 4rem;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-section .cta-content {
+  max-width: 600px;
+}
+
+.cta-section .cta-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: white;
+  line-height: 1.2;
+}
+
+.cta-section .cta-description {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.cta-section .cta-benefits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.cta-section .benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.cta-section .benefit-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.cta-section .benefit-icon {
+  font-size: 1rem;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-section .benefit-text {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.cta-section .cta-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.cta-section .cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  min-width: 150px;
+}
+
+.cta-section .btn-primary {
+  background: white;
+  color: #6366f1;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.cta-section .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.2);
+}
+
+.cta-section .btn-icon {
+  transition: transform 0.3s ease;
+}
+
+.cta-section .btn-primary:hover .btn-icon {
+  transform: translateX(4px);
+}
+
+.cta-section .btn-outlined {
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  background: none;
+}
+
+.cta-section .btn-outlined:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: white;
+  transform: translateY(-2px);
+}
+
+.cta-section .cta-image-container {
+  position: relative;
+  height: 100%;
+  min-height: 400px;
+}
+.cta-section .cta-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.cta-section .cta-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.2) 0%,
+    rgba(139, 92, 246, 0.2) 100%
+  );
+}
+
+@media (max-width: 1024px) {
+  .cta-section .cta-container {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .cta-section .cta-content {
+    text-align: center;
+    max-width: 100%;
+  }
+
+  .cta-section .cta-benefits {
+    justify-content: center;
+  }
+
+  .cta-section .benefit-item {
+    justify-content: center;
+  }
+
+  .cta-section .cta-buttons {
+    justify-content: center;
+  }
+
+  .cta-section .cta-image-container {
+    order: -1;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cta-section {
+    padding: 4rem 0;
+  }
+
+  .cta-section .cta-title {
+    font-size: 2rem;
+  }
+
+  .cta-section .cta-benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-section .cta-image-container {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 576px) {
+  .cta-section {
+    padding: 3rem 0;
+  }
+
+  .cta-section .cta-title {
+    font-size: 1.75rem;
+  }
+
+  .cta-section .cta-buttons {
+    flex-direction: column;
+  }
+
+  .cta-section .cta-btn {
+    width: 100%;
+  }
+}
