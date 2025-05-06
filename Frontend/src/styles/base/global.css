@@ -2,6 +2,10 @@
   Global styles and utility classes
 */
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* Container */
 .container {
   width: 100%;

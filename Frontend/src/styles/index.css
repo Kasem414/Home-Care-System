@@ -47,6 +47,12 @@
 
 
 
+/* Provider Dashboard Styles */
+@import "./components/providers/ProviderDashboard.css";
+@import "./components/providers/RequestsFeed.css";
+@import "./components/providers/RequestDetail.css";
+@import "./pages/CreateOfferPage.css";
+@import "./pages/RequestDetailsPage.css";
 
 
 

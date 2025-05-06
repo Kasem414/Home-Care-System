@@ -6,6 +6,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Navbar from "./components/shared/Navbar";
 import Footer from "./components/shared/Footer";
+import ScrollToTop from "./components/common/ScrollToTop";
 import HomePage from "./pages/Home/HomePage";
 import ServicesPage from "./pages/Services/ServicesPage";
 import AccountSettingsPage from "./pages/Account/AccountSettingsPage";
@@ -20,11 +21,16 @@ import DashboardPage from "./components/admin/AdminDashboard";
 import RequestWizardTester from "./components/requests/RequestWizardTester";
 import RequestsPage from "./pages/Requests/RequestsPage";
 import RequestDetailsPage from "./pages/Requests/RequestDetailsPage";
+import ProviderDashboardPage from "./pages/Provider/ProviderDashboardPage";
+import ProviderRequestDetailPage from "./pages/Provider/RequestDetailPage";
+import CreateOfferPage from "./pages/Provider/CreateOfferPage";
+import OffersList from "./components/requests/OffersList";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <div className="App">
           <Navbar />
           <Routes>
@@ -105,6 +111,42 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Providers Routes */}
+            <Route
+              path="/provider/dashboard"
+              element={
+                <ProtectedRoute>
+                  <ProviderDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/provider/request/:requestId"
+              element={
+                <ProtectedRoute>
+                  <ProviderRequestDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/provider/create-offer/:requestId"
+              element={
+                <ProtectedRoute>
+                  <CreateOfferPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Offers Routes */}
+            <Route
+              path="/offers"
+              element={
+                <ProtectedRoute>
+                  <OffersList />
+                </ProtectedRoute>
+              }
+            ></Route>
           </Routes>
           <Footer />
         </div>

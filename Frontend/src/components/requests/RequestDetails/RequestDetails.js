@@ -27,7 +27,7 @@ const RequestDetails = ({ onCancelRequest }) => {
         const mockRequest = {
           id: requestId,
           serviceType: "maintenance",
-          serviceCategory: "Home",
+          // serviceCategory: "Home",
           serviceName: "Plumbing Repair",
           status: "approved",
           createdAt: "2023-10-28T15:45:00Z",
@@ -339,10 +339,10 @@ const RequestDetails = ({ onCancelRequest }) => {
                 <span className="label">Service Name</span>
                 <span className="value">{request.serviceName}</span>
               </div>
-              <div className="summary-item">
+              {/* <div className="summary-item">
                 <span className="label">Category</span>
                 <span className="value">{request.serviceCategory}</span>
-              </div>
+              </div> */}
               <div className="summary-item">
                 <span className="label">Scheduled Date</span>
                 <span className="value">

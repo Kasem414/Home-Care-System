@@ -1,25 +1,24 @@
 /* Account Settings Styles */
-
 .account-settings {
   padding: 3rem 0;
   background-color: var(--bg-light);
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
 }
 
-.account-settings-container {
+.account-settings .account-settings-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
 
-.page-title {
+.account-settings .page-title {
   font-size: 2rem;
   color: var(--text-dark);
   margin-bottom: 2rem;
   font-weight: 600;
 }
 
-.settings-section {
+.account-settings .settings-section {
   background-color: white;
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
@@ -27,18 +26,18 @@
   margin-bottom: 2rem;
 }
 
-.settings-section h2 {
+.account-settings .settings-section h2 {
   font-size: 1.5rem;
   color: var(--text-dark);
   margin-bottom: 1.5rem;
   font-weight: 500;
 }
 
-.form-group {
+.account-settings .form-group {
   margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.account-settings .form-group label {
   display: block;
   font-size: 0.95rem;
   font-weight: 500;
@@ -46,8 +45,8 @@
   color: var(--text-dark);
 }
 
-.form-group input,
-.form-group textarea {
+.account-settings.form-group input,
+.account-settings .form-group textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-color);
@@ -57,33 +56,33 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+.account-settings .form-group input:focus,
+.account-settings .form-group textarea:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
   outline: none;
 }
 
-.alert {
+.account-settings .alert {
   padding: 1rem;
   border-radius: 4px;
   margin-bottom: 1.5rem;
   font-weight: 500;
 }
 
-.alert-success {
+.account-settings .alert-success {
   background-color: #d1fae5;
   border: 1px solid #34d399;
   color: #065f46;
 }
 
-.alert-error {
+.account-settings .alert-error {
   background-color: #fee2e2;
   border: 1px solid #f87171;
   color: #b91c1c;
 }
 
-.alert-info {
+.account-settings .alert-info {
   background-color: #e0f2fe;
   border: 1px solid #38bdf8;
   color: #0369a1;
@@ -92,48 +91,48 @@
   gap: 0.5rem;
 }
 
-.alert-info i {
+.account-settings .alert-info i {
   font-size: 1.2rem;
 }
 
-.danger-zone {
+.account-settings .danger-zone {
   border: 1px solid #fecaca;
   background-color: #fff5f5;
 }
 
-.danger-zone h2 {
+.account-settings .danger-zone h2 {
   color: #b91c1c;
 }
 
-.danger-zone p {
+.account-settings .danger-zone p {
   color: var(--text-medium);
   margin-bottom: 1.5rem;
 }
 
-.btn-danger {
+.account-settings .btn-danger {
   background-color: #ef4444;
   color: white;
   border: none;
 }
 
-.btn-danger:hover {
+.account-settings .btn-danger:hover {
   background-color: #dc2626;
 }
 
-.delete-confirmation {
+.account-settings .delete-confirmation {
   background-color: #fee2e2;
   padding: 1.5rem;
   border-radius: 4px;
   margin-top: 1rem;
 }
 
-.delete-confirmation p {
+.account-settings .delete-confirmation p {
   margin-bottom: 1.5rem;
   color: #b91c1c;
   font-weight: 500;
 }
 
-.confirmation-buttons {
+.account-settings .confirmation-buttons {
   display: flex;
   gap: 1rem;
 }
@@ -144,23 +143,23 @@
     padding: 2rem 0;
   }
 
-  .account-settings-container {
+  .account-settings .account-settings-container {
     padding: 0 1rem;
   }
 
-  .settings-section {
+  .account-settings .settings-section {
     padding: 1.5rem;
   }
 
-  .page-title {
+  .account-settings .page-title {
     font-size: 1.75rem;
   }
 
-  .settings-section h2 {
+  .account-settings .settings-section h2 {
     font-size: 1.25rem;
   }
 
-  .confirmation-buttons {
+  .account-settings .confirmation-buttons {
     flex-direction: column;
   }
 }

@@ -1,0 +1,218 @@
+/* Create Offer Styles */
+.create-offer-container {
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+  margin: var(--spacing-lg) 0;
+  /* max-width: 700px; */
+  animation: fadeIn var(--transition-normal) ease-in;
+}
+
+.create-offer-container h2 {
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.create-offer-container .offer-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.create-offer-container .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.create-offer-container .form-row {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.create-offer-container .form-row .form-group {
+  flex: 1;
+}
+
+.create-offer-container .offer-form label {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-dark);
+  font-size: var(--font-size-sm);
+}
+
+.create-offer-container .offer-form input,
+.create-offer-container .offer-form textarea {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  transition: all var(--transition-fast);
+  color: var(--text-dark);
+  background-color: var(--bg-white);
+}
+
+.create-offer-container .offer-form input:focus,
+.create-offer-container .offer-form textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.create-offer-container .input-with-icon {
+  position: relative;
+}
+
+.create-offer-container .currency-icon {
+  position: absolute;
+  left: var(--spacing-md);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-medium);
+}
+
+.create-offer-container .input-with-icon input {
+  padding-left: calc(var(--spacing-md) * 2);
+}
+
+.create-offer-container .total-estimate {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-light);
+  border-radius: var(--border-radius-md);
+  border: 1px dashed var(--border-color);
+  transition: background-color var(--transition-fast);
+}
+
+.create-offer-container .total-estimate:hover {
+  background-color: var(--primary-color-light);
+}
+
+.create-offer-container .estimate-label {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-dark);
+}
+
+.create-offer-container .estimate-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+}
+
+.create-offer-container .offer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+}
+
+.create-offer-container .btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  border: none;
+}
+
+.create-offer-container .btn-outlined {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-medium);
+}
+
+.create-offer-container .btn-outlined:hover {
+  background-color: var(--bg-light);
+  border-color: var(--text-light);
+  color: var(--text-dark);
+}
+
+.create-offer-container .btn-primary {
+  background-color: var(--primary-color);
+  color: var(--bg-white);
+}
+
+.create-offer-container .btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.create-offer-container .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.create-offer-container .error-message {
+  background-color: var(--danger-color-light);
+  color: var(--danger-color-dark);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+  border-left: 4px solid var(--danger-color);
+  font-size: var(--font-size-sm);
+}
+
+/* Spinner styles for the small variant */
+.create-offer-container .spinner.small {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+  border-color: var(--bg-white);
+  border-right-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-md));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .create-offer-container .form-row {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .create-offer-container {
+    padding: var(--spacing-md);
+  }
+
+  .create-offer-container .offer-actions {
+    flex-direction: column-reverse;
+    gap: var(--spacing-sm);
+  }
+
+  .create-offer-container .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,202 @@
+/* Provider Dashboard Styles */
+
+/* Main Dashboard Layout */
+.provider-dashboard {
+  min-height: calc(100vh - var(--header-height) - var(--footer-height));
+  background-color: var(--bg-light);
+}
+
+.provider-dashboard .dashboard-header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.provider-dashboard .dashboard-welcome h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.provider-dashboard .dashboard-welcome p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.provider-dashboard .dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.provider-dashboard .stat-card {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.provider-dashboard .stat-card:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-3px);
+}
+
+.provider-dashboard .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.provider-dashboard .stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.provider-dashboard .star {
+  color: #ffc107;
+}
+
+/* Dashboard Navigation */
+.provider-dashboard .dashboard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.provider-dashboard .dashboard-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.provider-dashboard .tab-btn {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  white-space: nowrap;
+  position: relative;
+  color: var(--text-medium);
+}
+
+.provider-dashboard .tab-btn.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.provider-dashboard .tab-btn:hover:not(.active) {
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+}
+
+.provider-dashboard .tab-btn i {
+  margin-right: 0.5rem;
+}
+
+.provider-dashboard .notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--danger-color);
+  color: white;
+  font-size: 0.7rem;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.provider-dashboard .dashboard-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.provider-dashboard .dashboard-actions .btn i {
+  margin-right: 0.5rem;
+}
+
+/* Dashboard Content */
+.provider-dashboard .dashboard-content {
+  padding-bottom: 3rem;
+}
+
+.provider-dashboard .placeholder-content {
+  background-color: white;
+  padding: 3rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.provider-dashboard .placeholder-content h2 {
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+
+.provider-dashboard .placeholder-content p {
+  color: var(--text-medium);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .provider-dashboard .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .provider-dashboard .dashboard-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .provider-dashboard .dashboard-tabs {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .provider-dashboard .dashboard-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .provider-dashboard .dashboard-header {
+    padding: 1.5rem 0;
+  }
+
+  .provider-dashboard .dashboard-welcome h1 {
+    font-size: 1.75rem;
+  }
+
+  .provider-dashboard .dashboard-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .provider-dashboard .stat-card {
+    padding: 1rem;
+  }
+
+  .provider-dashboard .dashboard-tabs {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 0.5rem;
+  }
+
+  .provider-dashboard .tab-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
