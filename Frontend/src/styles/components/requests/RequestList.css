@@ -1,0 +1,573 @@
+/* Request List Styles */
+.request-list-component {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.request-list-component .request-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+.request-list-component .request-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.request-list-component .request-list-header h2 {
+  font-size: 1.75rem;
+  color: var(--text-dark);
+  margin: 0;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Request Search Component */
+.request-list-component .request-search {
+  width: 100%;
+  max-width: 400px;
+}
+
+.request-list-component .search-container {
+  display: flex;
+  position: relative;
+}
+
+.request-list-component .search-container.focused {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.request-list-component .search-input {
+  width: 100%;
+  padding: 0.875rem 1.25rem;
+  padding-right: 3.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.request-list-component .search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  outline: none;
+}
+
+.request-list-component .search-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 3.5rem;
+  background: none;
+  border: none;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.request-list-component .search-button:hover {
+  color: var(--primary-color);
+}
+
+.request-list-component .search-button i {
+  font-size: 1.125rem;
+}
+
+.request-list-component .clear-button {
+  position: absolute;
+  right: 3.5rem;
+  top: 0;
+  height: 100%;
+  width: 2.5rem;
+  background: none;
+  border: none;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.request-list-component .clear-button:hover {
+  color: var(--text-dark);
+}
+
+/* Request Filters Component */
+.request-list-component .request-filters {
+  background-color: var(--bg-light);
+  padding: 1.75rem;
+  border-radius: 12px;
+  margin-bottom: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.request-list-component .request-filters:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.request-list-component .filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.request-list-component .filters-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.request-list-component .filters-title i {
+  color: var(--primary-color);
+  font-size: 1.125rem;
+}
+
+.request-list-component .filters-title h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.request-list-component .active-filters-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-left: 0.25rem;
+}
+
+.request-list-component .filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--border-color);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: var(--text-medium);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.request-list-component .filter-toggle:hover {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.request-list-component .filter-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  overflow: hidden;
+}
+
+.request-list-component .filter-group {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.request-list-component .filter-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-medium);
+  margin-left: 0.25rem;
+}
+
+.request-list-component .select-wrapper {
+  position: relative;
+}
+
+.request-list-component .select-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-medium);
+  pointer-events: none;
+}
+
+.request-list-component .filter-select {
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background-color: white;
+  appearance: none;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.request-list-component .filter-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  outline: none;
+}
+
+.request-list-component .filter-reset {
+  align-self: flex-end;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--border-color);
+  background-color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.request-list-component .filter-reset:hover {
+  background-color: var(--bg-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+.request-list-component .filter-reset i {
+  font-size: 0.875rem;
+}
+
+/* Request Count */
+.request-list-component .request-count {
+  color: var(--text-medium);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* Request Card Styles */
+.request-list-component .request-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.request-list-component .request-card {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-gap: 1.5rem;
+  padding: 1.75rem;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+}
+
+.request-list-component .request-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.09);
+  transform: translateY(-3px);
+}
+
+.request-list-component .request-header-card {
+  background-color: var(--bg-light);
+  font-weight: 600;
+  color: var(--text-dark);
+  border-bottom: 2px solid var(--border-color);
+  padding: 1.25rem 1.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 12px;
+}
+
+.request-list-component .request-info h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.625rem;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.request-list-component .request-address {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.request-list-component .request-address i {
+  color: var(--primary-color);
+  font-size: 0.875rem;
+}
+
+.request-list-component .request-date {
+  display: flex;
+  flex-direction: column;
+  color: var(--text-medium);
+}
+
+.request-list-component .scheduled-date {
+  font-weight: 600;
+  margin-bottom: 0.375rem;
+}
+
+.request-list-component .scheduled-time {
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.request-list-component .scheduled-time i {
+  color: var(--primary-color);
+  font-size: 0.875rem;
+}
+
+.request-list-component .request-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-right: 1rem;
+}
+
+.request-list-component .status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  gap: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.request-list-component .status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.request-list-component .request-id {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-family: monospace;
+  letter-spacing: 0.03em;
+}
+
+.request-list-component .status-pending {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #f59f00;
+}
+
+.request-list-component .status-approved {
+  background-color: rgba(0, 123, 255, 0.15);
+  color: #0069d9;
+}
+
+.request-list-component .status-completed {
+  background-color: rgba(40, 167, 69, 0.15);
+  color: #218838;
+}
+
+.request-list-component .status-cancelled {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #c82333;
+}
+
+.request-list-component .request-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.request-list-component .btn {
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  border: none;
+}
+
+.request-list-component .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.request-list-component .btn-outlined {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.request-list-component .btn-outlined:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.request-list-component .btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Loading and Empty States */
+.request-list-component .loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem;
+  color: var(--text-medium);
+  gap: 1.5rem;
+}
+
+.request-list-component .loading-spinner i {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.request-list-component .no-requests-found {
+  background-color: var(--bg-light);
+  padding: 4rem 2rem;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.request-list-component .no-requests-found p {
+  font-size: 1.125rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-medium);
+}
+
+.request-list-component .btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.request-list-component .btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .request-list-component .request-card {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    row-gap: 1.5rem;
+  }
+
+  .request-list-component .request-actions-header {
+    display: none;
+  }
+
+  .request-list-component .request-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-color);
+  }
+}
+
+@media (max-width: 768px) {
+  .request-list-component .request-list-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .request-list-component .request-search {
+    max-width: 100%;
+  }
+
+  .request-list-component .filter-section {
+    flex-direction: column;
+  }
+
+  .request-list-component .filter-group {
+    min-width: 100%;
+  }
+
+  .request-list-component .filters-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .request-list-component .filter-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .request-list-component .filter-reset {
+    align-self: stretch;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .request-list-component .request-header-card {
+    display: none;
+  }
+
+  .request-list-component .request-card {
+    grid-template-columns: 1fr;
+    padding: 1.25rem;
+  }
+
+  .request-list-component .request-info,
+  .request-list-component .request-date,
+  .request-list-component .request-status {
+    margin-bottom: 1rem;
+  }
+
+  .request-list-component .request-date {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .request-list-component .scheduled-date:after {
+    content: "•";
+    margin: 0 0.5rem;
+  }
+}

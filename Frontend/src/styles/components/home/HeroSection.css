@@ -1,0 +1,281 @@
+/* Hero Section Styles */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - var(--header-height));
+  max-height: 800px;
+}
+
+/* Carousel Styles */
+.hero-section .hero-carousel {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hero-section .carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-section .carousel-slide::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
+}
+
+.hero-section .carousel-slide.active {
+  opacity: 1;
+}
+
+.hero-section .carousel-content {
+  position: relative;
+  z-index: 1;
+  color: white;
+  text-align: center;
+  max-width: 800px;
+  padding: 0 2rem;
+}
+
+.hero-section .carousel-category {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.hero-section .carousel-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero-section .carousel-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.hero-section .carousel-control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+}
+
+.hero-section .carousel-control:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.hero-section .carousel-control.prev {
+  left: 2rem;
+}
+
+.hero-section .carousel-control.next {
+  right: 2rem;
+}
+
+.hero-section .carousel-indicators {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.hero-section .indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero-section .indicator.active {
+  background: white;
+  transform: scale(1.2);
+}
+
+/* Search Container */
+.hero-section .hero-container {
+  position: absolute;
+  bottom: 3rem;
+  left: 0;
+  right: 0;
+  /* background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent); */
+  padding: 4rem 2rem 2rem;
+  z-index: 2;
+}
+
+.hero-section .hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-section .search-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.hero-section .search-wrapper {
+  display: flex;
+  gap: 1rem;
+}
+
+.hero-section .search-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.hero-section .search-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  left: 1rem;
+  font-size: 1.25rem;
+}
+
+.hero-section .search-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.hero-section .search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hero-section .search-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hero-section .search-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: white;
+  color: #1e293b;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hero-section .search-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section .search-arrow {
+  transition: transform 0.2s ease;
+}
+
+.hero-section .search-button:hover .search-arrow {
+  transform: translateX(4px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .hero-section .carousel-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-section .carousel-subtitle {
+    font-size: 1.125rem;
+  }
+
+  .hero-section .hero-container {
+    padding: 3rem 1rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section .carousel-title {
+    font-size: 2rem;
+  }
+
+  .hero-section .carousel-control {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hero-section .carousel-control.prev {
+    left: 1rem;
+  }
+
+  .hero-section .carousel-control.next {
+    right: 1rem;
+  }
+
+  .hero-section .search-wrapper {
+    flex-direction: column;
+  }
+
+  .hero-section .search-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section .carousel-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-section .carousel-subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-section .carousel-control {
+    display: none;
+  }
+}

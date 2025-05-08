@@ -1,0 +1,67 @@
+/* Main CSS Entry Point */
+
+/* Base styles */
+@import "./base/variables.css";
+@import "./base/reset.css";
+@import "./base/global.css";
+
+/* Shared Components */
+@import "./components/shared/Navbar.css";
+@import "./components/shared/Footer.css";
+
+/* Home Components */
+@import "./components/home/HeroSection.css";
+@import "./components/home/FeaturedServices.css";
+@import "./components/home/HowItWorks.css";
+@import "./components/home/TopProviders.css";
+@import "./components/home/Testimonials.css";
+@import "./components/home/CallToAction.css";
+
+/* Page-specific styles */
+@import "./pages/Auth.css";
+@import "./pages/Services.css";
+@import "./pages/Account.css";
+@import "./pages/Requests.css";
+
+/* Admin Pages Styles */
+@import "./components/admin/AdminLayout.css";
+@import "./components/admin/ServicesManagement.css";
+@import "./components/admin/EditServiceModal.css";
+@import "./components/admin/DeleteConfirmationDialog.css";
+@import "./components/admin/AdminDashboard.css";
+@import "./components/admin/ProvidersManagement.css";
+@import "./components/admin/UserManagement.css";
+
+
+/* Request Wizard Styles */
+@import "./components/requests/RequestWizard.css";
+@import "./components/requests/RequestWizardTester.css";
+@import "./components/requests/RequestList.css";
+@import "./components/requests/LocationDetails.css";
+@import "./components/requests/ServiceSelection.css";
+@import "./components/requests/Requirements.css";
+@import "./components/requests/SchedulePreference.css";
+@import "./components/requests/RequestSummary.css";
+@import "./components/requests/OffersList.css";
+@import "./components/requests/RequestDetails.css";
+
+
+
+/* Provider Dashboard Styles */
+@import "./components/providers/ProviderDashboard.css";
+@import "./components/providers/RequestsFeed.css";
+@import "./components/providers/RequestDetail.css";
+@import "./pages/CreateOfferPage.css";
+@import "./pages/RequestDetailsPage.css";
+
+
+
+
+
+/* Account Management Styles */
+@import "./components/account/AccountSettings.css";
+@import "./components/account/ProviderAccountSettings.css";
+
+/* External libraries */
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");

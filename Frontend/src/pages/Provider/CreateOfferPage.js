@@ -1,0 +1,531 @@
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+
+const CreateOfferPage = () => {
+  const { requestId } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [request, setRequest] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  // Form state
+  const [offerData, setOfferData] = useState({
+    price: "",
+    estimatedDuration: "",
+    description: "",
+    availableDate: "",
+    availableTime: "",
+    materials: "",
+    termsAccepted: false,
+  });
+
+  // Form validation
+  const [formErrors, setFormErrors] = useState({});
+
+  // Fetch request details
+  useEffect(() => {
+    const fetchRequestDetails = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // In a real app, make an API call to fetch the request details
+        // For demo purposes, using mock data
+
+        // Simulate API call
+        setTimeout(() => {
+          // Mock request data
+          const mockRequest = {
+            id: requestId,
+            serviceType: "Home Cleaning",
+            status: "open",
+            createdAt: new Date(
+              Date.now() - 2 * 24 * 60 * 60 * 1000
+            ).toISOString(), // 2 days ago
+            scheduledDate: "2023-12-15",
+            scheduledTime: "14:00",
+            address: "123 Main St, Boston, MA 02108",
+            description:
+              "Need help with deep cleaning of a 2-bedroom apartment, including kitchen and bathrooms.",
+            budget: { min: 80, max: 120, type: "fixed" },
+            isUrgent: false,
+          };
+
+          setRequest(mockRequest);
+
+          // Pre-fill the date and time fields with the requested schedule
+          setOfferData((prev) => ({
+            ...prev,
+            availableDate: mockRequest.scheduledDate,
+            availableTime: mockRequest.scheduledTime,
+          }));
+
+          setLoading(false);
+        }, 1000);
+      } catch (err) {
+        console.error("Error fetching request details:", err);
+        setError("Failed to load request details. Please try again.");
+        setLoading(false);
+      }
+    };
+
+    fetchRequestDetails();
+  }, [requestId]);
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setOfferData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+
+    // Clear error when field is edited
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: null,
+      }));
+    }
+  };
+
+  // Validate form
+  const validateForm = () => {
+    const errors = {};
+
+    if (
+      !offerData.price ||
+      isNaN(offerData.price) ||
+      Number(offerData.price) <= 0
+    ) {
+      errors.price = "Please enter a valid price";
+    }
+
+    if (
+      !offerData.estimatedDuration ||
+      isNaN(offerData.estimatedDuration) ||
+      Number(offerData.estimatedDuration) <= 0
+    ) {
+      errors.estimatedDuration = "Please enter a valid duration";
+    }
+
+    if (!offerData.description.trim()) {
+      errors.description = "Please provide a description of your services";
+    } else if (offerData.description.length < 50) {
+      errors.description = "Description must be at least 50 characters";
+    }
+
+    if (!offerData.availableDate) {
+      errors.availableDate = "Please select an available date";
+    }
+
+    if (!offerData.availableTime) {
+      errors.availableTime = "Please select an available time";
+    }
+
+    if (!offerData.termsAccepted) {
+      errors.termsAccepted = "You must accept the terms and conditions";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      // Scroll to the first error
+      const firstErrorField = Object.keys(formErrors)[0];
+      if (firstErrorField) {
+        document.querySelector(`[name="${firstErrorField}"]`).scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // In a real app, make an API call to submit the offer
+      // For demo purposes, simulate a success response after a delay
+
+      // Create the offer object
+      const offer = {
+        requestId,
+        providerId: user?.id || "provider123",
+        price: Number(offerData.price),
+        estimatedDuration: Number(offerData.estimatedDuration),
+        description: offerData.description,
+        availableDate: offerData.availableDate,
+        availableTime: offerData.availableTime,
+        materials: offerData.materials,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+      };
+
+      // Simulate API call
+      setTimeout(() => {
+        console.log("Offer submitted:", offer);
+        setSuccessMessage(
+          "Your offer has been successfully submitted! The client will be notified."
+        );
+        setSubmitting(false);
+
+        // Redirect after a delay
+        setTimeout(() => {
+          navigate("/provider/dashboard");
+        }, 3000);
+      }, 1500);
+    } catch (err) {
+      console.error("Error submitting offer:", err);
+      setError("Failed to submit your offer. Please try again.");
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="create-offer-page">
+        <div className="container">
+          <div className="loading-spinner">
+            <i className="fas fa-spinner fa-spin"></i>
+            <span>Loading request details...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="create-offer-page">
+        <div className="container">
+          <div className="error-message">
+            <i className="fas fa-exclamation-circle"></i>
+            <p>{error}</p>
+            <button
+              className="btn btn-primary"
+              onClick={() => window.location.reload()}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!request) {
+    return (
+      <div className="create-offer-page">
+        <div className="container">
+          <div className="error-message">
+            <i className="fas fa-exclamation-circle"></i>
+            <p>Request not found.</p>
+            <Link to="/provider/dashboard" className="btn btn-primary">
+              Back to Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (successMessage) {
+    return (
+      <div className="create-offer-page">
+        <div className="container">
+          <div className="success-message">
+            <i className="fas fa-check-circle"></i>
+            <h2>Offer Submitted!</h2>
+            <p>{successMessage}</p>
+            <p>You will be redirected to the dashboard shortly...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="create-offer-page">
+      <div className="container">
+        <div className="page-header">
+          <div className="breadcrumb">
+            <Link to="/provider/dashboard">Dashboard</Link> {" > "}
+            {location.state?.from === "requestDetails" ? (
+              <>
+                <Link to={`/provider/request/${requestId}`}>
+                  Request Details
+                </Link>{" "}
+                {" > "}
+              </>
+            ) : null}
+            <span>Create Offer</span>
+          </div>
+        </div>
+
+        <div className="create-offer-container">
+          <div className="request-summary-card">
+            <div className="section-title">Request Summary</div>
+            <div className="request-info">
+              <h3>{request.serviceType}</h3>
+              <div className="request-detail">
+                <i className="fas fa-map-marker-alt"></i>
+                <span>{request.address}</span>
+              </div>
+              <div className="request-detail">
+                <i className="fas fa-calendar"></i>
+                <span>
+                  Requested for:{" "}
+                  {new Date(request.scheduledDate).toLocaleDateString()} at{" "}
+                  {request.scheduledTime}
+                </span>
+              </div>
+              <div className="request-detail">
+                <i className="fas fa-money-bill-wave"></i>
+                <span>
+                  Budget: ${request.budget.min} - ${request.budget.max}
+                </span>
+              </div>
+              <div className="request-detail description">
+                <i className="fas fa-file-alt"></i>
+                <span>{request.description}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="create-offer-form-card">
+            <div className="section-title">Create Your Offer</div>
+            <form onSubmit={handleSubmit} className="offer-form">
+              <div className="form-section">
+                <h4>Pricing and Duration</h4>
+
+                <div className="form-group">
+                  <label htmlFor="price">
+                    Your Price ($) <span className="required">*</span>
+                  </label>
+                  <div className="input-with-icon">
+                    {/* <i className="fas fa-dollar-sign"></i> */}
+                    <input
+                      type="number"
+                      id="price"
+                      name="price"
+                      min="1"
+                      step="0.01"
+                      value={offerData.price}
+                      onChange={handleInputChange}
+                      className={formErrors.price ? "error" : ""}
+                      required
+                    />
+                  </div>
+                  {formErrors.price && (
+                    <div className="error-message">{formErrors.price}</div>
+                  )}
+                  <small>
+                    The client's budget is ${request.budget.min} - $
+                    {request.budget.max}
+                  </small>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="estimatedDuration">
+                    Estimated Duration (hours){" "}
+                    <span className="required">*</span>
+                  </label>
+                  <div className="input-with-icon">
+                    {/* <i className="fas fa-clock"></i> */}
+                    <input
+                      type="number"
+                      id="estimatedDuration"
+                      name="estimatedDuration"
+                      min="0.5"
+                      step="0.5"
+                      value={offerData.estimatedDuration}
+                      onChange={handleInputChange}
+                      className={formErrors.estimatedDuration ? "error" : ""}
+                      required
+                    />
+                  </div>
+                  {formErrors.estimatedDuration && (
+                    <div className="error-message">
+                      {formErrors.estimatedDuration}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h4>Service Details</h4>
+
+                <div className="form-group">
+                  <label htmlFor="description">
+                    Description of Your Services{" "}
+                    <span className="required">*</span>
+                  </label>
+                  <textarea
+                    id="description"
+                    name="description"
+                    rows="4"
+                    value={offerData.description}
+                    onChange={handleInputChange}
+                    className={formErrors.description ? "error" : ""}
+                    placeholder="Describe how you'll complete this service, your experience, and why you're the best choice for this job."
+                    required
+                  ></textarea>
+                  {formErrors.description && (
+                    <div className="error-message">
+                      {formErrors.description}
+                    </div>
+                  )}
+                  <div className="character-count">
+                    {offerData.description.length}/500 characters (minimum 50)
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="materials">
+                    Materials and Equipment (optional)
+                  </label>
+                  <textarea
+                    id="materials"
+                    name="materials"
+                    rows="3"
+                    value={offerData.materials}
+                    onChange={handleInputChange}
+                    placeholder="List any materials or equipment you'll provide or need from the client."
+                  ></textarea>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h4>Availability</h4>
+
+                <div className="form-row">
+                  <div className="form-group half">
+                    <label htmlFor="availableDate">
+                      Available Date <span className="required">*</span>
+                    </label>
+                    <div className="input-with-icon">
+                      {/* <i className="fas fa-calendar-alt"></i> */}
+                      <input
+                        type="date"
+                        id="availableDate"
+                        name="availableDate"
+                        value={offerData.availableDate}
+                        onChange={handleInputChange}
+                        className={formErrors.availableDate ? "error" : ""}
+                        min={new Date().toISOString().split("T")[0]}
+                        required
+                      />
+                    </div>
+                    {formErrors.availableDate && (
+                      <div className="error-message">
+                        {formErrors.availableDate}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-group half">
+                    <label htmlFor="availableTime">
+                      Available Time <span className="required">*</span>
+                    </label>
+                    <div className="input-with-icon">
+                      {/* <i className="fas fa-clock"></i> */}
+                      <input
+                        type="time"
+                        id="availableTime"
+                        name="availableTime"
+                        value={offerData.availableTime}
+                        onChange={handleInputChange}
+                        className={formErrors.availableTime ? "error" : ""}
+                        required
+                      />
+                    </div>
+                    {formErrors.availableTime && (
+                      <div className="error-message">
+                        {formErrors.availableTime}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-message">
+                  <i className="fas fa-info-circle"></i>
+                  <span>
+                    The client requested service on{" "}
+                    <strong>
+                      {new Date(request.scheduledDate).toLocaleDateString()}
+                    </strong>{" "}
+                    at <strong>{request.scheduledTime}</strong>. If you're not
+                    available at this time, please propose an alternative.
+                  </span>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <div className="form-group checkbox">
+                  <input
+                    type="checkbox"
+                    id="termsAccepted"
+                    name="termsAccepted"
+                    checked={offerData.termsAccepted}
+                    onChange={handleInputChange}
+                    className={formErrors.termsAccepted ? "error" : ""}
+                  />
+                  <label htmlFor="termsAccepted">
+                    I confirm that I can perform this service as described, and
+                    I agree to the{" "}
+                    <Link to="/terms" target="_blank">
+                      Terms and Conditions
+                    </Link>
+                    . <span className="required">*</span>
+                  </label>
+                </div>
+                {formErrors.termsAccepted && (
+                  <div className="error-message">
+                    {formErrors.termsAccepted}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-actions">
+                <Link
+                  to={`/provider/request/${requestId}`}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </Link>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit Offer"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreateOfferPage;

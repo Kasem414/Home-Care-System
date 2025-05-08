@@ -1,0 +1,172 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  overflow-x: hidden;
+}
+
+/* Sidebar Styles */
+.admin-sidebar {
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  position: fixed; /* Change back to fixed */
+  top: 76px; /* Height of the navbar */
+  left: 0;
+  height: calc(100vh - 76px); /* Subtract navbar height */
+  z-index: 100;
+}
+
+.admin-sidebar.open {
+  width: 250px;
+}
+
+.admin-sidebar.closed {
+  width: 70px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: var(--text-medium);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+}
+
+.sidebar-nav {
+  padding: 1rem 0;
+  height: calc(100% - 80px); /* Subtract header height */
+  overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll on nav */
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: var(--text-medium);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar-item:hover {
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+}
+
+.sidebar-item.active {
+  background-color: var(--primary-color-light);
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.sidebar-item i {
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+  margin-right: 1rem;
+}
+
+.sidebar-item-label {
+  transition: opacity 0.3s ease;
+}
+
+.admin-sidebar.closed .sidebar-item-label {
+  opacity: 0;
+  width: 0;
+}
+
+/* Main Content Styles */
+.admin-main {
+  flex: 1;
+  margin-left: 250px;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+  min-height: calc(100vh - 64px); /* Subtract navbar height */
+  overflow-x: hidden; /* Prevent horizontal scroll on main content */
+  width: calc(100% - 250px); /* Ensure main content takes remaining width */
+}
+
+.admin-sidebar.closed + .admin-main {
+  margin-left: 70px;
+  width: calc(100% - 70px); /* Adjust width when sidebar is closed */
+}
+
+/* Content Transition */
+.admin-main > * {
+  animation: fadeIn 0.3s ease;
+  max-width: 100%; /* Ensure content doesn't overflow */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .admin-sidebar.open {
+    width: 200px;
+  }
+
+  .admin-main {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    top: 69px;
+    height: calc(100vh - 69px);
+  }
+  .sidebar-header {
+    display: none;
+  }
+  .admin-main {
+    margin-left: 0;
+    width: 100%;
+    min-height: calc(100vh - 56px);
+    padding: 1rem;
+  }
+}

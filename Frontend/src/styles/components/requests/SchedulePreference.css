@@ -1,0 +1,213 @@
+/* Schedule Preference Component */
+.schedule-preference .schedule-preference {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Form Section */
+.schedule-preference .form-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.schedule-preference .form-section h2 {
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.schedule-preference .section-description {
+  color: var(--text-medium);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* Schedule Options */
+.schedule-preference .schedule-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.schedule-preference .schedule-option {
+  margin-bottom: 1rem;
+}
+
+.schedule-preference .option-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.schedule-preference .option-card:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-color-light);
+}
+
+.schedule-preference .option-card.selected {
+  border-color: var(--primary-light);
+  background: var(--primary-light);
+  color: white;
+}
+
+.schedule-preference .option-radio {
+  margin-right: 1rem;
+}
+
+.schedule-preference .option-content h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: inherit;
+}
+
+.schedule-preference .option-content p {
+  font-size: 0.875rem;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.schedule-preference .option-details {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: white;
+}
+
+/* Form Groups */
+.schedule-preference .form-group {
+  margin-bottom: 2rem;
+}
+
+.schedule-preference .form-group label {
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.schedule-preference .form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.schedule-preference .form-row .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Checkbox Groups */
+.schedule-preference .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.schedule-preference .checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.schedule-preference .checkbox-item input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.schedule-preference .checkbox-item input[type="checkbox"]:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.schedule-preference .checkbox-item label {
+  margin: 0;
+  cursor: pointer;
+  color: var(--text-medium);
+}
+
+/* Error Message */
+.schedule-preference .error-message {
+  color: var(--danger-color);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Wizard Actions */
+.schedule-preference .wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .schedule-preference {
+    padding: 1rem;
+  }
+
+  .schedule-preference .form-section {
+    padding: 1.5rem;
+  }
+
+  .schedule-preference .form-row {
+    flex-direction: column;
+  }
+
+  .schedule-preference .wizard-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .schedule-preference .wizard-actions button {
+    width: 100%;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .schedule-preference .form-section,
+  .schedule-preference .option-card,
+  .schedule-preference .option-details {
+    background: var(--surface-dark);
+    border-color: var(--border-dark);
+  }
+
+  .schedule-preference .form-section h2,
+  .schedule-preference .form-group label {
+    color: var(--text-light);
+  }
+
+  .schedule-preference .section-description {
+    color: var(--text-light-secondary);
+  }
+
+  .schedule-preference .option-card:hover {
+    background: var(--primary-color-dark);
+  }
+
+  .schedule-preference .option-card.selected {
+    background: var(--primary-color);
+  }
+
+  .schedule-preference .checkbox-item input[type="checkbox"] {
+    border-color: var(--border-dark);
+  }
+
+  .schedule-preference .checkbox-item input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+}

@@ -1,0 +1,142 @@
+/* Location Details Component */
+.location-details .location-details {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Form Section */
+.location-details .form-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.location-details .form-section h2 {
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.location-details .section-description {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* Form Groups */
+.location-details .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.location-details .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.location-details .form-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.location-details .form-row .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Form Controls */
+.location-details .form-group select,
+.location-details .form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.location-details .form-group select:focus,
+.location-details .form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-light);
+}
+
+.location-details .form-group select.error,
+.location-details .form-group textarea.error {
+  border-color: var(--danger-color);
+}
+
+.location-details .error-message {
+  color: var(--danger-color);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Wizard Actions */
+.location-details .wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .location-details {
+    padding: 1rem;
+  }
+
+  .location-details .form-section {
+    padding: 1.5rem;
+  }
+
+  .location-details .form-row {
+    flex-direction: column;
+  }
+
+  .location-details .wizard-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .location-details .wizard-actions button {
+    width: 100%;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .location-details .form-section {
+    background: var(--surface-dark);
+  }
+
+  .location-details .form-section h2,
+  .location-details .form-group label {
+    color: var(--text-light);
+  }
+
+  .location-details .section-description {
+    color: var(--text-light-secondary);
+  }
+
+  .location-details .form-group select,
+  .location-details .form-group textarea {
+    background: var(--surface-dark);
+    border-color: var(--border-dark);
+    color: var(--text-light);
+  }
+
+  .form-group select:focus,
+  .location-details .form-group textarea:focus {
+    border-color: var(--primary-color);
+  }
+}

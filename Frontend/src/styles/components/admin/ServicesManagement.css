@@ -1,0 +1,550 @@
+.services-management {
+  padding: 2rem;
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.services-management .table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+}
+
+.services-management .table-header h2 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 1.5rem;
+}
+
+.services-management .action-area {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.services-management .add-service-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.services-management .add-service-btn:hover {
+  background-color: var(--primary-color-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.services-management .add-service-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.services-management .search-box {
+  position: relative;
+  width: 300px;
+}
+
+.services-management .search-box input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.services-management .search-box input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-light);
+}
+
+.services-management .search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+}
+
+.services-management .table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.services-management .table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.services-management .table-container::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+.services-management .table-container::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.services-management .table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+.services-management table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--white);
+  min-width: 800px;
+}
+
+.services-management th {
+  background-color: var(--bg-light);
+  color: var(--text-medium);
+  font-weight: 500;
+  text-align: left;
+  padding: 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.services-management th:hover {
+  background-color: var(--border-color);
+}
+
+.services-management td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-medium);
+  white-space: nowrap;
+}
+
+.services-management tr:hover {
+  background-color: var(--bg-light);
+}
+
+/* Namespace status badge styles to avoid conflicts */
+.services-management .admin-services .status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.services-management .admin-services .status-badge.active {
+  background-color: var(--success-color-light);
+  color: var(--success-color);
+}
+
+.services-management .admin-services .status-badge.inactive {
+  background-color: var(--danger-color-light);
+  color: var(--danger-color);
+}
+
+.services-management .action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.services-management .action-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.services-management .action-btn.edit {
+  color: var(--info-color);
+}
+
+.services-management .action-btn.edit:hover {
+  background-color: var(--info-color-light);
+}
+
+.services-management .action-btn.delete {
+  color: var(--danger-color);
+}
+
+.services-management .action-btn.delete:hover {
+  background-color: var(--danger-color-light);
+}
+
+.services-management .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.services-management .pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--white);
+  color: var(--text-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.services-management .pagination button:hover:not(:disabled) {
+  background-color: var(--bg-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.services-management .pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.services-management .pagination span {
+  color: var(--text-medium);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* Modal Styles */
+.services-management .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.services-management .modal-content {
+  background-color: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.services-management .add-service-modal {
+  padding: 0;
+}
+
+.services-management .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-light);
+  border-radius: 12px 12px 0 0;
+}
+
+.services-management .modal-header h3 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.services-management .close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.services-management .close-btn:hover {
+  color: var(--danger-color);
+}
+
+.services-management .add-service-modal form {
+  padding: 1.5rem;
+}
+
+.services-management .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.services-management .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-medium);
+  font-size: 0.875rem;
+}
+
+.services-management.form-group input,
+.services-management .form-group select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  background-color: var(--white);
+  color: var(--text-dark);
+}
+
+.services-management .form-group input:focus,
+.services-management .form-group select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-light);
+}
+
+.services-management .form-group input::placeholder {
+  color: var(--text-light);
+}
+
+.services-management .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.services-management .cancel-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--white);
+  color: var(--text-medium);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.services-management .cancel-btn:hover {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+.services-management .save-btn {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.services-management .save-btn:hover {
+  background-color: var(--primary-color-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.services-management .save-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .services-management {
+    padding: 1.5rem;
+  }
+
+  .services-management .table-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .services-management .action-area {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .services-management .search-box {
+    min-width: 60%;
+  }
+
+  .services-management .add-service-btn {
+    font-size: 0.875rem;
+    padding: 0.65rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .services-management {
+    padding: 1rem;
+  }
+
+  .services-management .table-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .services-management .action-area {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .services-management .search-box {
+    width: 100%;
+  }
+
+  .services-management .add-service-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  th,
+  .services-management td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .services-management .admin-services .status-badge {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .services-management .action-buttons {
+    gap: 0.25rem;
+  }
+
+  .services-management .action-btn {
+    padding: 0.4rem;
+    font-size: 0.875rem;
+  }
+
+  .services-management .pagination {
+    gap: 0.5rem;
+  }
+
+  .services-management .pagination button {
+    padding: 0.4rem 0.75rem;
+    min-width: 80px;
+    font-size: 0.875rem;
+  }
+
+  .services-management .modal-content {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-management {
+    padding: 0.75rem;
+  }
+
+  .services-management .table-header h2 {
+    font-size: 1.125rem;
+  }
+
+  th,
+  .services-management td {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .services-management .admin-services .status-badge {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.65rem;
+  }
+
+  .services-management .action-btn {
+    padding: 0.3rem;
+    font-size: 0.75rem;
+  }
+
+  .services-management .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .services-management .pagination button {
+    width: 100%;
+  }
+
+  .services-management .modal-header {
+    padding: 1rem;
+  }
+
+  .services-management .add-service-modal form {
+    padding: 1rem;
+  }
+
+  .services-management .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .services-management .modal-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cancel-btn,
+  .services-management .save-btn {
+    width: 100%;
+    padding: 0.6rem 1rem;
+  }
+}

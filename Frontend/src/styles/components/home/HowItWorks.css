@@ -1,0 +1,191 @@
+.how-it-works-section .how-it-works-section {
+  background-color: #f8fafc;
+  position: relative;
+  padding: 6rem 0;
+  overflow: hidden;
+}
+
+.how-it-works-section .section-header {
+  margin-bottom: 4rem;
+}
+
+.how-it-works-section .section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #1e293b;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.how-it-works-section .section-subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.how-it-works-section .steps-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0 4rem;
+  position: relative;
+  gap: 2rem;
+}
+
+.how-it-works-section .step-card {
+  flex: 1;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+  max-width: 280px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  transition: all 0.3s ease;
+}
+
+.how-it-works-section .step-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.how-it-works-section .step-number {
+  width: 40px;
+  height: 40px;
+  background: var(--primary-light);
+  color: white;
+  font-weight: 600;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.how-it-works-section .step-icon {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(99, 102, 241, 0.1);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.how-it-works-section .step-card:hover .step-icon {
+  transform: scale(1.1);
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.how-it-works-section .step-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.how-it-works-section .step-description {
+  font-size: 1rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.how-it-works-section .steps-connection {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.how-it-works-section .connection-line {
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #14b8a6);
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 2px;
+}
+
+.how-it-works-section .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.how-it-works-section .btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+}
+
+.how-it-works-section .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px -1px rgba(99, 102, 241, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .how-it-works-section .steps-container {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .how-it-works-section .step-card {
+    flex: 0 0 calc(50% - 2rem);
+    margin-bottom: 2rem;
+  }
+
+  .how-it-works-section .connection-line {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .how-it-works-section {
+    padding: 4rem 0;
+  }
+
+  .how-it-works-section .section-title {
+    font-size: 2rem;
+  }
+
+  .how-it-works-section .step-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .how-it-works-section {
+    padding: 3rem 0;
+  }
+
+  .how-it-works-section .section-title {
+    font-size: 1.75rem;
+  }
+
+  .how-it-works-section .step-card {
+    padding: 1.5rem;
+  }
+}

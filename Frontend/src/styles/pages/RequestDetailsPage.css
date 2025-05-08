@@ -1,0 +1,53 @@
+/* RequestDetailsPage CSS */
+.request-details-page {
+  min-height: calc(
+    100vh - 64px - 60px
+  ); /* Adjust based on navbar and footer heights */
+  background-color: var(--bg-color);
+  padding: 20px 0 40px;
+}
+
+/* Fade-in animation for the page */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.request-details-page {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Toast notification styles for cancellation */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--success-color);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toast-notification.error {
+  background-color: var(--danger-color);
+}
+
+.toast-notification i {
+  font-size: 20px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .request-details-page {
+    background-color: var(--bg-dark);
+  }
+}
