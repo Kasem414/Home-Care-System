@@ -9,7 +9,7 @@ class ServiceCategory(models.Model):
         primary_key=True
     )
     name = models.CharField(
-        max_length=255,
+        max_length=100,
         unique=True,  # Enforce uniqueness at the DB level
     )
     description = models.TextField(
@@ -33,41 +33,47 @@ class ServiceCategory(models.Model):
         """
         return self.name
 
-class ServiceRequest(models.Model):
-    # Auto-incrementing primary key
-    id = models.AutoField(primary_key=True)
-
-    customer_id = models.IntegerField()  # Provided in header (X-User-Id)
-    category = models.ForeignKey(ServiceCategory,on_delete=models.CASCADE,related_name='requests')  # Foreign key to ServiceCategory (assumed integer)
-
-    description = models.TextField()
+class Location(models.Model):
     street_address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     region = models.CharField(max_length=100)
-    additionalInfo = models.TextField(blank=True, null=True)
+    additional_info = models.TextField(blank=True, null=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
-    preferredDate = models.DateField(blank=True, null=True)
-    preferredTime = models.TimeField(blank=True, null=True)
 
-    flexibleDays = models.JSONField(blank=True, null=True)
-    flexibleTimes = models.JSONField(blank=True, null=True)
+class Schedule(models.Model):
+    preferred_date = models.DateField(blank=True, null=True)
+    preferred_time = models.TimeField(blank=True, null=True)
+    schedule_type = models.CharField(max_length=20, choices=[('specific', 'Specific'), ('flexible', 'Flexible')])
+    flexible_schedule_days = models.JSONField(blank=True, null=True)
+    flexible_time_slots = models.JSONField(blank=True, null=True)
 
-    budget_min_hourly = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    budget_max_hourly = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    fixed_price_offer = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
+class Budget(models.Model):
+    budget_type = models.CharField(max_length=20, choices=[('hourly', 'Hourly'), ('fixed', 'Fixed')])
+    budget_min_hourly = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    budget_max_hourly = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    fixed_price_offer = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-    status = models.CharField(max_length=50, default="Pending")
-    matched_provider_id = models.IntegerField(blank=True, null=True)
 
-    auto_expire_at = models.DateTimeField(blank=True, null=True)
+class ServiceRequest(models.Model):
+    customer_id = models.IntegerField()
+    service_type = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE)
+    description = models.TextField()
+    is_urgent = models.BooleanField(default=False)
+
+    location = models.OneToOneField(Location, on_delete=models.CASCADE)
+    schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE)
+    budget = models.OneToOneField(Budget, on_delete=models.CASCADE)
+    preferred_qualifications = models.JSONField(blank=True, null=True)
+    status = models.CharField(max_length=50, default='submitted')
+    matched_provider_id = models.IntegerField(null=True, blank=True)
+    auto_expire_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    preferredQualifications = models.CharField(max_length=50,blank=True,null=True)
-    def str(self):
-        return f"ServiceRequest #{self.id} - Category: {self.category_id}"
 
+    def str(self):
+        return f"Request #{self.id} - {self.description[:30]}"
 
 class ServiceRequestAttachment(models.Model):
     id = models.AutoField(primary_key=True)
