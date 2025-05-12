@@ -11,58 +11,56 @@ class ServiceRequestAttachmentSerializer(serializers.ModelSerializer):
             return request.build_absolute_url(obj.image.url)
         return obj.image.url
 
+
 class ServiceRequestSerializer(serializers.ModelSerializer):
     attachments = ServiceRequestAttachmentSerializer(many=True, read_only=True)
-    category = serializers.PrimaryKeyRelatedField(queryset=ServiceCategory.objects.all())
-    category_name = serializers.ReadOnlyField(source='category.name')
-    # budget_min_hourly = serializers.DecimalField(source='min')
-    # budget_max_hourly = serializers.DecimalField(source='max')
-    # fixed_price_offer = serializers.DecimalField(source='')
+    service_type = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=ServiceCategory.objects.all()
+    )
+
     class Meta:
         model = ServiceRequest
         fields = [
-            'id',
-            'customer_id',
-            'category',
-            'description',
-            'street_address',
-            'city',
-            'region',
-            'additionalInfo',
-            'preferredDate',
-            'preferredTime',
-            'flexibleDays',
-            'flexibleTimes',
-            'budget_min_hourly',
-            'budget_max_hourly',
-            'fixed_price_offer',
-            'latitude',
-            'longitude',
-            'status',
-            'matched_provider_id',
-            'auto_expire_at',
-            'created_at',
-            'attachments',
-            'preferredQualifications',
-            'category_name'
+            'id', 'customer_id', 'service_type', 'is_urgent',
+            'street_address', 'city', 'region', 'additional_info',
+            'latitude', 'longitude',
+            'preferred_date', 'preferred_time', 'schedule_type',
+            'flexible_schedule_days', 'flexible_time_slots',
+            'description', 'budget_type', 'budget_min_hourly',
+            'budget_max_hourly', 'fixed_price_offer',
+            'preferred_qualifications', 'status',
+            'matched_provider_id', 'auto_expire_at', 'created_at','attachments'
         ]
-        read_only_fields = ['status', 'matched_provider_id', 'auto_expire_at', 'created_at']
+        read_only_fields = ['id', 'created_at','status',
+            'matched_provider_id', 'auto_expire_at',]
 
-    def validate(self, data):
-        if self.partial:
-            return data
-        has_fixed = data.get('preferred_date') and data.get('preferred_time')
-        has_flexible = data.get('flexible_schedule_days') and data.get('flexible_time_slots')
+    def to_internal_value(self, data):
+        # Unpack nested structures
+        location = data.pop('location', {})
+        schedule = data.pop('schedule', {})
+        requirements = data.pop('requirements', {})
 
-        if not has_fixed and not has_flexible:
-            raise serializers.ValidationError("Either fixed schedule or flexible schedule must be provided.")
+        data.update({
+            'street_address': location.get('street_address'),
+            'city': location.get('city'),
+            'region': location.get('region'),
+            'additional_info': location.get('additional_info'),
+            'latitude': location.get('latitude'),
+            'longitude': location.get('longitude'),
 
-        if has_fixed and has_flexible:
-            raise serializers.ValidationError("Either fixed schedule or flexible schedule must be provided, not both.")
+            'preferred_date': schedule.get('preferredDate'),
+            'preferred_time': schedule.get('preferredTime'),
+            'schedule_type': schedule.get('flexibility'),
+            'flexible_schedule_days': schedule.get('flexibleDays'),
+            'flexible_time_slots': schedule.get('flexibleTimes'),
 
-        if (data.get('budget_min_hourly') and data.get('budget_max_hourly')) and (
-            data['budget_min_hourly'] > data['budget_max_hourly']
-        ):
-            raise serializers.ValidationError("Minimum hourly rate must not exceed maximum hourly rate.")
+            'description': requirements.get('description'),
+            'budget_type': (requirements.get('budget') or {}).get('type'),
+            'budget_min_hourly': (requirements.get('budget') or {}).get('min'),
+            'budget_max_hourly': (requirements.get('budget') or {}).get('max'),
+            'fixed_price_offer': (requirements.get('budget') or {}).get('fixed_price_offer'),
+            'preferred_qualifications': requirements.get('preferredQualifications')
+        })
 
-        return data
+        return super().to_internal_value(data)
