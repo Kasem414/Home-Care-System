@@ -27,13 +27,23 @@ class ServiceCategory(models.Model):
         verbose_name_plural = "Service Categories"
         ordering = ['name']
 
-    def str(self):
+    def __str__(self):
         """
         String representation of the service category (used in Django Admin and shell).
         """
         return self.name
 
-class Location(models.Model):
+
+class ServiceRequest(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    # Basic Info
+    customer_id = models.IntegerField()
+    service_type = models.ForeignKey(ServiceCategory, to_field='name', db_column='service_type', on_delete=models.CASCADE)
+    description = models.TextField()
+    is_urgent = models.BooleanField(default=False)
+
+    # Location
     street_address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     region = models.CharField(max_length=100)
@@ -41,38 +51,31 @@ class Location(models.Model):
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
 
-
-class Schedule(models.Model):
+    # Schedule
     preferred_date = models.DateField(blank=True, null=True)
     preferred_time = models.TimeField(blank=True, null=True)
-    schedule_type = models.CharField(max_length=20, choices=[('specific', 'Specific'), ('flexible', 'Flexible')])
+    schedule_type = models.CharField(
+        max_length=20,
+        choices=[('specific', 'Specific'), ('flexible', 'Flexible')],
+        default='specific'
+    )
     flexible_schedule_days = models.JSONField(blank=True, null=True)
     flexible_time_slots = models.JSONField(blank=True, null=True)
 
-
-class Budget(models.Model):
+    # Budget
     budget_type = models.CharField(max_length=20, choices=[('hourly', 'Hourly'), ('fixed', 'Fixed')])
     budget_min_hourly = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     budget_max_hourly = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     fixed_price_offer = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
-
-class ServiceRequest(models.Model):
-    customer_id = models.IntegerField()
-    service_type = models.ForeignKey(ServiceCategory, on_delete=models.CASCADE)
-    description = models.TextField()
-    is_urgent = models.BooleanField(default=False)
-
-    location = models.OneToOneField(Location, on_delete=models.CASCADE)
-    schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE)
-    budget = models.OneToOneField(Budget, on_delete=models.CASCADE)
+    # Additional Fields
     preferred_qualifications = models.JSONField(blank=True, null=True)
     status = models.CharField(max_length=50, default='submitted')
     matched_provider_id = models.IntegerField(null=True, blank=True)
     auto_expire_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return f"Request #{self.id} - {self.description[:30]}"
 
 class ServiceRequestAttachment(models.Model):
@@ -81,5 +84,5 @@ class ServiceRequestAttachment(models.Model):
     image = models.ImageField(upload_to='service_request_attachments/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
+    def __str__(self):
         return f"Attachment #{self.id} for Request #{self.request.id}"
