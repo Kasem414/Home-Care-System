@@ -4,20 +4,36 @@ from service_app.serializers.service_mgmt import ServiceCategorySerializer
 from service_app.repositories.service_category_repository import ServiceCategoryRepository
 from drf_yasg.utils import swagger_auto_schema
 from service_app.tasks import publish_service_category_event
+from service_app.pagination import CustomPagePagination
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+pagination_parameters = [
+    openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
+    openapi.Parameter('limit', openapi.IN_QUERY, description="Items per page", type=openapi.TYPE_INTEGER),
+]
+
+
 class ServiceCategoryViewSet(viewsets.ViewSet):
     """
     ViewSet to handle CRUD operations for ServiceCategory.
     Only Admin users can create, update, or delete categories.
     """
 
+    @swagger_auto_schema(
+        manual_parameters=pagination_parameters,
+        operation_description="Retrieve a paginated list of service categories."
+    )
     def list(self, request):
         """
         Retrieve all service categories.
         Open to all authenticated users (admin, worker, customer).
         """
         categories = ServiceCategoryRepository.list_categories()
-        serializer = ServiceCategorySerializer(categories, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = CustomPagePagination()
+        result_page = paginator.paginate_queryset(categories,request)
+        serializer = ServiceCategorySerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
     @swagger_auto_schema(request_body=ServiceCategorySerializer)
     def create(self, request):
         """

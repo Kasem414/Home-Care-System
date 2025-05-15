@@ -1,7 +1,7 @@
 from celery import shared_task
 import json
 import logging
-from .event_publisher import publish_event
+from service_app.events.event_publisher import publish_event
 
 logger = logging.getLogger(__name__)
 

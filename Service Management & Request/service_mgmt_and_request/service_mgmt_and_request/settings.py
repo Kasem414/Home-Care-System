@@ -100,7 +100,10 @@ DATABASES = {
         },
 }
 }
-
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'service_app.pagination.CustomPagePagination',
+    'PAGE_SIZE': 10,  # fallback default if limit not provided
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
