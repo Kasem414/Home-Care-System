@@ -58,12 +58,12 @@ class ServiceRequestCreateView(APIView):
 
     @swagger_auto_schema(request_body=ServiceRequestSerializer)
     def post(self, request):
-        user_id = request.headers.get('X-User-Id')
-        user_role = request.headers.get('X-User-Role')
+        user_id = request.data.get('customerId')
+        # user_role = request.headers.get('X-User-Role')
 
-        if user_role != 'Customer' or not user_id:
-            return Response({'message': 'Only customers can submit requests.', 'status_code': status.HTTP_403_FORBIDDEN},
-                            status=status.HTTP_403_FORBIDDEN)
+        # if  not user_id:
+        #     return Response({'message': 'Only customers can submit requests.', 'status_code': status.HTTP_403_FORBIDDEN},
+        #                      status=status.HTTP_403_FORBIDDEN)
 
         form_data = request.data.copy()
         form_data['customer_id'] = user_id

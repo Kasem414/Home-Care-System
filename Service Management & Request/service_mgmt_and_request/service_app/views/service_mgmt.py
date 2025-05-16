@@ -40,11 +40,11 @@ class ServiceCategoryViewSet(viewsets.ViewSet):
         Create a new service category.
         Only accessible by Admin users.
         """
-        role = request.headers.get('X-User-Role')
-        user_id = request.headers.get('X-User-Id')
+        # role = request.headers.get('X-User-Role')
+        user_id = request.data.get('id')
 
-        if role != "Adminstrator":
-            return Response({"detail": "Only Admins can create categories."}, status=status.HTTP_403_FORBIDDEN)
+        # if role != "Adminstrator":
+        #     return Response({"detail": "Only Admins can create categories."}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = ServiceCategorySerializer(data=request.data)
         if serializer.is_valid():
