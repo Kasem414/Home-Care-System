@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 
 class ServiceCategory(models.Model):
     """
@@ -86,3 +88,46 @@ class ServiceRequestAttachment(models.Model):
 
     def __str__(self):
         return f"Attachment #{self.id} for Request #{self.request.id}"
+
+class ServiceOffer(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    request = models.ForeignKey('ServiceRequest', on_delete=models.CASCADE, related_name='offers')
+    provider_id = models.IntegerField()
+
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    available_date = models.DateField()
+    available_time = models.TimeField()
+    estimated_duration = models.DecimalField(max_digits=4, decimal_places=2) 
+
+    materials = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+        ('expired', 'Expired'),
+    ]
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    auto_expire_at = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.auto_expire_at:
+            self.auto_expire_at = timezone.now() + timedelta(days=7)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Offer by Provider {self.provider_id} for Request {self.request.id}"
+
+class UserProfile(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    role = models.CharField(max_length=50)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f"{self.name} ({self.role})"
