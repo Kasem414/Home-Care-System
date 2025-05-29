@@ -1,6 +1,6 @@
 from django.urls import path,include
 from rest_framework.routers import DefaultRouter
-from service_app.views import service_mgmt,service_request,service_offer,customer_offers
+from service_app.views import service_mgmt,service_request,service_offer,customer_offers,provider_requests
 
 # Create router and register our viewsets with it 
 router = DefaultRouter()
@@ -15,6 +15,8 @@ urlpatterns = [
     path("customer/offers/", customer_offers.CustomerOffersView.as_view(), name="customer-offers"),
     path("requests/<int:request_id>/offers/", customer_offers.RequestOffersListView.as_view(), name="customer-offers-list"),
     path("requests/<int:request_id>/offers/<int:offer_id>/accept/", customer_offers.AcceptOfferView.as_view(), name="accept-offer"),
+    path("provider/requests/", provider_requests.ProviderRequestListView.as_view(), name="provider-request-list"),
+    path("provider/requests/<int:request_id>/", provider_requests.ProviderRequestDetailView.as_view(), name="provider-request-detail"),
     path("", include(router.urls))
 ]
 

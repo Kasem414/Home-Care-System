@@ -127,6 +127,8 @@ class UserProfile(models.Model):
     name = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     email = models.EmailField()
+    city = models.CharField(max_length=100,null=True)
+    region = models.CharField(max_length=100,null=True)
     role = models.CharField(max_length=50)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
