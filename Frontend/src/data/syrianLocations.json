@@ -1,0 +1,279 @@
+{
+  "cities": [
+    {
+      "id": "damascus",
+      "name": "Damascus",
+      "nameAr": "دمشق",
+      "regions": [
+        {
+          "id": "old-damascus",
+          "name": "Old Damascus",
+          "nameAr": "دمشق القديمة"
+        },
+        {
+          "id": "al-midan",
+          "name": "Al-Midan",
+          "nameAr": "الميدان"
+        },
+        {
+          "id": "al-shaghour",
+          "name": "Al-Shaghour",
+          "nameAr": "الشاغور"
+        },
+        {
+          "id": "sarouja",
+          "name": "Sarouja",
+          "nameAr": "ساروجة"
+        },
+        {
+          "id": "al-qanawat",
+          "name": "Al-Qanawat",
+          "nameAr": "القنوات"
+        }
+      ]
+    },
+    {
+      "id": "aleppo",
+      "name": "Aleppo",
+      "nameAr": "حلب",
+      "regions": [
+        {
+          "id": "old-aleppo",
+          "name": "Old Aleppo",
+          "nameAr": "حلب القديمة"
+        },
+        {
+          "id": "al-jdeydeh",
+          "name": "Al-Jdeydeh",
+          "nameAr": "الجديدة"
+        },
+        {
+          "id": "al-aziziyah",
+          "name": "Al-Aziziyah",
+          "nameAr": "العزيزية"
+        },
+        {
+          "id": "al-sabil",
+          "name": "Al-Sabil",
+          "nameAr": "السبيل"
+        }
+      ]
+    },
+    {
+      "id": "homs",
+      "name": "Homs",
+      "nameAr": "حمص",
+      "regions": [
+        {
+          "id": "old-homs",
+          "name": "Old Homs",
+          "nameAr": "حمص القديمة"
+        },
+        {
+          "id": "al-waer",
+          "name": "Al-Waer",
+          "nameAr": "الوعر"
+        },
+        {
+          "id": "al-hamidiyah",
+          "name": "Al-Hamidiyah",
+          "nameAr": "الحميدية"
+        },
+        {
+          "id": "al-khaldiyah",
+          "name": "Al-Khaldiyah",
+          "nameAr": "الخالدية"
+        }
+      ]
+    },
+    {
+      "id": "latakia",
+      "name": "Latakia",
+      "nameAr": "اللاذقية",
+      "regions": [
+        {
+          "id": "al-ziraa",
+          "name": "Al-Ziraa",
+          "nameAr": "الزراعة"
+        },
+        {
+          "id": "al-awqaf",
+          "name": "Al-Awqaf",
+          "nameAr": "الأوقاف"
+        },
+        {
+          "id": "al-tabiyat",
+          "name": "Al-Tabiyat",
+          "nameAr": "الطابيات"
+        },
+        {
+          "id": "al-american",
+          "name": "American Quarter",
+          "nameAr": "الأمريكان"
+        }
+      ]
+    },
+    {
+      "id": "hama",
+      "name": "Hama",
+      "nameAr": "حماة",
+      "regions": [
+        {
+          "id": "old-hama",
+          "name": "Old Hama",
+          "nameAr": "حماة القديمة"
+        },
+        {
+          "id": "al-hadir",
+          "name": "Al-Hadir",
+          "nameAr": "الحاضر"
+        },
+        {
+          "id": "al-madina",
+          "name": "Al-Madina",
+          "nameAr": "المدينة"
+        },
+        {
+          "id": "al-souk",
+          "name": "Al-Souk",
+          "nameAr": "السوق"
+        }
+      ]
+    },
+    {
+      "id": "tartus",
+      "name": "Tartus",
+      "nameAr": "طرطوس",
+      "regions": [
+        {
+          "id": "al-karnak",
+          "name": "Al-Karnak",
+          "nameAr": "الكرنك"
+        },
+        {
+          "id": "al-hamidiyah-tartus",
+          "name": "Al-Hamidiyah",
+          "nameAr": "الحميدية"
+        },
+        {
+          "id": "al-mashrou",
+          "name": "Al-Mashrou",
+          "nameAr": "المشروع"
+        },
+        {
+          "id": "al-bassel",
+          "name": "Al-Bassel",
+          "nameAr": "الباسل"
+        }
+      ]
+    },
+    {
+      "id": "deir-ez-zor",
+      "name": "Deir ez-Zor",
+      "nameAr": "دير الزور",
+      "regions": [
+        {
+          "id": "al-joura",
+          "name": "Al-Joura",
+          "nameAr": "الجورة"
+        },
+        {
+          "id": "al-qusour",
+          "name": "Al-Qusour",
+          "nameAr": "القصور"
+        },
+        {
+          "id": "al-ummal",
+          "name": "Al-Ummal",
+          "nameAr": "العمال"
+        },
+        {
+          "id": "al-rushdiyah",
+          "name": "Al-Rushdiyah",
+          "nameAr": "الرشدية"
+        }
+      ]
+    },
+    {
+      "id": "al-hasakah",
+      "name": "Al-Hasakah",
+      "nameAr": "الحسكة",
+      "regions": [
+        {
+          "id": "al-nashwa",
+          "name": "Al-Nashwa",
+          "nameAr": "النشوة"
+        },
+        {
+          "id": "al-aziziyah-hasakah",
+          "name": "Al-Aziziyah",
+          "nameAr": "العزيزية"
+        },
+        {
+          "id": "al-salihiyah",
+          "name": "Al-Salihiyah",
+          "nameAr": "الصالحية"
+        },
+        {
+          "id": "al-mufti",
+          "name": "Al-Mufti",
+          "nameAr": "المفتي"
+        }
+      ]
+    },
+    {
+      "id": "raqqa",
+      "name": "Raqqa",
+      "nameAr": "الرقة",
+      "regions": [
+        {
+          "id": "al-thawrah",
+          "name": "Al-Thawrah",
+          "nameAr": "الثورة"
+        },
+        {
+          "id": "al-mansour",
+          "name": "Al-Mansour",
+          "nameAr": "المنصور"
+        },
+        {
+          "id": "al-andalus",
+          "name": "Al-Andalus",
+          "nameAr": "الأندلس"
+        },
+        {
+          "id": "al-tamin",
+          "name": "Al-Tamin",
+          "nameAr": "التأمين"
+        }
+      ]
+    },
+    {
+      "id": "daraa",
+      "name": "Daraa",
+      "nameAr": "درعا",
+      "regions": [
+        {
+          "id": "daraa-al-balad",
+          "name": "Daraa Al-Balad",
+          "nameAr": "درعا البلد"
+        },
+        {
+          "id": "daraa-al-mahatta",
+          "name": "Daraa Al-Mahatta",
+          "nameAr": "درعا المحطة"
+        },
+        {
+          "id": "al-sahari",
+          "name": "Al-Sahari",
+          "nameAr": "الصحاري"
+        },
+        {
+          "id": "al-kashef",
+          "name": "Al-Kashef",
+          "nameAr": "الكاشف"
+        }
+      ]
+    }
+  ]
+} 

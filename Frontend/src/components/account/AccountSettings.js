@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 // Mock user data for testing without authentication
 const mockUser = {
@@ -22,12 +23,14 @@ const AccountSettings = () => {
   // Use actual user data or mock data if no user is authenticated
   const userData = user || mockUser;
 
-  // Form state
+  // Form state for profile information
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
-    address: "",
+    city: "",
+    region: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -38,10 +41,12 @@ const AccountSettings = () => {
     if (userData) {
       setFormData({
         ...formData,
-        name: userData.name || "",
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
         email: userData.email || "",
         phone: userData.phone || "",
-        address: userData.address || "",
+        city: userData.city || "",
+        region: userData.region || "",
       });
     }
   }, [userData]);
@@ -60,24 +65,14 @@ const AccountSettings = () => {
     setMessage({ type: "", text: "" });
 
     try {
-      // Mock successful update if no real user
-      if (!user) {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Your profile has been successfully updated! (Development Mode)",
-          });
-          setLoading(false);
-        }, 1000);
-        return;
-      }
-
       // Use the context function to update profile
       const profileData = {
-        name: formData.name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
-        address: formData.address,
+        city: formData.city,
+        region: formData.region,
       };
 
       const result = await updateProfile(profileData);
@@ -87,6 +82,7 @@ const AccountSettings = () => {
           type: "success",
           text: "Your profile has been successfully updated!",
         });
+        toast.success("Profile updated successfully!");
       } else {
         throw new Error(result.error || "Failed to update profile");
       }
@@ -95,6 +91,7 @@ const AccountSettings = () => {
         type: "error",
         text: error.message || "Failed to update profile. Please try again.",
       });
+      toast.error(error.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -111,6 +108,7 @@ const AccountSettings = () => {
         type: "error",
         text: "New passwords do not match.",
       });
+      toast.error("New passwords do not match");
       setLoading(false);
       return;
     }
@@ -120,29 +118,12 @@ const AccountSettings = () => {
         type: "error",
         text: "Password must be at least 8 characters long.",
       });
+      toast.error("Password must be at least 8 characters long");
       setLoading(false);
       return;
     }
 
     try {
-      // Mock successful password change if no real user
-      if (!user) {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Your password has been successfully changed! (Development Mode)",
-          });
-          setFormData({
-            ...formData,
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: "",
-          });
-          setLoading(false);
-        }, 1000);
-        return;
-      }
-
       // Use the context function to change password
       const result = await changePassword(
         formData.currentPassword,
@@ -154,6 +135,7 @@ const AccountSettings = () => {
           type: "success",
           text: "Your password has been successfully changed!",
         });
+        toast.success("Password changed successfully!");
         setFormData({
           ...formData,
           currentPassword: "",
@@ -168,6 +150,7 @@ const AccountSettings = () => {
         type: "error",
         text: error.message || "Failed to change password. Please try again.",
       });
+      toast.error(error.message || "Failed to change password");
     } finally {
       setLoading(false);
     }
@@ -177,23 +160,10 @@ const AccountSettings = () => {
     setLoading(true);
 
     try {
-      // Mock successful account deletion if no real user
-      if (!user) {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Account would be deleted in production mode.",
-          });
-          setLoading(false);
-          setShowDeleteConfirmation(false);
-        }, 1000);
-        return;
-      }
-
-      // Use the context function to delete account
       const result = await deleteAccount();
 
       if (result.success) {
+        toast.success("Account successfully deleted");
         navigate("/");
       } else {
         throw new Error(result.error || "Failed to delete account");
@@ -203,21 +173,29 @@ const AccountSettings = () => {
         type: "error",
         text: error.message || "Failed to delete account. Please try again.",
       });
+      toast.error(error.message || "Failed to delete account");
       setLoading(false);
     }
   };
+
+  if (!user) {
+    return (
+      <div className="account-settings">
+        <div className="account-settings-container">
+          <h1 className="page-title">Account Settings</h1>
+          <div className="alert alert-error">
+            <i className="fas fa-exclamation-circle"></i> You must be logged in
+            to view this page
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="account-settings">
       <div className="account-settings-container">
         <h1 className="page-title">Account Settings</h1>
-
-        {!user && (
-          <div className="alert alert-info">
-            <i className="fas fa-info-circle"></i> Development Mode: Using mock
-            data for testing
-          </div>
-        )}
 
         {message.text && (
           <div
@@ -232,16 +210,29 @@ const AccountSettings = () => {
         <div className="settings-section">
           <h2>Profile Information</h2>
           <form onSubmit={handleProfileUpdate}>
-            <div className="form-group">
-              <label htmlFor="name">Full Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
+            <div className="form-row">
+              <div className="form-group half">
+                <label htmlFor="firstName">First Name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group half">
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
 
             <div className="form-group">
@@ -267,20 +258,32 @@ const AccountSettings = () => {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="address">Address</label>
-              <textarea
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                rows="3"
-              ></textarea>
+            <div className="form-row">
+              <div className="form-group half">
+                <label htmlFor="city">City</label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group half">
+                <label htmlFor="region">Region</label>
+                <input
+                  type="text"
+                  id="region"
+                  name="region"
+                  value={formData.region}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <button
               type="submit"
-              className="btn btn-primary"
+              className={`btn btn-primary ${loading ? "loading" : ""}`}
               disabled={loading}
             >
               {loading ? "Updating..." : "Update Profile"}
@@ -312,7 +315,6 @@ const AccountSettings = () => {
                 value={formData.newPassword}
                 onChange={handleChange}
                 required
-                minLength="8"
               />
             </div>
 
@@ -325,16 +327,15 @@ const AccountSettings = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                minLength="8"
               />
             </div>
 
             <button
               type="submit"
-              className="btn btn-primary"
+              className={`btn btn-primary ${loading ? "loading" : ""}`}
               disabled={loading}
             >
-              {loading ? "Changing..." : "Change Password"}
+              {loading ? "Updating..." : "Change Password"}
             </button>
           </form>
         </div>
@@ -342,8 +343,8 @@ const AccountSettings = () => {
         <div className="settings-section danger-zone">
           <h2>Delete Account</h2>
           <p>
-            Once you delete your account, there is no going back. Please be
-            certain.
+            This action cannot be undone. All of your data will be permanently
+            removed.
           </p>
 
           {!showDeleteConfirmation ? (
@@ -355,24 +356,20 @@ const AccountSettings = () => {
             </button>
           ) : (
             <div className="delete-confirmation">
-              <p>
-                Are you sure you want to delete your account? All your data will
-                be permanently removed.
-              </p>
-              <div className="confirmation-buttons">
+              <p>Are you sure you want to delete your account?</p>
+              <div className="button-group">
                 <button
-                  className="btn btn-danger"
+                  className="btn btn-outline"
+                  onClick={() => setShowDeleteConfirmation(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={`btn btn-danger ${loading ? "loading" : ""}`}
                   onClick={handleDeleteAccount}
                   disabled={loading}
                 >
-                  {loading ? "Deleting..." : "Yes, Delete My Account"}
-                </button>
-                <button
-                  className="btn btn-outlined"
-                  onClick={() => setShowDeleteConfirmation(false)}
-                  disabled={loading}
-                >
-                  Cancel
+                  {loading ? "Deleting..." : "Confirm Delete"}
                 </button>
               </div>
             </div>
