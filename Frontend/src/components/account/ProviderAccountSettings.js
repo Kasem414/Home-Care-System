@@ -1,39 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-
-// Mock provider user data for testing without authentication
-const mockProviderUser = {
-  id: "provider123",
-  name: "Provider Test User",
-  email: "provider@example.com",
-  phone: "555-123-4567",
-  address: "123 Provider Street, Test City, 12345",
-  role: "provider",
-  bio: "Experienced professional with 5+ years in home care services.",
-  services: ["Cleaning", "Gardening", "Home Repair"],
-  qualifications: ["Certified Cleaner", "First Aid Certified"],
-  hourlyRate: 35,
-  availability: {
-    monday: { available: true, from: "09:00", to: "17:00" },
-    tuesday: { available: true, from: "09:00", to: "17:00" },
-    wednesday: { available: true, from: "09:00", to: "17:00" },
-    thursday: { available: true, from: "09:00", to: "17:00" },
-    friday: { available: true, from: "09:00", to: "17:00" },
-    saturday: { available: false, from: "", to: "" },
-    sunday: { available: false, from: "", to: "" },
-  },
-};
+import { toast } from "react-toastify";
 
 // Available service categories
 const serviceCategories = [
-  { value: "Cleaning", label: "Cleaning" },
-  { value: "Gardening", label: "Gardening" },
-  { value: "Home Repair", label: "Home Repair" },
-  { value: "Electrical", label: "Electrical" },
-  { value: "Plumbing", label: "Plumbing" },
-  { value: "Painting", label: "Painting" },
-  { value: "Meal Preparation", label: "Meal Preparation" },
+  { value: "plumbing", label: "Plumbing" },
+  { value: "electrical", label: "Electrical" },
+  { value: "cleaning", label: "Cleaning" },
+  { value: "painting", label: "Painting" },
+  { value: "gardening", label: "Gardening" },
+  { value: "carpentry", label: "Carpentry" },
+  { value: "hvac", label: "HVAC" },
+  { value: "roofing", label: "Roofing" },
+  { value: "flooring", label: "Flooring" },
+];
+
+// Available regions
+const availableRegions = [
+  "Damascus Governorate",
+  "Aleppo Governorate",
+  "Homs Governorate",
+  "Latakia Governorate",
+  "Hama Governorate",
+  "Tartus Governorate",
+  "Deir ez-Zor Governorate",
+  "Al-Hasakah Governorate",
+  "Raqqa Governorate",
+  "Daraa Governorate",
+  "Idlib Governorate",
+  "Quneitra Governorate",
+  "As-Suwayda Governorate",
 ];
 
 const ProviderAccountSettings = () => {
@@ -44,23 +41,24 @@ const ProviderAccountSettings = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
 
-  // Use actual user data or mock data if no user is authenticated
-  const userData = user?.role === "provider" ? user : mockProviderUser;
-
   // Form state for basic profile
   const [basicProfileData, setBasicProfileData] = useState({
-    name: "",
+    companyName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
-    address: "",
+    city: "",
+    region: "",
     bio: "",
   });
 
   // Form state for services
   const [servicesData, setServicesData] = useState({
-    services: [],
-    qualifications: [],
-    hourlyRate: 0,
+    serviceCategories: [],
+    serviceRegions: [],
+    yearsInBusiness: "",
+    employeeCount: "",
   });
 
   // Form state for availability
@@ -83,29 +81,80 @@ const ProviderAccountSettings = () => {
 
   // Load user data when component mounts
   useEffect(() => {
-    if (userData) {
+    if (user && user.role === "provider") {
+      // Get provider profile from API if available
+      // For now, using the user data directly
+      const providerProfile = user.provider_profile || {};
+
+      // Parse availability if it's stored as comma-separated string
+      let parsedAvailability = availabilityData;
+      if (user.availability && typeof user.availability === "string") {
+        const availabilityItems = user.availability.split(",");
+        availabilityItems.forEach((item) => {
+          const [day, time] = item.split(":");
+          if (day && time) {
+            const [from, to] = time.trim().split("-");
+            if (from && to && parsedAvailability[day.trim().toLowerCase()]) {
+              parsedAvailability[day.trim().toLowerCase()] = {
+                available: true,
+                from: from.trim(),
+                to: to.trim(),
+              };
+            }
+          }
+        });
+      }
+
+      // Parse service categories if stored as comma-separated string
+      let parsedCategories = [];
+      if (
+        providerProfile.serviceCategories &&
+        typeof providerProfile.serviceCategories === "string"
+      ) {
+        parsedCategories = providerProfile.serviceCategories
+          .split(",")
+          .map((c) => c.trim());
+      } else if (Array.isArray(providerProfile.serviceCategories)) {
+        parsedCategories = providerProfile.serviceCategories;
+      }
+
+      // Parse service regions if stored as comma-separated string
+      let parsedRegions = [];
+      if (
+        providerProfile.serviceRegions &&
+        typeof providerProfile.serviceRegions === "string"
+      ) {
+        parsedRegions = providerProfile.serviceRegions
+          .split(",")
+          .map((r) => r.trim());
+      } else if (Array.isArray(providerProfile.serviceRegions)) {
+        parsedRegions = providerProfile.serviceRegions;
+      }
+
       // Basic profile data
       setBasicProfileData({
-        name: userData.name || "",
-        email: userData.email || "",
-        phone: userData.phone || "",
-        address: userData.address || "",
-        bio: userData.bio || "",
+        companyName: providerProfile.companyName || "",
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        city: user.city || "",
+        region: user.region || "",
+        bio: providerProfile.bio || "",
       });
 
       // Services data
       setServicesData({
-        services: userData.services || [],
-        qualifications: userData.qualifications || [],
-        hourlyRate: userData.hourlyRate || 0,
+        serviceCategories: parsedCategories,
+        serviceRegions: parsedRegions,
+        yearsInBusiness: providerProfile.yearsInBusiness || "",
+        employeeCount: providerProfile.employeeCount || "",
       });
 
       // Availability data
-      if (userData.availability) {
-        setAvailabilityData(userData.availability);
-      }
+      setAvailabilityData(parsedAvailability);
     }
-  }, [userData]);
+  }, [user]);
 
   // Handle basic profile field changes
   const handleBasicProfileChange = (e) => {
@@ -125,51 +174,50 @@ const ProviderAccountSettings = () => {
     });
   };
 
-  // Handle service selection
-  const handleServiceChange = (e) => {
+  // Handle service category selection
+  const handleCategoryChange = (e) => {
     const { value, checked } = e.target;
 
     if (checked) {
       setServicesData({
         ...servicesData,
-        services: [...servicesData.services, value],
+        serviceCategories: [...servicesData.serviceCategories, value],
       });
     } else {
       setServicesData({
         ...servicesData,
-        services: servicesData.services.filter((service) => service !== value),
+        serviceCategories: servicesData.serviceCategories.filter(
+          (category) => category !== value
+        ),
       });
     }
   };
 
-  // Handle qualification field
-  const handleQualificationAdd = () => {
-    const qualificationInput = document.getElementById("qualification-input");
-    const qualification = qualificationInput.value.trim();
+  // Handle service region selection
+  const handleRegionChange = (e) => {
+    const { value, checked } = e.target;
 
-    if (qualification && !servicesData.qualifications.includes(qualification)) {
+    if (checked) {
       setServicesData({
         ...servicesData,
-        qualifications: [...servicesData.qualifications, qualification],
+        serviceRegions: [...servicesData.serviceRegions, value],
       });
-      qualificationInput.value = "";
+    } else {
+      setServicesData({
+        ...servicesData,
+        serviceRegions: servicesData.serviceRegions.filter(
+          (region) => region !== value
+        ),
+      });
     }
   };
 
-  const handleQualificationRemove = (qualification) => {
+  // Handle other service data changes
+  const handleServiceDataChange = (e) => {
+    const { name, value } = e.target;
     setServicesData({
       ...servicesData,
-      qualifications: servicesData.qualifications.filter(
-        (q) => q !== qualification
-      ),
-    });
-  };
-
-  // Handle hourly rate change
-  const handleRateChange = (e) => {
-    setServicesData({
-      ...servicesData,
-      hourlyRate: parseFloat(e.target.value),
+      [name]: value,
     });
   };
 
@@ -179,7 +227,8 @@ const ProviderAccountSettings = () => {
       ...availabilityData,
       [day]: {
         ...availabilityData[day],
-        [field]: field === "available" ? value : value,
+        [field]:
+          field === "available" ? !availabilityData[day].available : value,
       },
     });
   };
@@ -191,30 +240,17 @@ const ProviderAccountSettings = () => {
     setMessage({ type: "", text: "" });
 
     try {
-      // Mock successful update if no real provider user
-      if (!user || user.role !== "provider") {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Your profile has been successfully updated! (Development Mode)",
-          });
-          setLoading(false);
-        }, 1000);
-        return;
-      }
-
       // Use the context function to update profile
-      const profileData = {
+      const result = await updateProfile({
         ...basicProfileData,
-      };
-
-      const result = await updateProfile(profileData);
+      });
 
       if (result.success) {
         setMessage({
           type: "success",
           text: "Your profile has been successfully updated!",
         });
+        toast.success("Profile updated successfully!");
       } else {
         throw new Error(result.error || "Failed to update profile");
       }
@@ -223,6 +259,7 @@ const ProviderAccountSettings = () => {
         type: "error",
         text: error.message || "Failed to update profile. Please try again.",
       });
+      toast.error(error.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -235,32 +272,17 @@ const ProviderAccountSettings = () => {
     setMessage({ type: "", text: "" });
 
     try {
-      // Mock successful update if no real provider user
-      if (!user || user.role !== "provider") {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Your services have been successfully updated! (Development Mode)",
-          });
-          setLoading(false);
-        }, 1000);
-        return;
-      }
-
-      // Use the context function to update profile with services data
-      const servicesProfileData = {
-        services: servicesData.services,
-        qualifications: servicesData.qualifications,
-        hourlyRate: servicesData.hourlyRate,
-      };
-
-      const result = await updateProfile(servicesProfileData);
+      // Use the context function to update services
+      const result = await updateProfile({
+        ...servicesData,
+      });
 
       if (result.success) {
         setMessage({
           type: "success",
           text: "Your services have been successfully updated!",
         });
+        toast.success("Services updated successfully!");
       } else {
         throw new Error(result.error || "Failed to update services");
       }
@@ -269,6 +291,7 @@ const ProviderAccountSettings = () => {
         type: "error",
         text: error.message || "Failed to update services. Please try again.",
       });
+      toast.error(error.message || "Failed to update services");
     } finally {
       setLoading(false);
     }
@@ -281,30 +304,25 @@ const ProviderAccountSettings = () => {
     setMessage({ type: "", text: "" });
 
     try {
-      // Mock successful update if no real provider user
-      if (!user || user.role !== "provider") {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Your availability has been successfully updated! (Development Mode)",
-          });
-          setLoading(false);
-        }, 1000);
-        return;
-      }
+      // Convert availability to array format for API
+      const availabilityArray = [];
+      Object.entries(availabilityData).forEach(([day, value]) => {
+        if (value.available) {
+          availabilityArray.push(`${day}: ${value.from}-${value.to}`);
+        }
+      });
 
-      // Use the context function to update profile with availability data
-      const availabilityProfileData = {
-        availability: availabilityData,
-      };
-
-      const result = await updateProfile(availabilityProfileData);
+      // Use the context function to update availability
+      const result = await updateProfile({
+        availability: availabilityArray,
+      });
 
       if (result.success) {
         setMessage({
           type: "success",
           text: "Your availability has been successfully updated!",
         });
+        toast.success("Availability updated successfully!");
       } else {
         throw new Error(result.error || "Failed to update availability");
       }
@@ -314,11 +332,13 @@ const ProviderAccountSettings = () => {
         text:
           error.message || "Failed to update availability. Please try again.",
       });
+      toast.error(error.message || "Failed to update availability");
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle password change
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -330,6 +350,7 @@ const ProviderAccountSettings = () => {
         type: "error",
         text: "New passwords do not match.",
       });
+      toast.error("New passwords do not match");
       setLoading(false);
       return;
     }
@@ -339,29 +360,12 @@ const ProviderAccountSettings = () => {
         type: "error",
         text: "Password must be at least 8 characters long.",
       });
+      toast.error("Password must be at least 8 characters long");
       setLoading(false);
       return;
     }
 
     try {
-      // Mock successful password change if no real provider user
-      if (!user || user.role !== "provider") {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Your password has been successfully changed! (Development Mode)",
-          });
-          setSecurityData({
-            ...securityData,
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: "",
-          });
-          setLoading(false);
-        }, 1000);
-        return;
-      }
-
       // Use the context function to change password
       const result = await changePassword(
         securityData.currentPassword,
@@ -373,8 +377,8 @@ const ProviderAccountSettings = () => {
           type: "success",
           text: "Your password has been successfully changed!",
         });
+        toast.success("Password changed successfully!");
         setSecurityData({
-          ...securityData,
           currentPassword: "",
           newPassword: "",
           confirmPassword: "",
@@ -387,32 +391,21 @@ const ProviderAccountSettings = () => {
         type: "error",
         text: error.message || "Failed to change password. Please try again.",
       });
+      toast.error(error.message || "Failed to change password");
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle account deletion
   const handleDeleteAccount = async () => {
     setLoading(true);
 
     try {
-      // Mock successful account deletion if no real provider user
-      if (!user || user.role !== "provider") {
-        setTimeout(() => {
-          setMessage({
-            type: "success",
-            text: "Account would be deleted in production mode.",
-          });
-          setLoading(false);
-          setShowDeleteConfirmation(false);
-        }, 1000);
-        return;
-      }
-
-      // Use the context function to delete account
       const result = await deleteAccount();
 
       if (result.success) {
+        toast.success("Account successfully deleted");
         navigate("/");
       } else {
         throw new Error(result.error || "Failed to delete account");
@@ -422,21 +415,31 @@ const ProviderAccountSettings = () => {
         type: "error",
         text: error.message || "Failed to delete account. Please try again.",
       });
+      toast.error(error.message || "Failed to delete account");
+    } finally {
       setLoading(false);
+      setShowDeleteConfirmation(false);
     }
   };
 
+  if (!user || user.role !== "provider") {
+    return (
+      <div className="account-settings">
+        <div className="account-settings-container">
+          <h1 className="page-title">Provider Account Settings</h1>
+          <div className="alert alert-error">
+            <i className="fas fa-exclamation-circle"></i> You must be logged in
+            as a service provider to view this page
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="account-settings provider-account-settings">
+    <div className="account-settings provider-settings">
       <div className="account-settings-container">
         <h1 className="page-title">Provider Account Settings</h1>
-
-        {(!user || user.role !== "provider") && (
-          <div className="alert alert-info">
-            <i className="fas fa-info-circle"></i> Development Mode: Using mock
-            provider data for testing
-          </div>
-        )}
 
         {message.text && (
           <div
@@ -453,13 +456,13 @@ const ProviderAccountSettings = () => {
             className={`tab-btn ${activeTab === "profile" ? "active" : ""}`}
             onClick={() => setActiveTab("profile")}
           >
-            <i className="fas fa-user"></i> Basic Profile
+            Profile
           </button>
           <button
             className={`tab-btn ${activeTab === "services" ? "active" : ""}`}
             onClick={() => setActiveTab("services")}
           >
-            <i className="fas fa-tools"></i> Services
+            Services
           </button>
           <button
             className={`tab-btn ${
@@ -467,31 +470,55 @@ const ProviderAccountSettings = () => {
             }`}
             onClick={() => setActiveTab("availability")}
           >
-            <i className="fas fa-calendar-alt"></i> Availability
+            Availability
           </button>
           <button
             className={`tab-btn ${activeTab === "security" ? "active" : ""}`}
             onClick={() => setActiveTab("security")}
           >
-            <i className="fas fa-shield-alt"></i> Security
+            Security
           </button>
         </div>
 
-        {/* Basic Profile Tab */}
         {activeTab === "profile" && (
           <div className="settings-section">
-            <h2>Basic Profile Information</h2>
+            <h2>Basic Information</h2>
             <form onSubmit={handleBasicProfileUpdate}>
               <div className="form-group">
-                <label htmlFor="name">Full Name</label>
+                <label htmlFor="companyName">Company Name</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={basicProfileData.name}
+                  id="companyName"
+                  name="companyName"
+                  value={basicProfileData.companyName}
                   onChange={handleBasicProfileChange}
                   required
                 />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group half">
+                  <label htmlFor="firstName">First Name</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    value={basicProfileData.firstName}
+                    onChange={handleBasicProfileChange}
+                    required
+                  />
+                </div>
+                <div className="form-group half">
+                  <label htmlFor="lastName">Last Name</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    value={basicProfileData.lastName}
+                    onChange={handleBasicProfileChange}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="form-group">
@@ -517,32 +544,43 @@ const ProviderAccountSettings = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="address">Address</label>
-                <textarea
-                  id="address"
-                  name="address"
-                  value={basicProfileData.address}
-                  onChange={handleBasicProfileChange}
-                  rows="3"
-                ></textarea>
+              <div className="form-row">
+                <div className="form-group half">
+                  <label htmlFor="city">City</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={basicProfileData.city}
+                    onChange={handleBasicProfileChange}
+                  />
+                </div>
+                <div className="form-group half">
+                  <label htmlFor="region">Region</label>
+                  <input
+                    type="text"
+                    id="region"
+                    name="region"
+                    value={basicProfileData.region}
+                    onChange={handleBasicProfileChange}
+                  />
+                </div>
               </div>
 
               <div className="form-group">
-                <label htmlFor="bio">Professional Bio</label>
+                <label htmlFor="bio">Bio / About</label>
                 <textarea
                   id="bio"
                   name="bio"
                   value={basicProfileData.bio}
                   onChange={handleBasicProfileChange}
-                  rows="5"
-                  placeholder="Describe your experience, specialties, and background..."
+                  rows="4"
                 ></textarea>
               </div>
 
               <button
                 type="submit"
-                className="btn btn-primary"
+                className={`btn btn-primary ${loading ? "loading" : ""}`}
                 disabled={loading}
               >
                 {loading ? "Updating..." : "Update Profile"}
@@ -551,25 +589,26 @@ const ProviderAccountSettings = () => {
           </div>
         )}
 
-        {/* Services Tab */}
         {activeTab === "services" && (
           <div className="settings-section">
-            <h2>Services & Qualifications</h2>
+            <h2>Services Information</h2>
             <form onSubmit={handleServicesUpdate}>
               <div className="form-group">
-                <label>Services You Provide</label>
-                <div className="services-grid">
-                  {serviceCategories.map((service) => (
-                    <div className="service-checkbox" key={service.value}>
+                <label>Service Categories</label>
+                <div className="checkbox-group">
+                  {serviceCategories.map((category) => (
+                    <div className="checkbox-item" key={category.value}>
                       <input
                         type="checkbox"
-                        id={`service-${service.value}`}
-                        value={service.value}
-                        checked={servicesData.services.includes(service.value)}
-                        onChange={handleServiceChange}
+                        id={`category-${category.value}`}
+                        value={category.value}
+                        checked={servicesData.serviceCategories.includes(
+                          category.value
+                        )}
+                        onChange={handleCategoryChange}
                       />
-                      <label htmlFor={`service-${service.value}`}>
-                        {service.label}
+                      <label htmlFor={`category-${category.value}`}>
+                        {category.label}
                       </label>
                     </div>
                   ))}
@@ -577,60 +616,49 @@ const ProviderAccountSettings = () => {
               </div>
 
               <div className="form-group">
-                <label>Qualifications & Certifications</label>
-                <div className="qualification-input-container">
-                  <input
-                    type="text"
-                    id="qualification-input"
-                    placeholder="Add a qualification or certification..."
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-outlined btn-sm"
-                    onClick={handleQualificationAdd}
-                  >
-                    Add
-                  </button>
+                <label>Service Regions</label>
+                <div className="checkbox-group">
+                  {availableRegions.map((region) => (
+                    <div className="checkbox-item" key={region}>
+                      <input
+                        type="checkbox"
+                        id={`region-${region}`}
+                        value={region}
+                        checked={servicesData.serviceRegions.includes(region)}
+                        onChange={handleRegionChange}
+                      />
+                      <label htmlFor={`region-${region}`}>{region}</label>
+                    </div>
+                  ))}
                 </div>
-
-                {servicesData.qualifications.length > 0 && (
-                  <div className="qualifications-list">
-                    {servicesData.qualifications.map((qualification, index) => (
-                      <div className="qualification-tag" key={index}>
-                        <span>{qualification}</span>
-                        <button
-                          type="button"
-                          className="remove-btn"
-                          onClick={() =>
-                            handleQualificationRemove(qualification)
-                          }
-                        >
-                          <i className="fas fa-times"></i>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="hourlyRate">Hourly Rate (USD)</label>
-                <div className="rate-input-container">
-                  <span className="rate-currency">$</span>
+              <div className="form-row">
+                <div className="form-group half">
+                  <label htmlFor="yearsInBusiness">Years in Business</label>
                   <input
-                    type="number"
-                    id="hourlyRate"
-                    min="0"
-                    step="0.01"
-                    value={servicesData.hourlyRate}
-                    onChange={handleRateChange}
+                    type="text"
+                    id="yearsInBusiness"
+                    name="yearsInBusiness"
+                    value={servicesData.yearsInBusiness}
+                    onChange={handleServiceDataChange}
+                  />
+                </div>
+                <div className="form-group half">
+                  <label htmlFor="employeeCount">Number of Employees</label>
+                  <input
+                    type="text"
+                    id="employeeCount"
+                    name="employeeCount"
+                    value={servicesData.employeeCount}
+                    onChange={handleServiceDataChange}
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="btn btn-primary"
+                className={`btn btn-primary ${loading ? "loading" : ""}`}
                 disabled={loading}
               >
                 {loading ? "Updating..." : "Update Services"}
@@ -639,41 +667,35 @@ const ProviderAccountSettings = () => {
           </div>
         )}
 
-        {/* Availability Tab */}
         {activeTab === "availability" && (
           <div className="settings-section">
-            <h2>Availability Schedule</h2>
+            <h2>Availability</h2>
             <form onSubmit={handleAvailabilityUpdate}>
-              <div className="availability-container">
-                {Object.keys(availabilityData).map((day) => (
+              <div className="availability-grid">
+                {Object.entries(availabilityData).map(([day, data]) => (
                   <div className="availability-day" key={day}>
                     <div className="day-header">
+                      <input
+                        type="checkbox"
+                        id={`available-${day}`}
+                        checked={data.available}
+                        onChange={() =>
+                          handleAvailabilityChange(day, "available")
+                        }
+                      />
                       <label htmlFor={`available-${day}`}>
-                        <input
-                          type="checkbox"
-                          id={`available-${day}`}
-                          checked={availabilityData[day].available}
-                          onChange={(e) =>
-                            handleAvailabilityChange(
-                              day,
-                              "available",
-                              e.target.checked
-                            )
-                          }
-                        />
-                        <span className="day-name">
-                          {day.charAt(0).toUpperCase() + day.slice(1)}
-                        </span>
+                        {day.charAt(0).toUpperCase() + day.slice(1)}
                       </label>
                     </div>
 
-                    {availabilityData[day].available && (
+                    {data.available && (
                       <div className="time-range">
                         <div className="time-input">
-                          <label>From</label>
+                          <label htmlFor={`from-${day}`}>From</label>
                           <input
                             type="time"
-                            value={availabilityData[day].from}
+                            id={`from-${day}`}
+                            value={data.from}
                             onChange={(e) =>
                               handleAvailabilityChange(
                                 day,
@@ -684,10 +706,11 @@ const ProviderAccountSettings = () => {
                           />
                         </div>
                         <div className="time-input">
-                          <label>To</label>
+                          <label htmlFor={`to-${day}`}>To</label>
                           <input
                             type="time"
-                            value={availabilityData[day].to}
+                            id={`to-${day}`}
+                            value={data.to}
                             onChange={(e) =>
                               handleAvailabilityChange(
                                 day,
@@ -705,7 +728,7 @@ const ProviderAccountSettings = () => {
 
               <button
                 type="submit"
-                className="btn btn-primary"
+                className={`btn btn-primary ${loading ? "loading" : ""}`}
                 disabled={loading}
               >
                 {loading ? "Updating..." : "Update Availability"}
@@ -714,65 +737,60 @@ const ProviderAccountSettings = () => {
           </div>
         )}
 
-        {/* Security Tab */}
         {activeTab === "security" && (
-          <>
-            <div className="settings-section">
-              <h2>Change Password</h2>
-              <form onSubmit={handlePasswordChange}>
-                <div className="form-group">
-                  <label htmlFor="currentPassword">Current Password</label>
-                  <input
-                    type="password"
-                    id="currentPassword"
-                    name="currentPassword"
-                    value={securityData.currentPassword}
-                    onChange={handleSecurityChange}
-                    required
-                  />
-                </div>
+          <div className="settings-section">
+            <h2>Security Settings</h2>
+            <form onSubmit={handlePasswordChange}>
+              <div className="form-group">
+                <label htmlFor="currentPassword">Current Password</label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  value={securityData.currentPassword}
+                  onChange={handleSecurityChange}
+                  required
+                />
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="newPassword">New Password</label>
-                  <input
-                    type="password"
-                    id="newPassword"
-                    name="newPassword"
-                    value={securityData.newPassword}
-                    onChange={handleSecurityChange}
-                    required
-                    minLength="8"
-                  />
-                </div>
+              <div className="form-group">
+                <label htmlFor="newPassword">New Password</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  name="newPassword"
+                  value={securityData.newPassword}
+                  onChange={handleSecurityChange}
+                  required
+                />
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="confirmPassword">Confirm New Password</label>
-                  <input
-                    type="password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={securityData.confirmPassword}
-                    onChange={handleSecurityChange}
-                    required
-                    minLength="8"
-                  />
-                </div>
+              <div className="form-group">
+                <label htmlFor="confirmPassword">Confirm New Password</label>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={securityData.confirmPassword}
+                  onChange={handleSecurityChange}
+                  required
+                />
+              </div>
 
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={loading}
-                >
-                  {loading ? "Changing..." : "Change Password"}
-                </button>
-              </form>
-            </div>
+              <button
+                type="submit"
+                className={`btn btn-primary ${loading ? "loading" : ""}`}
+                disabled={loading}
+              >
+                {loading ? "Updating..." : "Change Password"}
+              </button>
+            </form>
 
-            <div className="settings-section danger-zone">
+            <div className="danger-zone">
               <h2>Delete Account</h2>
               <p>
-                Once you delete your account, there is no going back. Please be
-                certain.
+                This action cannot be undone. All of your data will be
+                permanently removed.
               </p>
 
               {!showDeleteConfirmation ? (
@@ -784,30 +802,26 @@ const ProviderAccountSettings = () => {
                 </button>
               ) : (
                 <div className="delete-confirmation">
-                  <p>
-                    Are you sure you want to delete your account? All your data
-                    will be permanently removed.
-                  </p>
-                  <div className="confirmation-buttons">
+                  <p>Are you sure you want to delete your account?</p>
+                  <div className="button-group">
                     <button
-                      className="btn btn-danger"
+                      className="btn btn-outline"
+                      onClick={() => setShowDeleteConfirmation(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className={`btn btn-danger ${loading ? "loading" : ""}`}
                       onClick={handleDeleteAccount}
                       disabled={loading}
                     >
-                      {loading ? "Deleting..." : "Yes, Delete My Account"}
-                    </button>
-                    <button
-                      className="btn btn-outlined"
-                      onClick={() => setShowDeleteConfirmation(false)}
-                      disabled={loading}
-                    >
-                      Cancel
+                      {loading ? "Deleting..." : "Confirm Delete"}
                     </button>
                   </div>
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

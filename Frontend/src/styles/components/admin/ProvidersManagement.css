@@ -235,6 +235,21 @@
   color: var(--danger-color);
 }
 
+.providers-management .status-badge.verified {
+  background-color: var(--success-color-light);
+  color: var(--success-color);
+}
+
+.providers-management .status-badge.pending {
+  background-color: var(--warning-color-light);
+  color: var(--warning-color);
+}
+
+.providers-management .status-badge.rejected {
+  background-color: var(--danger-color-light);
+  color: var(--danger-color);
+}
+
 .providers-management .provider-info {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
@@ -256,9 +271,15 @@
 
 .providers-management .provider-services {
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.providers-management .service-tags {
+  display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
+  gap: 0.5rem;
 }
 
 .providers-management .service-tag {
@@ -306,6 +327,15 @@
   background-color: var(--danger-color-dark);
 }
 
+.providers-management .btn-warning {
+  background-color: var(--warning-color);
+  color: var(--bg-white);
+}
+
+.providers-management .btn-warning:hover {
+  background-color: var(--warning-color-dark);
+}
+
 .providers-management .pagination {
   display: flex;
   justify-content: center;
@@ -338,6 +368,35 @@
 .providers-management .pagination span {
   color: var(--text-medium);
   font-size: var(--font-size-sm);
+}
+
+/* Loading, Error and No Results States */
+.providers-management .loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--primary-color);
+  font-size: var(--font-size-lg);
+}
+
+.providers-management .error-message {
+  padding: var(--spacing-lg);
+  background-color: var(--danger-color-light);
+  color: var(--danger-color);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.providers-management .no-results {
+  grid-column: 1 / -1;
+  padding: var(--spacing-xl);
+  background-color: var(--bg-light);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  color: var(--text-medium);
+  font-size: var(--font-size-md);
 }
 
 /* Responsive Design */

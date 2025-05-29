@@ -1,23 +1,49 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 const Login = () => {
-  const [activeTab, setActiveTab] = useState("homeowner");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const result = await login(email, password, (path) => {
+        navigate(path);
+        toast.success("Login successful");
+      });
+
+      if (!result.success) {
+        setError(
+          result.error || "Login failed. Please check your credentials."
+        );
+        toast.error(
+          result.error || "Login failed. Please check your credentials."
+        );
+      }
+
+      // Save remember me preference if selected
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", "true");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again later.");
+      toast.error("An unexpected error occurred. Please try again later.");
+      console.error("Login error:", err);
+    } finally {
       setIsLoading(false);
-      // Handle login logic here
-      console.log("Logging in as", activeTab, { email, password, rememberMe });
-    }, 1500);
+    }
   };
 
   return (
@@ -28,20 +54,13 @@ const Login = () => {
           <p className="auth-subtitle">Log in to your account to continue</p>
         </div>
 
-        <div className="auth-tabs">
-          <button
-            className={`auth-tab ${activeTab === "homeowner" ? "active" : ""}`}
-            onClick={() => setActiveTab("homeowner")}
-          >
-            Homeowner
-          </button>
-          <button
-            className={`auth-tab ${activeTab === "provider" ? "active" : ""}`}
-            onClick={() => setActiveTab("provider")}
-          >
-            Service Provider
-          </button>
-        </div>
+        
+        {error && (
+          <div className="error-message">
+            <i className="fas fa-exclamation-circle"></i>
+            <span>{error}</span>
+          </div>
+        )}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -104,21 +123,6 @@ const Login = () => {
             )}
           </button>
         </form>
-
-        <div className="auth-divider">
-          <span>or login with</span>
-        </div>
-
-        <div className="social-auth">
-          <button className="social-btn google">
-            <i className="fab fa-google"></i>
-            <span>Continue with Google</span>
-          </button>
-          <button className="social-btn facebook">
-            <i className="fab fa-facebook-f"></i>
-            <span>Continue with Facebook</span>
-          </button>
-        </div>
 
         <div className="auth-footer">
           <p>

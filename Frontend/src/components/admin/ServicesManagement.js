@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaEdit,
   FaTrash,
@@ -7,49 +7,14 @@ import {
   FaSortUp,
   FaSortDown,
   FaPlus,
+  FaSpinner,
 } from "react-icons/fa";
 import EditServiceModal from "./EditServiceModal";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import { adminService } from "../../services/api";
 
 const ServicesManagement = () => {
-  const [services, setServices] = useState([
-    {
-      id: 1,
-      name: "Home Nursing",
-      category: "Medical",
-      price: 150,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Elderly Care",
-      category: "Care",
-      price: 120,
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Physical Therapy",
-      category: "Medical",
-      price: 200,
-      status: "Inactive",
-    },
-    {
-      id: 4,
-      name: "House Cleaning",
-      category: "Home",
-      price: 80,
-      status: "Active",
-    },
-    {
-      id: 5,
-      name: "Meal Preparation",
-      category: "Care",
-      price: 90,
-      status: "Active",
-    },
-  ]);
-
+  const [services, setServices] = useState([]);
   const [editingService, setEditingService] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -57,37 +22,55 @@ const ServicesManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalServices, setTotalServices] = useState(0);
+  const itemsPerPage = 10;
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
 
-  // Filter services based on search term
-  const filteredServices = services.filter(
-    (service) =>
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Fetch services data
+  useEffect(() => {
+    fetchServices();
+  }, [currentPage, categoryFilter, statusFilter, searchTerm]);
 
-  // Sort services
-  const sortedServices = React.useMemo(() => {
-    if (!sortConfig.key) return filteredServices;
+  const fetchServices = async () => {
+    setLoading(true);
+    try {
+      const response = await adminService.getServices(
+        currentPage,
+        itemsPerPage,
+        categoryFilter,
+        statusFilter,
+        searchTerm
+      );
 
-    return [...filteredServices].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1;
+      if (response.success) {
+        setServices(response.data.services);
+        setTotalServices(response.data.total);
+        setTotalPages(response.data.pages);
+
+        // Extract unique categories from services for the filter
+        const uniqueCategories = new Set();
+        response.data.services.forEach((service) => {
+          if (service.category) {
+            uniqueCategories.add(service.category);
+          }
+        });
+        setCategories(Array.from(uniqueCategories).sort());
+      } else {
+        setError("Failed to load services");
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [filteredServices, sortConfig]);
-
-  // Pagination
-  const totalPages = Math.ceil(sortedServices.length / itemsPerPage);
-  const paginatedServices = sortedServices.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    } catch (err) {
+      setError("An error occurred while fetching services");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -107,38 +90,113 @@ const ServicesManagement = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDelete = () => {
-    setServices(
-      services.filter((service) => service.id !== serviceToDelete.id)
-    );
-    setIsDeleteDialogOpen(false);
-    setServiceToDelete(null);
+  const confirmDelete = async () => {
+    setLoading(true);
+    try {
+      const response = await adminService.deleteService(serviceToDelete.id);
+      if (response.success) {
+        // Remove the deleted service from the state
+        setServices(
+          services.filter((service) => service.id !== serviceToDelete.id)
+        );
+        setIsDeleteDialogOpen(false);
+        setServiceToDelete(null);
+      } else {
+        setError("Failed to delete service");
+      }
+    } catch (err) {
+      setError("An error occurred while deleting the service");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSave = (updatedService) => {
-    setServices(
-      services.map((service) =>
-        service.id === updatedService.id ? updatedService : service
-      )
-    );
-    setIsEditModalOpen(false);
-    setEditingService(null);
+  const handleSave = async (updatedService) => {
+    setLoading(true);
+    try {
+      const response = await adminService.updateService(updatedService.id, {
+        name: updatedService.name,
+        category: updatedService.category,
+        description: updatedService.description || "",
+      });
+
+      if (response.success) {
+        // Update the service in the local state
+        setServices(
+          services.map((service) =>
+            service.id === updatedService.id ? response.data : service
+          )
+        );
+        setIsEditModalOpen(false);
+        setEditingService(null);
+      } else {
+        setError("Failed to update service");
+      }
+    } catch (err) {
+      setError("An error occurred while updating the service");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAddService = (newService) => {
-    const newId = Math.max(...services.map((service) => service.id), 0) + 1;
-    const serviceToAdd = {
-      id: newId,
-      ...newService,
-    };
-    setServices([...services, serviceToAdd]);
-    setIsAddModalOpen(false);
+  const handleAddService = async (newService) => {
+    setLoading(true);
+    try {
+      const response = await adminService.createService({
+        name: newService.name,
+        category: newService.category,
+        description: newService.description || "",
+      });
+
+      if (response.success) {
+        // Add the new service to the state
+        setServices([...services, response.data]);
+        setIsAddModalOpen(false);
+      } else {
+        setError("Failed to create service");
+      }
+    } catch (err) {
+      setError("An error occurred while creating the service");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "category") {
+      setCategoryFilter(value);
+    } else if (name === "status") {
+      setStatusFilter(value);
+    }
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when search term changes
   };
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort />;
     return sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />;
   };
+
+  if (loading && services.length === 0) {
+    return (
+      <div className="loading-container">
+        <FaSpinner className="spinner" />
+        <p>Loading services...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
 
   return (
     <div className="services-management admin-services">
@@ -151,7 +209,7 @@ const ServicesManagement = () => {
               type="text"
               placeholder="Search services..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
           <button
@@ -163,60 +221,92 @@ const ServicesManagement = () => {
         </div>
       </div>
 
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th onClick={() => handleSort("name")}>
-                Name {getSortIcon("name")}
-              </th>
-              <th onClick={() => handleSort("category")}>
-                Category {getSortIcon("category")}
-              </th>
-              <th onClick={() => handleSort("price")}>
-                Price {getSortIcon("price")}
-              </th>
-              <th onClick={() => handleSort("status")}>
-                Status {getSortIcon("status")}
-              </th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedServices.map((service) => (
-              <tr key={service.id}>
-                <td>{service.name}</td>
-                <td>{service.category}</td>
-                <td>${service.price}</td>
-                <td>
-                  <span
-                    className={`status-badge ${service.status.toLowerCase()}`}
-                  >
-                    {service.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button
-                      onClick={() => handleEdit(service)}
-                      className="action-btn edit"
-                      aria-label={`Edit ${service.name}`}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(service)}
-                      className="action-btn delete"
-                      aria-label={`Delete ${service.name}`}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+      <div className="filters-container">
+        <div className="filter-group">
+          <label htmlFor="categoryFilter">Category:</label>
+          <select
+            id="categoryFilter"
+            name="category"
+            value={categoryFilter}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Categories</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
-          </tbody>
-        </table>
+          </select>
+        </div>
+        <div className="filter-group">
+          <label htmlFor="statusFilter">Status:</label>
+          <select
+            id="statusFilter"
+            name="status"
+            value={statusFilter}
+            onChange={handleFilterChange}
+          >
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="table-container">
+        {services.length === 0 ? (
+          <div className="no-data">
+            No services found matching your criteria
+          </div>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th onClick={() => handleSort("name")}>
+                  Name {getSortIcon("name")}
+                </th>
+                <th onClick={() => handleSort("category")}>
+                  Category {getSortIcon("category")}
+                </th>
+                <th onClick={() => handleSort("createdAt")}>
+                  Created {getSortIcon("createdAt")}
+                </th>
+                <th onClick={() => handleSort("updatedAt")}>
+                  Updated {getSortIcon("updatedAt")}
+                </th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {services.map((service) => (
+                <tr key={service.id}>
+                  <td>{service.name}</td>
+                  <td>{service.category}</td>
+                  <td>{new Date(service.createdAt).toLocaleDateString()}</td>
+                  <td>{new Date(service.updatedAt).toLocaleDateString()}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button
+                        onClick={() => handleEdit(service)}
+                        className="action-btn edit"
+                        aria-label={`Edit ${service.name}`}
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(service)}
+                        className="action-btn delete"
+                        aria-label={`Delete ${service.name}`}
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Pagination */}
@@ -228,7 +318,7 @@ const ServicesManagement = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage} of {totalPages} ({totalServices} total services)
         </span>
         <button
           onClick={() =>
@@ -252,15 +342,16 @@ const ServicesManagement = () => {
         />
       )}
 
-      {/* Add Service Modal */}
+      {/* Add Modal */}
       {isAddModalOpen && (
-        <AddServiceModal
+        <EditServiceModal
+          service={null}
           onClose={() => setIsAddModalOpen(false)}
           onSave={handleAddService}
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation */}
       {isDeleteDialogOpen && (
         <DeleteConfirmationDialog
           service={serviceToDelete}
@@ -271,108 +362,6 @@ const ServicesManagement = () => {
           onConfirm={confirmDelete}
         />
       )}
-    </div>
-  );
-};
-
-// Add Service Modal Component
-const AddServiceModal = ({ onClose, onSave }) => {
-  const [newService, setNewService] = useState({
-    name: "",
-    category: "",
-    price: "",
-    status: "Active",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewService({
-      ...newService,
-      [name]: name === "price" ? parseFloat(value) || "" : value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(newService);
-  };
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content add-service-modal">
-        <div className="modal-header">
-          <h3>Add New Service</h3>
-          <button className="close-btn" onClick={onClose}>
-            &times;
-          </button>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Service Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={newService.name}
-              onChange={handleChange}
-              required
-              placeholder="Enter service name"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <select
-              id="category"
-              name="category"
-              value={newService.category}
-              onChange={handleChange}
-              required
-            >
-              <option value="" disabled>
-                Select a category
-              </option>
-              <option value="Medical">Medical</option>
-              <option value="Care">Care</option>
-              <option value="Home">Home</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="price">Price ($)</label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={newService.price}
-              onChange={handleChange}
-              required
-              min="0"
-              step="0.01"
-              placeholder="Enter price"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="status">Status</label>
-            <select
-              id="status"
-              name="status"
-              value={newService.status}
-              onChange={handleChange}
-              required
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-          <div className="modal-actions">
-            <button type="button" onClick={onClose} className="cancel-btn">
-              Cancel
-            </button>
-            <button type="submit" className="save-btn">
-              Add Service
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   FaSearch,
   FaSort,
@@ -11,99 +11,143 @@ import {
   FaPhone,
   FaEnvelope,
   FaFilter,
+  FaBuilding,
+  FaCalendarAlt,
+  FaTags,
 } from "react-icons/fa";
+import { adminService } from "../../services/api";
 
 const ProvidersManagement = () => {
-  const [providers, setProviders] = useState([
-    {
-      id: 1,
-      name: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 234-567-8901",
-      location: "New York, NY",
-      rating: 4.8,
-      status: "active",
-      services: ["Home Nursing", "Elderly Care"],
-      joinedDate: "2024-01-15",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      phone: "+1 234-567-8902",
-      location: "Los Angeles, CA",
-      rating: 4.5,
-      status: "inactive",
-      services: ["Physical Therapy", "Home Care"],
-      joinedDate: "2024-02-01",
-    },
-    {
-      id: 3,
-      name: "Michael Brown",
-      email: "michael.b@example.com",
-      phone: "+1 234-567-8903",
-      location: "Chicago, IL",
-      rating: 4.9,
-      status: "active",
-      services: ["Medical Care", "Home Nursing"],
-      joinedDate: "2024-01-20",
-    },
-  ]);
-
+  const [providers, setProviders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [serviceFilter, setServiceFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const itemsPerPage = 5;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalProviders, setTotalProviders] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
 
-  // Get unique services from all providers
-  const availableServices = useMemo(() => {
-    const services = new Set();
+  // Fetch providers data
+  useEffect(() => {
+    fetchProviders();
+  }, [currentPage, statusFilter, categoryFilter, cityFilter, searchTerm]);
+
+  const fetchProviders = async () => {
+    setLoading(true);
+    try {
+      const response = await adminService.getProviders(
+        currentPage,
+        itemsPerPage,
+        categoryFilter,
+        cityFilter,
+        statusFilter,
+        searchTerm
+      );
+
+      if (response.success) {
+        setProviders(response.data.providers);
+        setTotalProviders(response.data.total);
+        setTotalPages(response.data.pages);
+      } else {
+        setError("Failed to load providers");
+      }
+    } catch (err) {
+      setError("An error occurred while fetching providers");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get unique categories and cities from providers for filter options
+  const categories = useMemo(() => {
+    if (!providers.length) return [];
+    const categoriesSet = new Set();
     providers.forEach((provider) => {
-      provider.services.forEach((service) => services.add(service));
+      if (provider.serviceCategories) {
+        provider.serviceCategories.forEach((category) =>
+          categoriesSet.add(category)
+        );
+      }
     });
-    return Array.from(services).sort();
+    return Array.from(categoriesSet).sort();
   }, [providers]);
 
-  // Filter providers based on search term, status, and service
-  const filteredProviders = providers.filter((provider) => {
-    const matchesSearch =
-      provider.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      provider.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      provider.location.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" || provider.status === statusFilter;
-
-    const matchesService =
-      serviceFilter === "all" || provider.services.includes(serviceFilter);
-
-    return matchesSearch && matchesStatus && matchesService;
-  });
-
-  // Sort providers
-  const sortedProviders = React.useMemo(() => {
-    if (!sortConfig.key) return filteredProviders;
-
-    return [...filteredProviders].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1;
+  const cities = useMemo(() => {
+    if (!providers.length) return [];
+    const citiesSet = new Set();
+    providers.forEach((provider) => {
+      if (provider.city) {
+        citiesSet.add(provider.city);
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
     });
-  }, [filteredProviders, sortConfig]);
+    return Array.from(citiesSet).sort();
+  }, [providers]);
 
-  // Pagination
-  const totalPages = Math.ceil(sortedProviders.length / itemsPerPage);
-  const paginatedProviders = sortedProviders.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const activateProvider = async (providerId) => {
+    try {
+      const response = await adminService.activateUser(providerId);
+      if (response.success) {
+        // Update the provider in the local state
+        setProviders(
+          providers.map((provider) =>
+            provider.id === providerId
+              ? { ...provider, status: "active" }
+              : provider
+          )
+        );
+      } else {
+        setError("Failed to activate provider");
+      }
+    } catch (err) {
+      setError("An error occurred while activating provider");
+      console.error(err);
+    }
+  };
+
+  const deactivateProvider = async (providerId) => {
+    try {
+      const response = await adminService.deactivateUser(providerId);
+      if (response.success) {
+        // Update the provider in the local state
+        setProviders(
+          providers.map((provider) =>
+            provider.id === providerId
+              ? { ...provider, status: "inactive" }
+              : provider
+          )
+        );
+      } else {
+        setError("Failed to deactivate provider");
+      }
+    } catch (err) {
+      setError("An error occurred while deactivating provider");
+      console.error(err);
+    }
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "status") {
+      setStatusFilter(value);
+    } else if (name === "category") {
+      setCategoryFilter(value);
+    } else if (name === "city") {
+      setCityFilter(value);
+    }
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    // Reset to first page when search term changes
+    setCurrentPage(1);
+  };
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -113,30 +157,33 @@ const ProvidersManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleStatusChange = (providerId, newStatus) => {
-    setProviders(
-      providers.map((provider) =>
-        provider.id === providerId
-          ? { ...provider, status: newStatus }
-          : provider
-      )
-    );
-  };
+  // Sort providers (client-side sorting for properties not handled by API)
+  const sortedProviders = useMemo(() => {
+    if (!sortConfig.key) return providers;
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "status") {
-      setStatusFilter(value);
-    } else if (name === "service") {
-      setServiceFilter(value);
-    }
-    setCurrentPage(1); // Reset to first page when filter changes
-  };
+    return [...providers].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [providers, sortConfig]);
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort />;
     return sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />;
   };
+
+  if (loading && providers.length === 0) {
+    return <div className="loading-spinner">Loading providers...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
 
   return (
     <div className="providers-management">
@@ -149,7 +196,7 @@ const ProvidersManagement = () => {
               type="text"
               placeholder="Search providers..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
           <button
@@ -171,23 +218,39 @@ const ProvidersManagement = () => {
               value={statusFilter}
               onChange={handleFilterChange}
             >
-              <option value="all">All Status</option>
+              <option value="">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
           <div className="filter-group">
-            <label htmlFor="serviceFilter">Service:</label>
+            <label htmlFor="categoryFilter">Category:</label>
             <select
-              id="serviceFilter"
-              name="service"
-              value={serviceFilter}
+              id="categoryFilter"
+              name="category"
+              value={categoryFilter}
               onChange={handleFilterChange}
             >
-              <option value="all">All Services</option>
-              {availableServices.map((service) => (
-                <option key={service} value={service}>
-                  {service}
+              <option value="">All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <label htmlFor="cityFilter">City:</label>
+            <select
+              id="cityFilter"
+              name="city"
+              value={cityFilter}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Cities</option>
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
                 </option>
               ))}
             </select>
@@ -196,11 +259,11 @@ const ProvidersManagement = () => {
             <span>Sort by:</span>
             <button
               className={`sort-btn ${
-                sortConfig.key === "name" ? "active" : ""
+                sortConfig.key === "companyName" ? "active" : ""
               }`}
-              onClick={() => handleSort("name")}
+              onClick={() => handleSort("companyName")}
             >
-              Name {getSortIcon("name")}
+              Company {getSortIcon("companyName")}
             </button>
             <button
               className={`sort-btn ${
@@ -212,69 +275,100 @@ const ProvidersManagement = () => {
             </button>
             <button
               className={`sort-btn ${
-                sortConfig.key === "joinedDate" ? "active" : ""
+                sortConfig.key === "createdAt" ? "active" : ""
               }`}
-              onClick={() => handleSort("joinedDate")}
+              onClick={() => handleSort("createdAt")}
             >
-              Join Date {getSortIcon("joinedDate")}
+              Join Date {getSortIcon("createdAt")}
             </button>
           </div>
         </div>
       )}
 
       <div className="providers-grid">
-        {paginatedProviders.map((provider) => (
-          <div key={provider.id} className="provider-card">
-            <div className="provider-header">
-              <h3>{provider.name}</h3>
-              <span className={`status-badge ${provider.status}`}>
-                {provider.status}
-              </span>
-            </div>
-            <div className="provider-info">
-              <div className="info-item">
-                <FaEnvelope />
-                <span>{provider.email}</span>
-              </div>
-              <div className="info-item">
-                <FaPhone />
-                <span>{provider.phone}</span>
-              </div>
-              <div className="info-item">
-                <FaMapMarkerAlt />
-                <span>{provider.location}</span>
-              </div>
-              <div className="info-item">
-                <FaStar />
-                <span>{provider.rating} Rating</span>
-              </div>
-            </div>
-            <div className="provider-services">
-              {provider.services.map((service, index) => (
-                <span key={index} className="service-tag">
-                  {service}
-                </span>
-              ))}
-            </div>
-            <div className="provider-actions">
-              {provider.status === "active" ? (
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleStatusChange(provider.id, "inactive")}
-                >
-                  <FaUserTimes /> Deactivate
-                </button>
-              ) : (
-                <button
-                  className="btn btn-success"
-                  onClick={() => handleStatusChange(provider.id, "active")}
-                >
-                  <FaUserCheck /> Activate
-                </button>
-              )}
-            </div>
+        {sortedProviders.length === 0 ? (
+          <div className="no-results">
+            No providers found matching your criteria
           </div>
-        ))}
+        ) : (
+          sortedProviders.map((provider) => (
+            <div key={provider.id} className="provider-card">
+              <div className="provider-header">
+                <h3>{provider.companyName}</h3>
+                <span className={`status-badge ${provider.status || "active"}`}>
+                  {provider.status || "Active"}
+                </span>
+              </div>
+              <div className="provider-info">
+                <div className="info-item">
+                  <FaEnvelope />
+                  <span>{provider.email}</span>
+                </div>
+                <div className="info-item">
+                  <FaPhone />
+                  <span>{provider.phone}</span>
+                </div>
+                <div className="info-item">
+                  <FaMapMarkerAlt />
+                  <span>
+                    {provider.city}, {provider.region}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <FaStar />
+                  <span>
+                    {provider.rating || "No ratings"}{" "}
+                    {provider.rating && "Rating"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <FaCalendarAlt />
+                  <span>Total Bookings: {provider.totalBookings || 0}</span>
+                </div>
+                <div className="info-item">
+                  <FaBuilding />
+                  <span>
+                    Joined: {new Date(provider.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+              {provider.serviceCategories &&
+                provider.serviceCategories.length > 0 && (
+                  <div className="provider-services">
+                    <div className="info-item">
+                      <FaTags />
+                      <span>Services:</span>
+                    </div>
+                    <div className="service-tags">
+                      {provider.serviceCategories.map((service, idx) => (
+                        <span key={idx} className="service-tag">
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              <div className="provider-actions">
+                {(!provider.status || provider.status === "inactive") && (
+                  <button
+                    className="btn-success"
+                    onClick={() => activateProvider(provider.id)}
+                  >
+                    <FaUserCheck /> Activate
+                  </button>
+                )}
+                {(!provider.status || provider.status === "active") && (
+                  <button
+                    className="btn-danger"
+                    onClick={() => deactivateProvider(provider.id)}
+                  >
+                    <FaUserTimes /> Deactivate
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Pagination */}
@@ -286,7 +380,7 @@ const ProvidersManagement = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage} of {totalPages} ({totalProviders} total providers)
         </span>
         <button
           onClick={() =>

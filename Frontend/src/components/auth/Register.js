@@ -1,10 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "react-toastify";
+import Select from "react-select";
+import syrianLocations from "../../data/syrianLocations.json";
 
 const Register = () => {
   const [activeTab, setActiveTab] = useState("homeowner");
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+  const { registerHomeowner, registerServiceProvider } = useAuth();
 
   // Homeowner form state
   const [homeownerForm, setHomeownerForm] = useState({
@@ -39,8 +47,6 @@ const Register = () => {
     yearsInBusiness: "",
     employeeCount: "",
     licenses: [],
-    insurance: false,
-    insuranceDetails: "",
 
     // Step 4: Profile setup
     bio: "",
@@ -71,55 +77,62 @@ const Register = () => {
     { id: "flooring", name: "Flooring" },
   ];
 
-  // Syrian cities and regions
-  const syrianCities = [
-    "Damascus",
-    "Aleppo",
-    "Homs",
-    "Latakia",
-    "Hama",
-    "Tartus",
-    "Deir ez-Zor",
-    "Al-Hasakah",
-    "Raqqa",
-    "Daraa",
-    "Idlib",
-    "Quneitra",
-    "As-Suwayda",
-  ];
+  // Replace the static arrays with data from JSON
+  const cities = syrianLocations.cities.map((city) => ({
+    value: city.id,
+    label: city.name,
+  }));
 
-  const syrianRegions = [
-    "Damascus Governorate",
-    "Aleppo Governorate",
-    "Homs Governorate",
-    "Latakia Governorate",
-    "Hama Governorate",
-    "Tartus Governorate",
-    "Deir ez-Zor Governorate",
-    "Al-Hasakah Governorate",
-    "Raqqa Governorate",
-    "Daraa Governorate",
-    "Idlib Governorate",
-    "Quneitra Governorate",
-    "As-Suwayda Governorate",
-  ];
-
-  // Handle input change for homeowner form
-  const handleHomeownerChange = (e) => {
-    const { name, value } = e.target;
-    setHomeownerForm({
-      ...homeownerForm,
-      [name]: value,
-    });
+  // Function to get regions for a selected city
+  const getRegionsForCity = (cityId) => {
+    const city = syrianLocations.cities.find((c) => c.id === cityId);
+    return city
+      ? city.regions.map((region) => ({
+          value: region.id,
+          label: region.name,
+        }))
+      : [];
   };
 
-  // Handle input change for provider form
+  // State to store available regions based on selected city
+  const [availableRegions, setAvailableRegions] = useState([]);
+
+  // Update city selection handler for homeowner
+  const handleHomeownerChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "city") {
+      const cityData = syrianLocations.cities.find((c) => c.id === value);
+      setHomeownerForm({
+        ...homeownerForm,
+        city: value,
+        region: "", // Reset region when city changes
+      });
+      setAvailableRegions(cityData ? cityData.regions : []);
+    } else {
+      setHomeownerForm({
+        ...homeownerForm,
+        [name]: value,
+      });
+    }
+  };
+
+  // Update city selection handler for provider
   const handleProviderChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setProviderForm({
-      ...providerForm,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    if (name === "city") {
+      const cityData = syrianLocations.cities.find((c) => c.id === value);
+      setProviderForm({
+        ...providerForm,
+        city: value,
+        region: "", // Reset region when city changes
+      });
+      setAvailableRegions(cityData ? cityData.regions : []);
+    } else {
+      setProviderForm({
+        ...providerForm,
+        [name]: type === "checkbox" ? checked : value,
+      });
+    }
   };
 
   // Handle service category selection
@@ -140,21 +153,13 @@ const Register = () => {
     });
   };
 
-  // Handle service region selection
-  const handleServiceRegionChange = (region) => {
-    const updatedRegions = [...providerForm.serviceRegions];
-    if (updatedRegions.includes(region)) {
-      // Remove region if already selected
-      const index = updatedRegions.indexOf(region);
-      updatedRegions.splice(index, 1);
-    } else {
-      // Add region if not selected
-      updatedRegions.push(region);
-    }
-
+  // Handle service region selection with react-select
+  const handleServiceRegionChange = (selectedOptions) => {
     setProviderForm({
       ...providerForm,
-      serviceRegions: updatedRegions,
+      serviceRegions: selectedOptions
+        ? selectedOptions.map((option) => option.value)
+        : [],
     });
   };
 
@@ -175,21 +180,108 @@ const Register = () => {
     });
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  // Add this function at the top level of your component
+  const validatePasswords = (password, confirmPassword) => {
+    if (password !== confirmPassword) {
+      return "Passwords do not match";
+    }
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    return null;
+  };
+
+  // Update handleSubmit function
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      console.log("Starting registration process...");
+      let result;
+
+      if (activeTab === "homeowner") {
+        // Validate passwords
+        const passwordError = validatePasswords(
+          homeownerForm.password,
+          homeownerForm.confirmPassword
+        );
+        if (passwordError) {
+          setError(passwordError);
+          toast.error(passwordError);
+          setIsLoading(false);
+          return;
+        }
+
+        console.log("Submitting homeowner registration:", homeownerForm);
+        result = await registerHomeowner(homeownerForm, (path) => {
+          console.log("Navigation callback called with path:", path);
+          navigate(path);
+          toast.success("Registration and login successful!");
+        });
+      } else {
+        // Validate passwords
+        const passwordError = validatePasswords(
+          providerForm.password,
+          providerForm.confirmPassword
+        );
+        if (passwordError) {
+          setError(passwordError);
+          toast.error(passwordError);
+          setIsLoading(false);
+          return;
+        }
+
+        // Format availability data as array of strings
+        const availabilityArray = Object.entries(providerForm.availability)
+          .filter(([_, value]) => value.available)
+          .map(([day, value]) => `${day}:${value.from}-${value.to}`);
+
+        const providerData = {
+          companyName: providerForm.companyName,
+          firstName: providerForm.firstName,
+          lastName: providerForm.lastName,
+          email: providerForm.email,
+          phone: providerForm.phone,
+          password: providerForm.password,
+          city: providerForm.city,
+          region: providerForm.region,
+          serviceCategories: providerForm.serviceCategories,
+          serviceRegions: providerForm.serviceRegions,
+          yearsInBusiness: providerForm.yearsInBusiness,
+          employeeCount: providerForm.employeeCount,
+          bio: providerForm.bio,
+          availability: availabilityArray,
+        };
+
+        console.log(
+          "Submitting provider registration with formatted data:",
+          providerData
+        );
+        result = await registerServiceProvider(providerData, (path) => {
+          console.log("Navigation callback called with path:", path);
+          navigate(path);
+          toast.success("Registration and login successful!");
+        });
+      }
+
+      console.log("Registration result:", result);
+
+      if (result.success) {
+        console.log("Registration successful");
+      } else {
+        console.log("Registration failed:", result.error);
+        setError(result.error || "Registration failed. Please try again.");
+        toast.error(result.error || "Registration failed. Please try again.");
+      }
+    } catch (err) {
+      console.error("Unexpected registration error:", err);
+      setError("An unexpected error occurred. Please try again later.");
+      toast.error("An unexpected error occurred. Please try again later.");
+    } finally {
       setIsLoading(false);
-      console.log(
-        "Registering as",
-        activeTab,
-        activeTab === "homeowner" ? homeownerForm : providerForm
-      );
-      // Handle registration logic here
-    }, 1500);
+    }
   };
 
   // Go to next step in provider registration
@@ -276,9 +368,9 @@ const Register = () => {
             required
           >
             <option value="">Select your city</option>
-            {syrianCities.map((city) => (
-              <option key={city} value={city}>
-                {city}
+            {syrianLocations.cities.map((city) => (
+              <option key={city.id} value={city.id}>
+                {city.name}
               </option>
             ))}
           </select>
@@ -292,13 +384,15 @@ const Register = () => {
             value={homeownerForm.region}
             onChange={handleHomeownerChange}
             required
+            disabled={!homeownerForm.city}
           >
             <option value="">Select your region</option>
-            {syrianRegions.map((region) => (
-              <option key={region} value={region}>
-                {region}
-              </option>
-            ))}
+            {homeownerForm.city &&
+              getRegionsForCity(homeownerForm.city).map((region) => (
+                <option key={region.value} value={region.value}>
+                  {region.label}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -508,9 +602,9 @@ const Register = () => {
             required
           >
             <option value="">Select your city</option>
-            {syrianCities.map((city) => (
-              <option key={city} value={city}>
-                {city}
+            {syrianLocations.cities.map((city) => (
+              <option key={city.id} value={city.id}>
+                {city.name}
               </option>
             ))}
           </select>
@@ -524,13 +618,15 @@ const Register = () => {
             value={providerForm.region}
             onChange={handleProviderChange}
             required
+            disabled={!providerForm.city}
           >
             <option value="">Select your region</option>
-            {syrianRegions.map((region) => (
-              <option key={region} value={region}>
-                {region}
-              </option>
-            ))}
+            {providerForm.city &&
+              getRegionsForCity(providerForm.city).map((region) => (
+                <option key={region.value} value={region.value}>
+                  {region.label}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -550,6 +646,15 @@ const Register = () => {
 
   // Render provider registration step 3
   const renderProviderStep3 = () => {
+    // Create all regions options from all cities
+    const allRegionsOptions = syrianLocations.cities.flatMap((city) =>
+      city.regions.map((region) => ({
+        value: `${city.id}-${region.id}`,
+        label: `${region.name} (${city.name})`,
+        labelAr: `${region.nameAr} (${city.nameAr})`,
+      }))
+    );
+
     return (
       <div className="step-form">
         <div className="step-header">
@@ -621,53 +726,31 @@ const Register = () => {
 
         <div className="form-group">
           <label>Service Regions</label>
-          <div className="region-grid">
-            {syrianRegions.map((region) => (
-              <div
-                key={region}
-                className={`region-item ${
-                  providerForm.serviceRegions.includes(region) ? "selected" : ""
-                }`}
-                onClick={() => handleServiceRegionChange(region)}
-              >
-                <div className="region-check">
-                  {providerForm.serviceRegions.includes(region) && (
-                    <i className="fas fa-check"></i>
-                  )}
-                </div>
-                <span>{region}</span>
-              </div>
-            ))}
-          </div>
+          <Select
+            isMulti
+            name="serviceRegions"
+            options={allRegionsOptions}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            value={allRegionsOptions.filter((option) =>
+              providerForm.serviceRegions.includes(option.value)
+            )}
+            onChange={(selected) => {
+              setProviderForm({
+                ...providerForm,
+                serviceRegions: selected
+                  ? selected.map((option) => option.value)
+                  : [],
+              });
+            }}
+            placeholder="Select regions where you provide services..."
+            noOptionsMessage={() => "No regions found"}
+            closeMenuOnSelect={false}
+          />
           <small className="form-text">
             Select all regions where you provide services
           </small>
         </div>
-
-        <div className="form-check">
-          <input
-            type="checkbox"
-            id="insurance"
-            name="insurance"
-            checked={providerForm.insurance}
-            onChange={handleProviderChange}
-          />
-          <label htmlFor="insurance">I have liability insurance</label>
-        </div>
-
-        {providerForm.insurance && (
-          <div className="form-group">
-            <label htmlFor="insuranceDetails">Insurance Details</label>
-            <textarea
-              id="insuranceDetails"
-              name="insuranceDetails"
-              value={providerForm.insuranceDetails}
-              onChange={handleProviderChange}
-              placeholder="Please provide details about your insurance coverage"
-              rows="2"
-            />
-          </div>
-        )}
 
         <div className="form-actions">
           <button type="button" className="btn-prev" onClick={goToPreviousStep}>
@@ -874,6 +957,7 @@ const Register = () => {
             onClick={() => {
               setActiveTab("homeowner");
               setStep(1);
+              setError("");
             }}
           >
             I'm a Homeowner
@@ -883,26 +967,19 @@ const Register = () => {
             onClick={() => {
               setActiveTab("provider");
               setStep(1);
+              setError("");
             }}
           >
             I'm a Service Provider
           </button>
         </div>
 
-        <div className="social-auth">
-          <button className="social-btn google">
-            <i className="fab fa-google"></i>
-            <span>Continue with Google</span>
-          </button>
-          <button className="social-btn facebook">
-            <i className="fab fa-facebook-f"></i>
-            <span>Continue with Facebook</span>
-          </button>
-        </div>
-
-        <div className="auth-divider">
-          <span>or register with email</span>
-        </div>
+        {error && (
+          <div className="error-message">
+            <i className="fas fa-exclamation-circle"></i>
+            <span>{error}</span>
+          </div>
+        )}
 
         {activeTab === "homeowner"
           ? renderHomeownerForm()

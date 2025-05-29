@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 
-
 const EditServiceModal = ({ service, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
-    price: "",
-    status: "Active",
+    description: "",
   });
 
   useEffect(() => {
@@ -15,8 +13,14 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
       setFormData({
         name: service.name || "",
         category: service.category || "",
-        price: service.price || "",
-        status: service.status || "Active",
+        description: service.description || "",
+      });
+    } else {
+      // Reset form for new service
+      setFormData({
+        name: "",
+        category: "",
+        description: "",
       });
     }
   }, [service]);
@@ -34,7 +38,6 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
     onSave({
       ...service,
       ...formData,
-      price: Number(formData.price),
     });
   };
 
@@ -42,7 +45,7 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
     <div className="modal-overlay">
       <div className="modal">
         <div className="modal-header">
-          <h2>Edit Service</h2>
+          <h2>{service ? "Edit Service" : "Add New Service"}</h2>
           <button
             className="modal-close"
             onClick={onClose}
@@ -62,48 +65,31 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                placeholder="Enter service name"
               />
             </div>
             <div className="form-group">
               <label htmlFor="category">Category</label>
-              <select
+              <input
+                type="text"
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 required
-              >
-                <option value="">Select Category</option>
-                <option value="Medical">Medical</option>
-                <option value="Care">Care</option>
-                <option value="Home">Home</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="price">Price ($)</label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                min="0"
-                step="0.01"
-                required
+                placeholder="Enter category (e.g., Medical, Home)"
               />
             </div>
             <div className="form-group">
-              <label htmlFor="status">Status</label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleChange}
-                required
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
+                placeholder="Enter service description"
+                rows="4"
+              />
             </div>
           </div>
           <div className="modal-footer">
@@ -115,7 +101,7 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
-              Save Changes
+              {service ? "Save Changes" : "Add Service"}
             </button>
           </div>
         </form>

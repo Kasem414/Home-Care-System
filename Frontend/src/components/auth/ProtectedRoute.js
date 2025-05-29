@@ -2,18 +2,16 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-// Set this to true during development to bypass authentication requirements
-// IMPORTANT: Set to false before production deployment
-const DEVELOPMENT_MODE = true;
+// Set this to false to enforce authentication
+const DEVELOPMENT_MODE = false;
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { isAuthenticated, loading, user } = useAuth();
   const location = useLocation();
 
-  // For development purposes only - creates a test user if none exists
-  if (DEVELOPMENT_MODE && !isAuthenticated) {
+  // For development purposes only - bypass authentication if needed
+  if (DEVELOPMENT_MODE) {
     console.warn("⚠️ Development mode is enabled - bypassing authentication");
-    // In development mode, we'll bypass authentication checks
     return children;
   }
 
@@ -26,13 +24,20 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Check for role-based access
   if (requiredRole && user.role !== requiredRole) {
-    // Redirect to home page if user doesn't have required role
-    return <Navigate to="/" replace />;
+    // Customize based on user role
+    if (user.role === "homeowner") {
+      return <Navigate to="/homeowner/dashboard" replace />;
+    } else if (user.role === "provider") {
+      return <Navigate to="/provider/dashboard" replace />;
+    } else {
+      // Fallback for any other role
+      return <Navigate to="/" replace />;
+    }
   }
 
   return children;
 };
 
 export default ProtectedRoute;
- 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   FaSearch,
   FaSort,
@@ -12,82 +12,86 @@ import {
   FaFilter,
   FaUser,
 } from "react-icons/fa";
+import { adminService } from "../../services/api";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      phone: "+1 234-567-8902",
-      location: "Los Angeles, CA",
-      role: "customer",
-      status: "active",
-      joinedDate: "2024-02-01",
-    },
-    {
-      id: 2,
-      name: "Emily Davis",
-      email: "emily.d@example.com",
-      phone: "+1 234-567-8904",
-      location: "Miami, FL",
-      role: "customer",
-      status: "active",
-      joinedDate: "2024-02-15",
-    },
-    {
-      id: 3,
-      name: "Robert Wilson",
-      email: "robert.w@example.com",
-      phone: "+1 234-567-8905",
-      location: "Seattle, WA",
-      role: "customer",
-      status: "inactive",
-      joinedDate: "2024-03-01",
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const itemsPerPage = 5;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
 
-  // Filter users based on search term and status
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.location.toLowerCase().includes(searchTerm.toLowerCase());
+  useEffect(() => {
+    fetchUsers();
+  }, [currentPage, statusFilter, roleFilter, searchTerm]);
 
-    const matchesStatus =
-      statusFilter === "all" || user.status === statusFilter;
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await adminService.getUsers(
+        currentPage,
+        itemsPerPage,
+        roleFilter,
+        statusFilter,
+        searchTerm
+      );
 
-    return matchesSearch && matchesStatus;
-  });
-
-  // Sort users
-  const sortedUsers = React.useMemo(() => {
-    if (!sortConfig.key) return filteredUsers;
-
-    return [...filteredUsers].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1;
+      if (response.success) {
+        setUsers(response.data.users);
+        setTotalUsers(response.data.total);
+        setTotalPages(response.data.pages);
+      } else {
+        setError("Failed to load users");
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [filteredUsers, sortConfig]);
+    } catch (err) {
+      setError("An error occurred while fetching users");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Pagination
-  const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
-  const paginatedUsers = sortedUsers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const handleStatusChange = async (userId, newStatus) => {
+    try {
+      const response = await adminService.updateUserStatus(userId, newStatus);
+      if (response.success) {
+        // Update the user in the local state
+        setUsers(
+          users.map((user) =>
+            user.id === userId ? { ...user, status: newStatus } : user
+          )
+        );
+      } else {
+        setError("Failed to update user status");
+      }
+    } catch (err) {
+      setError("An error occurred while updating status");
+      console.error(err);
+    }
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "status") {
+      setStatusFilter(value);
+    } else if (name === "role") {
+      setRoleFilter(value);
+    }
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    // Reset to first page when search term changes
+    setCurrentPage(1);
+  };
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -97,39 +101,46 @@ const UserManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const handleStatusChange = (userId, newStatus) => {
-    setUsers(
-      users.map((user) =>
-        user.id === userId ? { ...user, status: newStatus } : user
-      )
-    );
-  };
+  // Sort users (client-side sorting for properties not handled by API)
+  const sortedUsers = useMemo(() => {
+    if (!sortConfig.key) return users;
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "status") {
-      setStatusFilter(value);
-    }
-    setCurrentPage(1); // Reset to first page when filter changes
-  };
+    return [...users].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [users, sortConfig]);
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort />;
     return sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />;
   };
 
+  if (loading && users.length === 0) {
+    return <div className="loading-spinner">Loading users...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
+
   return (
     <div className="user-management">
       <div className="table-header">
-        <h2>Client Management</h2>
+        <h2>User Management</h2>
         <div className="header-actions">
           <div className="search-box">
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Search clients..."
+              placeholder="Search users..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
           <button
@@ -151,77 +162,112 @@ const UserManagement = () => {
               value={statusFilter}
               onChange={handleFilterChange}
             >
-              <option value="all">All Status</option>
+              <option value="">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
+              <option value="pending">Pending</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label htmlFor="roleFilter">Role:</label>
+            <select
+              id="roleFilter"
+              name="role"
+              value={roleFilter}
+              onChange={handleFilterChange}
+            >
+              <option value="">All Roles</option>
+              <option value="homeowner">Homeowner</option>
+              <option value="provider">Service Provider</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
           <div className="sort-options">
             <span>Sort by:</span>
             <button
               className={`sort-btn ${
-                sortConfig.key === "name" ? "active" : ""
+                sortConfig.key === "firstName" ? "active" : ""
               }`}
-              onClick={() => handleSort("name")}
+              onClick={() => handleSort("firstName")}
             >
-              Name {getSortIcon("name")}
+              Name {getSortIcon("firstName")}
             </button>
             <button
               className={`sort-btn ${
-                sortConfig.key === "joinedDate" ? "active" : ""
+                sortConfig.key === "createdAt" ? "active" : ""
               }`}
-              onClick={() => handleSort("joinedDate")}
+              onClick={() => handleSort("createdAt")}
             >
-              Join Date {getSortIcon("joinedDate")}
+              Join Date {getSortIcon("createdAt")}
+            </button>
+            <button
+              className={`sort-btn ${
+                sortConfig.key === "lastLogin" ? "active" : ""
+              }`}
+              onClick={() => handleSort("lastLogin")}
+            >
+              Last Login {getSortIcon("lastLogin")}
             </button>
           </div>
         </div>
       )}
 
       <div className="users-grid">
-        {paginatedUsers.map((user) => (
-          <div key={user.id} className="user-card">
-            <div className="user-header">
-              <div className="user-title">
-                <h3>{user.name}</h3>
-              </div>
-              <span className={`status-badge ${user.status}`}>
-                {user.status}
-              </span>
-            </div>
-            <div className="user-info">
-              <div className="info-item">
-                <FaEnvelope />
-                <span>{user.email}</span>
-              </div>
-              <div className="info-item">
-                <FaPhone />
-                <span>{user.phone}</span>
-              </div>
-              <div className="info-item">
-                <FaMapMarkerAlt />
-                <span>{user.location}</span>
-              </div>
-            </div>
-            <div className="user-actions">
-              {user.status === "active" ? (
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleStatusChange(user.id, "inactive")}
-                >
-                  <FaUserTimes /> Deactivate
-                </button>
-              ) : (
-                <button
-                  className="btn btn-success"
-                  onClick={() => handleStatusChange(user.id, "active")}
-                >
-                  <FaUserCheck /> Activate
-                </button>
-              )}
-            </div>
+        {sortedUsers.length === 0 ? (
+          <div className="no-results">
+            No users found matching your criteria
           </div>
-        ))}
+        ) : (
+          sortedUsers.map((user) => (
+            <div key={user.id} className="user-card">
+              <div className="user-header">
+                <div className="user-title">
+                  <h3>
+                    {user.firstName} {user.lastName}
+                  </h3>
+                  <span className="user-role">{user.role}</span>
+                </div>
+                <span className={`status-badge ${user.status}`}>
+                  {user.status}
+                </span>
+              </div>
+              <div className="user-info">
+                <div className="info-item">
+                  <FaEnvelope />
+                  <span>{user.email}</span>
+                </div>
+                <div className="info-item">
+                  <FaPhone />
+                  <span>{user.phone || "Not provided"}</span>
+                </div>
+                <div className="info-item">
+                  <FaUser />
+                  <span>
+                    Joined: {new Date(user.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+              <div className="user-actions">
+                {user.status === "active" ? (
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleStatusChange(user.id, "inactive")}
+                  >
+                    <FaUserTimes /> Deactivate
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-success"
+                    onClick={() => handleStatusChange(user.id, "active")}
+                  >
+                    <FaUserCheck /> Activate
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Pagination */}
@@ -233,7 +279,7 @@ const UserManagement = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          Page {currentPage} of {totalPages} ({totalUsers} total users)
         </span>
         <button
           onClick={() =>
