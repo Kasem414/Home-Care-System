@@ -6,77 +6,117 @@ import {
   FaSortDown,
   FaUserCheck,
   FaUserTimes,
-  FaMapMarkerAlt,
   FaPhone,
   FaEnvelope,
   FaFilter,
   FaUser,
-  FaTags,
-  FaStar,
-  FaCalendarAlt,
 } from "react-icons/fa";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import "../../styles/components/admin/UserManagement.css";
 
-const API_BASE_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:3001/api";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState("");
-  const [roleFilter, setRoleFilter] = useState("customer"); // Default to showing customers
+  const [roleFilter, setRoleFilter] = useState("customer");
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
+  const [totalUsers, setTotalUsers] = useState(0);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const checkTokenValidity = () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+
+      // Debug token information
+      console.log("Token from localStorage:", token);
+
+      const decodedToken = jwtDecode(token);
+      console.log("Decoded token:", decodedToken);
+      console.log(
+        "Token expiration:",
+        new Date(decodedToken.exp * 1000).toLocaleString()
+      );
+      console.log("Current time:", new Date().toLocaleString());
+
+      const currentTime = Date.now() / 1000;
+      if (decodedToken.exp < currentTime) {
+        throw new Error("Token has expired");
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Token validation error:", error);
+      if (error.message === "Invalid token specified") {
+        console.error("Token format is invalid");
+      }
+      logout();
+      navigate("/login");
+      return false;
+    }
+  };
 
   useEffect(() => {
-    fetchUsers();
-  }, [currentPage, statusFilter, roleFilter, searchTerm]);
+    if (checkTokenValidity()) {
+      fetchUsers();
+    }
+  }, [currentPage, roleFilter, searchTerm]);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${API_BASE_URL}/users`, {
+      console.log("Making request with token:", token);
+
+      const response = await axios.get(`${API_BASE_URL}/users/users/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
         params: {
           page: currentPage,
-          limit: itemsPerPage,
           role: roleFilter,
-          status: statusFilter,
           search: searchTerm,
         },
       });
 
-      if (response.data.success) {
-        setUsers(response.data.data);
-        setTotalUsers(response.data.total);
-        setTotalPages(Math.ceil(response.data.total / itemsPerPage));
-      } else {
-        setError("Failed to load users");
-      }
+      setUsers(response.data.results);
+      setTotalUsers(response.data.count);
+      setTotalPages(response.data.total_pages);
     } catch (err) {
-      setError("An error occurred while fetching users");
-      console.error(err);
+      console.error("Full error object:", err);
+      console.error("Error response:", err.response?.data);
+
+      if (err.response?.data?.code === "token_not_valid") {
+        console.error("Token validation failed:", err.response.data);
+        logout();
+        navigate("/login");
+      } else {
+        setError("An error occurred while fetching users");
+        console.error(err);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleStatusChange = async (userId, newStatus) => {
+  const handleStatusChange = async (userId, newActive) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
-        `${API_BASE_URL}/users/${userId}/status`,
-        { status: newStatus },
+        `${API_BASE_URL}/users/users/${userId}/`,
+        { active: newActive },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,10 +124,10 @@ const UserManagement = () => {
         }
       );
 
-      if (response.data.success) {
+      if (response.status === 200) {
         setUsers(
           users.map((user) =>
-            user._id === userId ? { ...user, status: newStatus } : user
+            user.id === userId ? { ...user, active: newActive } : user
           )
         );
       } else {
@@ -101,9 +141,7 @@ const UserManagement = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    if (name === "status") {
-      setStatusFilter(value);
-    } else if (name === "role") {
+    if (name === "role") {
       setRoleFilter(value);
     }
     setCurrentPage(1);
@@ -145,19 +183,21 @@ const UserManagement = () => {
     const isProvider = user.role === "service_provider";
 
     return (
-      <div key={user._id} className="user-card">
+      <div key={user.id} className="user-card">
         <div className="user-header">
           <div className="user-title">
             <h3>
               {user.firstName} {user.lastName}
             </h3>
             <span className="user-role">
-              {user.role === "service_provider"
-                ? "Service Provider"
-                : "Customer"}
+              {isProvider ? "Service Provider" : "Customer"}
             </span>
           </div>
-          <span className={`status-badge ${user.status}`}>{user.status}</span>
+          <span
+            className={`status-badge ${user.active ? "active" : "inactive"}`}
+          >
+            {user.active ? "Active" : "Inactive"}
+          </span>
         </div>
 
         <div className="user-info">
@@ -169,51 +209,26 @@ const UserManagement = () => {
             <FaPhone />
             <span>{user.phone || "Not provided"}</span>
           </div>
-          {user.city && (
+          {user.payment && (
             <div className="info-item">
-              <FaMapMarkerAlt />
-              <span>
-                {user.city}, {user.region}
-              </span>
+              <FaUser />
+              <span>Payment: ${user.payment}</span>
             </div>
-          )}
-          <div className="info-item">
-            <FaCalendarAlt />
-            <span>Joined: {new Date(user.createdAt).toLocaleDateString()}</span>
-          </div>
-          {isProvider && (
-            <>
-              {user.rating && (
-                <div className="info-item">
-                  <FaStar />
-                  <span>Rating: {user.rating}</span>
-                </div>
-              )}
-              {user.serviceCategories && (
-                <div className="info-item">
-                  <FaTags />
-                  <span>
-                    Services:{" "}
-                    {user.serviceCategories.map((cat) => cat.name).join(", ")}
-                  </span>
-                </div>
-              )}
-            </>
           )}
         </div>
 
         <div className="user-actions">
-          {user.status === "active" ? (
+          {user.active ? (
             <button
               className="btn btn-danger"
-              onClick={() => handleStatusChange(user._id, "inactive")}
+              onClick={() => handleStatusChange(user.id, false)}
             >
               <FaUserTimes /> Deactivate
             </button>
           ) : (
             <button
               className="btn btn-success"
-              onClick={() => handleStatusChange(user._id, "active")}
+              onClick={() => handleStatusChange(user.id, true)}
             >
               <FaUserCheck /> Activate
             </button>
@@ -273,21 +288,6 @@ const UserManagement = () => {
 
       {showFilters && (
         <div className="filters-panel">
-          <div className="filter-group">
-            <label htmlFor="statusFilter">Status:</label>
-            <select
-              id="statusFilter"
-              name="status"
-              value={statusFilter}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="pending">Pending</option>
-              <option value="suspended">Suspended</option>
-            </select>
-          </div>
           <div className="sort-options">
             <span>Sort by:</span>
             <button
@@ -300,11 +300,11 @@ const UserManagement = () => {
             </button>
             <button
               className={`sort-btn ${
-                sortConfig.key === "createdAt" ? "active" : ""
+                sortConfig.key === "email" ? "active" : ""
               }`}
-              onClick={() => handleSort("createdAt")}
+              onClick={() => handleSort("email")}
             >
-              Join Date {getSortIcon("createdAt")}
+              Email {getSortIcon("email")}
             </button>
           </div>
         </div>

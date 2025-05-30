@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
+import "./EditServiceModal.css";
 
 const EditServiceModal = ({ service, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     name: "",
-    category: "",
     description: "",
   });
 
@@ -12,14 +12,12 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
     if (service) {
       setFormData({
         name: service.name || "",
-        category: service.category || "",
         description: service.description || "",
       });
     } else {
       // Reset form for new service
       setFormData({
         name: "",
-        category: "",
         description: "",
       });
     }
@@ -66,18 +64,7 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
                 onChange={handleChange}
                 required
                 placeholder="Enter service name"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="category">Category</label>
-              <input
-                type="text"
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-                placeholder="Enter category (e.g., Medical, Home)"
+                className="form-input"
               />
             </div>
             <div className="form-group">
@@ -89,13 +76,14 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
                 onChange={handleChange}
                 placeholder="Enter service description"
                 rows="4"
+                className="form-textarea"
               />
             </div>
           </div>
           <div className="modal-footer">
             <button
               type="button"
-              className="btn btn-outlined"
+              className="btn btn-secondary"
               onClick={onClose}
             >
               Cancel

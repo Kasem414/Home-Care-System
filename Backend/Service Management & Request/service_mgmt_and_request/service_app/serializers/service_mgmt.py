@@ -10,7 +10,7 @@ class ServiceCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceCategory
         fields = '__all__'
-        read_only_fields = ('id', 'created_by_user_id', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'created_at', 'updated_at')
 
     def validate_name(self, value):
         """

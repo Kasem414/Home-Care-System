@@ -19,48 +19,32 @@ const ServicesManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [totalServices, setTotalServices] = useState(0);
   const itemsPerPage = 10;
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
 
   // Fetch services data
   useEffect(() => {
     fetchServices();
-  }, [currentPage, categoryFilter, statusFilter, searchTerm]);
+  }, [currentPage]);
 
   const fetchServices = async () => {
     setLoading(true);
     try {
       const response = await adminService.getServices(
         currentPage,
-        itemsPerPage,
-        categoryFilter,
-        statusFilter,
-        searchTerm
+        itemsPerPage
       );
 
       if (response.success) {
         setServices(response.data.services);
         setTotalServices(response.data.total);
         setTotalPages(response.data.pages);
-
-        // Extract unique categories from services for the filter
-        const uniqueCategories = new Set();
-        response.data.services.forEach((service) => {
-          if (service.category) {
-            uniqueCategories.add(service.category);
-          }
-        });
-        setCategories(Array.from(uniqueCategories).sort());
+        setCurrentPage(response.data.currentPage);
       } else {
         setError("Failed to load services");
       }
@@ -70,14 +54,6 @@ const ServicesManagement = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
   };
 
   const handleEdit = (service) => {
@@ -95,17 +71,19 @@ const ServicesManagement = () => {
     try {
       const response = await adminService.deleteService(serviceToDelete.id);
       if (response.success) {
-        // Remove the deleted service from the state
-        setServices(
-          services.filter((service) => service.id !== serviceToDelete.id)
-        );
+        // Refresh the services list
+        fetchServices();
         setIsDeleteDialogOpen(false);
         setServiceToDelete(null);
+        setError(null); // Clear any existing errors
       } else {
-        setError("Failed to delete service");
+        setError("Failed to delete service. Please try again.");
       }
     } catch (err) {
-      setError("An error occurred while deleting the service");
+      setError(
+        err.response?.data?.message ||
+          "An error occurred while deleting the service"
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -117,24 +95,23 @@ const ServicesManagement = () => {
     try {
       const response = await adminService.updateService(updatedService.id, {
         name: updatedService.name,
-        category: updatedService.category,
         description: updatedService.description || "",
       });
 
       if (response.success) {
-        // Update the service in the local state
-        setServices(
-          services.map((service) =>
-            service.id === updatedService.id ? response.data : service
-          )
-        );
+        // Refresh the services list
+        fetchServices();
         setIsEditModalOpen(false);
         setEditingService(null);
+        setError(null); // Clear any existing errors
       } else {
-        setError("Failed to update service");
+        setError("Failed to update service. Please try again.");
       }
     } catch (err) {
-      setError("An error occurred while updating the service");
+      setError(
+        err.response?.data?.message ||
+          "An error occurred while updating the service"
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -146,43 +123,26 @@ const ServicesManagement = () => {
     try {
       const response = await adminService.createService({
         name: newService.name,
-        category: newService.category,
         description: newService.description || "",
       });
 
       if (response.success) {
-        // Add the new service to the state
-        setServices([...services, response.data]);
+        // Add the new service to the state and refresh the list
+        fetchServices();
         setIsAddModalOpen(false);
+        setError(null); // Clear any existing errors
       } else {
-        setError("Failed to create service");
+        setError("Failed to create service. Please try again.");
       }
     } catch (err) {
-      setError("An error occurred while creating the service");
+      setError(
+        err.response?.data?.message ||
+          "An error occurred while creating the service"
+      );
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "category") {
-      setCategoryFilter(value);
-    } else if (name === "status") {
-      setStatusFilter(value);
-    }
-    setCurrentPage(1); // Reset to first page when filter changes
-  };
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when search term changes
-  };
-
-  const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <FaSort />;
-    return sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />;
   };
 
   if (loading && services.length === 0) {
@@ -203,15 +163,6 @@ const ServicesManagement = () => {
       <div className="table-header">
         <h2>Services Management</h2>
         <div className="action-area">
-          <div className="search-box">
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search services..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </div>
           <button
             className="add-service-btn"
             onClick={() => setIsAddModalOpen(true)}
@@ -221,59 +172,17 @@ const ServicesManagement = () => {
         </div>
       </div>
 
-      <div className="filters-container">
-        <div className="filter-group">
-          <label htmlFor="categoryFilter">Category:</label>
-          <select
-            id="categoryFilter"
-            name="category"
-            value={categoryFilter}
-            onChange={handleFilterChange}
-          >
-            <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="filter-group">
-          <label htmlFor="statusFilter">Status:</label>
-          <select
-            id="statusFilter"
-            name="status"
-            value={statusFilter}
-            onChange={handleFilterChange}
-          >
-            <option value="">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-      </div>
-
       <div className="table-container">
         {services.length === 0 ? (
-          <div className="no-data">
-            No services found matching your criteria
-          </div>
+          <div className="no-data">No services found</div>
         ) : (
           <table>
             <thead>
               <tr>
-                <th onClick={() => handleSort("name")}>
-                  Name {getSortIcon("name")}
-                </th>
-                <th onClick={() => handleSort("category")}>
-                  Category {getSortIcon("category")}
-                </th>
-                <th onClick={() => handleSort("createdAt")}>
-                  Created {getSortIcon("createdAt")}
-                </th>
-                <th onClick={() => handleSort("updatedAt")}>
-                  Updated {getSortIcon("updatedAt")}
-                </th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created</th>
+                <th>Updated</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -281,7 +190,7 @@ const ServicesManagement = () => {
               {services.map((service) => (
                 <tr key={service.id}>
                   <td>{service.name}</td>
-                  <td>{service.category}</td>
+                  <td>{service.description}</td>
                   <td>{new Date(service.createdAt).toLocaleDateString()}</td>
                   <td>{new Date(service.updatedAt).toLocaleDateString()}</td>
                   <td>

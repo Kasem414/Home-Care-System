@@ -7,14 +7,13 @@ class ServiceCategoryRepository:
     """
 
     @staticmethod
-    def create_category(name, description, created_by_user_id):
+    def create_category(name, description):
         """
         Create a new service category.
         
         Args:
             name (str): Name of the category.
             description (str): Optional description.
-            created_by_user_id (UUID): ID of the admin user creating the category.
 
         Returns:
             ServiceCategory instance if created successfully, None if failed.
@@ -24,8 +23,7 @@ class ServiceCategoryRepository:
         try:
             category = ServiceCategory.objects.create(
                 name=name,
-                description=description,
-                created_by_user_id=created_by_user_id
+                description=description
             )
             return category
         except IntegrityError as e:

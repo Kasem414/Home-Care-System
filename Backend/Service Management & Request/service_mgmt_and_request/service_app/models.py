@@ -16,7 +16,6 @@ class ServiceCategory(models.Model):
     )
     description = models.TextField(
         blank=True,)
-    created_by_user_id = models.IntegerField()
     created_at = models.DateTimeField(
         auto_now_add=True,
     )

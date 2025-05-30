@@ -41,8 +41,6 @@ class ServiceCategoryViewSet(viewsets.ViewSet):
         Only accessible by Admin users.
         """
         # role = request.headers.get('X-User-Role')
-        user_id = request.data.get('id')
-
         # if role != "Adminstrator":
         #     return Response({"detail": "Only Admins can create categories."}, status=status.HTTP_403_FORBIDDEN)
 
@@ -51,8 +49,7 @@ class ServiceCategoryViewSet(viewsets.ViewSet):
             try:
                 category = ServiceCategoryRepository.create_category(
                     name=serializer.validated_data['name'],
-                    description=serializer.validated_data.get('description', ''),
-                    created_by_user_id=user_id
+                    description=serializer.validated_data.get('description', '')
                 )
                 publish_service_category_event.delay(event_type='created',category_id=str(category.id),name=category.name,description=category.description)
                 response_serializer = ServiceCategorySerializer(category)
@@ -76,13 +73,7 @@ class ServiceCategoryViewSet(viewsets.ViewSet):
     def update(self, request, pk=None):
         """
         Update a service category.
-        Only accessible by Admin users.
         """
-        role = request.headers.get('X-User-Role')
-
-        if role != "Adminstrator":
-            return Response({"detail": "Only Admins can update categories."}, status=status.HTTP_403_FORBIDDEN)
-
         category = ServiceCategoryRepository.get_category_by_id(pk)
         if not category:
             return Response({"detail": "Service Category not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -103,12 +94,7 @@ class ServiceCategoryViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         """
         Delete a service category.
-        Only accessible by Admin users.
         """
-        role = request.headers.get('X-User-Role')
-
-        if role != "Adminstrator":
-            return Response({"detail": "Only Admins can delete categories."}, status=status.HTTP_403_FORBIDDEN)
         category = ServiceCategoryRepository.get_category_by_id(pk)
         if not category:
             return Response({"detail": "Service Category not found."}, status=status.HTTP_404_NOT_FOUND)

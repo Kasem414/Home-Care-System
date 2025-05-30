@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // API base URL
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://localhost:9000";
 
 // Create an axios instance with default config
 const apiClient = axios.create({
@@ -107,18 +107,22 @@ export const adminService = {
   },
 
   // Get all services with pagination and filters
-  getServices: async (
-    page = 1,
-    limit = 10,
-    category = "",
-    status = "",
-    search = ""
-  ) => {
+  getServices: async (page = 1, limit = 10) => {
     try {
-      const response = await apiClient.get("/api/admin/services", {
-        params: { page, limit, category, status, search },
+      const response = await apiClient.get("/api/service-categories/", {
+        params: { page, limit },
       });
-      return response.data;
+      return {
+        success: true,
+        data: {
+          services: response.data.data,
+          total: response.data.pagination.total,
+          pages: Math.ceil(
+            response.data.pagination.total / response.data.pagination.limit
+          ),
+          currentPage: response.data.pagination.page,
+        },
+      };
     } catch (error) {
       console.error("Error fetching services:", error);
       throw error;
@@ -128,8 +132,14 @@ export const adminService = {
   // Create a new service
   createService: async (serviceData) => {
     try {
-      const response = await apiClient.post("/api/admin/services", serviceData);
-      return response.data;
+      const response = await apiClient.post(
+        "/api/service-categories/",
+        serviceData
+      );
+      return {
+        success: response.status === 201,
+        data: response.data,
+      };
     } catch (error) {
       console.error("Error creating service:", error);
       throw error;
@@ -140,10 +150,13 @@ export const adminService = {
   updateService: async (serviceId, serviceData) => {
     try {
       const response = await apiClient.put(
-        `/api/admin/services/${serviceId}`,
+        `/api/service-categories/${serviceId}/`,
         serviceData
       );
-      return response.data;
+      return {
+        success: response.status === 200,
+        data: response.data,
+      };
     } catch (error) {
       console.error("Error updating service:", error);
       throw error;
@@ -154,9 +167,11 @@ export const adminService = {
   deleteService: async (serviceId) => {
     try {
       const response = await apiClient.delete(
-        `/api/admin/services/${serviceId}`
+        `/api/service-categories/${serviceId}/`
       );
-      return response.data;
+      return {
+        success: response.status === 204,
+      };
     } catch (error) {
       console.error("Error deleting service:", error);
       throw error;
