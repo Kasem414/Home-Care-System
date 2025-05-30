@@ -25,15 +25,28 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   // Check for role-based access
-  if (requiredRole && user.role !== requiredRole) {
-    // Customize based on user role
-    if (user.role === "homeowner") {
-      return <Navigate to="/homeowner/dashboard" replace />;
-    } else if (user.role === "provider") {
-      return <Navigate to="/provider/dashboard" replace />;
-    } else {
-      // Fallback for any other role
-      return <Navigate to="/" replace />;
+  if (requiredRole) {
+    // Map the required role to match the backend role names
+    const roleMapping = {
+      admin: "administrator",
+      provider: "service_provider",
+      homeowner: "customer",
+    };
+
+    const requiredBackendRole = roleMapping[requiredRole] || requiredRole;
+
+    if (user.role !== requiredBackendRole) {
+      // Customize based on user role
+      switch (user.role) {
+        case "customer":
+          return <Navigate to="/requests" replace />;
+        case "service_provider":
+          return <Navigate to="/provider/dashboard" replace />;
+        case "administrator":
+          return <Navigate to="/admin" replace />;
+        default:
+          return <Navigate to="/" replace />;
+      }
     }
   }
 

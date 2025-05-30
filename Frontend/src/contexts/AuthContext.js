@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
               onSuccess("/provider/dashboard");
               break;
             case "administrator":
-              onSuccess("/admin/dashboard");
+              onSuccess("/admin");
               break;
             case "customer":
               onSuccess("/requests");

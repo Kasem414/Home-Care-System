@@ -11,8 +11,15 @@ import {
   FaEnvelope,
   FaFilter,
   FaUser,
+  FaTags,
+  FaStar,
+  FaCalendarAlt,
 } from "react-icons/fa";
-import { adminService } from "../../services/api";
+import axios from "axios";
+import "../../styles/components/admin/UserManagement.css";
+
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "http://localhost:3001/api";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -20,7 +27,7 @@ const UserManagement = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("customer"); // Default to showing customers
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,18 +42,24 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await adminService.getUsers(
-        currentPage,
-        itemsPerPage,
-        roleFilter,
-        statusFilter,
-        searchTerm
-      );
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API_BASE_URL}/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          page: currentPage,
+          limit: itemsPerPage,
+          role: roleFilter,
+          status: statusFilter,
+          search: searchTerm,
+        },
+      });
 
-      if (response.success) {
-        setUsers(response.data.users);
+      if (response.data.success) {
+        setUsers(response.data.data);
         setTotalUsers(response.data.total);
-        setTotalPages(response.data.pages);
+        setTotalPages(Math.ceil(response.data.total / itemsPerPage));
       } else {
         setError("Failed to load users");
       }
@@ -60,12 +73,21 @@ const UserManagement = () => {
 
   const handleStatusChange = async (userId, newStatus) => {
     try {
-      const response = await adminService.updateUserStatus(userId, newStatus);
-      if (response.success) {
-        // Update the user in the local state
+      const token = localStorage.getItem("token");
+      const response = await axios.patch(
+        `${API_BASE_URL}/users/${userId}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
         setUsers(
           users.map((user) =>
-            user.id === userId ? { ...user, status: newStatus } : user
+            user._id === userId ? { ...user, status: newStatus } : user
           )
         );
       } else {
@@ -84,12 +106,11 @@ const UserManagement = () => {
     } else if (name === "role") {
       setRoleFilter(value);
     }
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1);
   };
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
-    // Reset to first page when search term changes
     setCurrentPage(1);
   };
 
@@ -101,7 +122,6 @@ const UserManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  // Sort users (client-side sorting for properties not handled by API)
   const sortedUsers = useMemo(() => {
     if (!sortConfig.key) return users;
 
@@ -119,6 +139,88 @@ const UserManagement = () => {
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort />;
     return sortConfig.direction === "asc" ? <FaSortUp /> : <FaSortDown />;
+  };
+
+  const renderUserCard = (user) => {
+    const isProvider = user.role === "service_provider";
+
+    return (
+      <div key={user._id} className="user-card">
+        <div className="user-header">
+          <div className="user-title">
+            <h3>
+              {user.firstName} {user.lastName}
+            </h3>
+            <span className="user-role">
+              {user.role === "service_provider"
+                ? "Service Provider"
+                : "Customer"}
+            </span>
+          </div>
+          <span className={`status-badge ${user.status}`}>{user.status}</span>
+        </div>
+
+        <div className="user-info">
+          <div className="info-item">
+            <FaEnvelope />
+            <span>{user.email}</span>
+          </div>
+          <div className="info-item">
+            <FaPhone />
+            <span>{user.phone || "Not provided"}</span>
+          </div>
+          {user.city && (
+            <div className="info-item">
+              <FaMapMarkerAlt />
+              <span>
+                {user.city}, {user.region}
+              </span>
+            </div>
+          )}
+          <div className="info-item">
+            <FaCalendarAlt />
+            <span>Joined: {new Date(user.createdAt).toLocaleDateString()}</span>
+          </div>
+          {isProvider && (
+            <>
+              {user.rating && (
+                <div className="info-item">
+                  <FaStar />
+                  <span>Rating: {user.rating}</span>
+                </div>
+              )}
+              {user.serviceCategories && (
+                <div className="info-item">
+                  <FaTags />
+                  <span>
+                    Services:{" "}
+                    {user.serviceCategories.map((cat) => cat.name).join(", ")}
+                  </span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="user-actions">
+          {user.status === "active" ? (
+            <button
+              className="btn btn-danger"
+              onClick={() => handleStatusChange(user._id, "inactive")}
+            >
+              <FaUserTimes /> Deactivate
+            </button>
+          ) : (
+            <button
+              className="btn btn-success"
+              onClick={() => handleStatusChange(user._id, "active")}
+            >
+              <FaUserCheck /> Activate
+            </button>
+          )}
+        </div>
+      </div>
+    );
   };
 
   if (loading && users.length === 0) {
@@ -152,6 +254,23 @@ const UserManagement = () => {
         </div>
       </div>
 
+      <div className="role-tabs">
+        <button
+          className={`role-tab ${roleFilter === "customer" ? "active" : ""}`}
+          onClick={() => setRoleFilter("customer")}
+        >
+          Customers
+        </button>
+        <button
+          className={`role-tab ${
+            roleFilter === "service_provider" ? "active" : ""
+          }`}
+          onClick={() => setRoleFilter("service_provider")}
+        >
+          Service Providers
+        </button>
+      </div>
+
       {showFilters && (
         <div className="filters-panel">
           <div className="filter-group">
@@ -167,20 +286,6 @@ const UserManagement = () => {
               <option value="inactive">Inactive</option>
               <option value="pending">Pending</option>
               <option value="suspended">Suspended</option>
-            </select>
-          </div>
-          <div className="filter-group">
-            <label htmlFor="roleFilter">Role:</label>
-            <select
-              id="roleFilter"
-              name="role"
-              value={roleFilter}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Roles</option>
-              <option value="homeowner">Homeowner</option>
-              <option value="provider">Service Provider</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
           <div className="sort-options">
@@ -201,14 +306,6 @@ const UserManagement = () => {
             >
               Join Date {getSortIcon("createdAt")}
             </button>
-            <button
-              className={`sort-btn ${
-                sortConfig.key === "lastLogin" ? "active" : ""
-              }`}
-              onClick={() => handleSort("lastLogin")}
-            >
-              Last Login {getSortIcon("lastLogin")}
-            </button>
           </div>
         </div>
       )}
@@ -219,58 +316,10 @@ const UserManagement = () => {
             No users found matching your criteria
           </div>
         ) : (
-          sortedUsers.map((user) => (
-            <div key={user.id} className="user-card">
-              <div className="user-header">
-                <div className="user-title">
-                  <h3>
-                    {user.firstName} {user.lastName}
-                  </h3>
-                  <span className="user-role">{user.role}</span>
-                </div>
-                <span className={`status-badge ${user.status}`}>
-                  {user.status}
-                </span>
-              </div>
-              <div className="user-info">
-                <div className="info-item">
-                  <FaEnvelope />
-                  <span>{user.email}</span>
-                </div>
-                <div className="info-item">
-                  <FaPhone />
-                  <span>{user.phone || "Not provided"}</span>
-                </div>
-                <div className="info-item">
-                  <FaUser />
-                  <span>
-                    Joined: {new Date(user.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-              <div className="user-actions">
-                {user.status === "active" ? (
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleStatusChange(user.id, "inactive")}
-                  >
-                    <FaUserTimes /> Deactivate
-                  </button>
-                ) : (
-                  <button
-                    className="btn btn-success"
-                    onClick={() => handleStatusChange(user.id, "active")}
-                  >
-                    <FaUserCheck /> Activate
-                  </button>
-                )}
-              </div>
-            </div>
-          ))
+          sortedUsers.map((user) => renderUserCard(user))
         )}
       </div>
 
-      {/* Pagination */}
       <div className="pagination">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}

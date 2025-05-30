@@ -127,7 +127,7 @@ const Navbar = () => {
 
           <div className="navbar-end">
             {isAuthenticated ? (
-              <div className="navbar-user" ref={userMenuRef}>
+              <div className="navbanr-user" ref={userMenuRef}>
                 <button
                   className="user-profile-toggle"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -153,7 +153,7 @@ const Navbar = () => {
                       <FaCog /> Account Settings
                     </Link>
 
-                    {user?.role === "admin" && (
+                    {user?.role === "administrator" && (
                       <Link
                         to="/admin"
                         className="dropdown-item"
