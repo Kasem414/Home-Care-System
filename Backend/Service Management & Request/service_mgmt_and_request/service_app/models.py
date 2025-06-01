@@ -42,15 +42,11 @@ class ServiceRequest(models.Model):
     customer_id = models.IntegerField()
     service_type = models.ForeignKey(ServiceCategory, to_field='name', db_column='service_type', on_delete=models.CASCADE)
     description = models.TextField()
-    is_urgent = models.BooleanField(default=False)
 
     # Location
-    street_address = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     region = models.CharField(max_length=100)
     additional_info = models.TextField(blank=True, null=True)
-    latitude = models.FloatField(null=True, blank=True)
-    longitude = models.FloatField(null=True, blank=True)
 
     # Schedule
     preferred_date = models.DateField(blank=True, null=True)

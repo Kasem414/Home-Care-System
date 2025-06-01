@@ -53,9 +53,8 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceRequest
         fields = [
-            'id', 'customer_id', 'service_type', 'is_urgent',
-            'street_address', 'city', 'region', 'additional_info',
-            'latitude', 'longitude',
+            'id', 'customer_id', 'service_type',
+            'city', 'region', 'additional_info',
             'preferred_date', 'preferred_time', 'schedule_type',
             'flexible_schedule_days', 'flexible_time_slots',
             'description', 'budget_type', 'budget_min_hourly',
@@ -72,12 +71,9 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         # Flatten keys from nested frontend structure
         data.update({
-            'street_address': data.get('location[street_address]'),
             'city': data.get('location[city]'),
             'region': data.get('location[region]'),
             'additional_info': data.get('location[additional_info]'),
-            'latitude': data.get('location[latitude]'),
-            'longitude': data.get('location[longitude]'),
 
             'preferred_date': data.get('schedule[preferredDate]'),
             'preferred_time': data.get('schedule[preferredTime]'),
