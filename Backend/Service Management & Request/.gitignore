@@ -148,3 +148,5 @@ Service Management & Request/service_mgmt_and_request/media/service_request_atta
 Service Management & Request/service_mgmt_and_request/media/service_request_attachments/لقطة_الشاشة_18_x7oBhxW.png
 D:\University\Projects\Home Care System\Backend\Service Management & Request\home_venv
 /home_venv
+**/__pycache__
+**/migrations
