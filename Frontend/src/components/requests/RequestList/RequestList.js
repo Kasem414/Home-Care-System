@@ -3,103 +3,74 @@ import PropTypes from "prop-types";
 import RequestCard from "./RequestCard";
 import RequestFilters from "./RequestFilters";
 import RequestSearch from "./RequestSearch";
+import { requestService } from "../../../services/requestService";
+import { useAuth } from "../../../contexts/AuthContext";
+import { toast } from "react-toastify";
 
-const RequestList = ({ requests: initialRequests }) => {
-  const [requests, setRequests] = useState(initialRequests);
-  const [filteredRequests, setFilteredRequests] = useState(initialRequests);
+const RequestList = () => {
+  const { user } = useAuth();
+  const [requests, setRequests] = useState([]);
   const [filters, setFilters] = useState({
     status: "all",
-    serviceType: "all",
+    service_type: "all",
     dateRange: "all",
   });
   const [sortOption, setSortOption] = useState("dateDesc");
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+  });
 
-  // Apply filters, search, and sort
+  // Fetch requests
+  const fetchRequests = async () => {
+    try {
+      setIsLoading(true);
+      const params = {
+        page: pagination.page,
+        limit: pagination.limit,
+        status: filters.status !== "all" ? filters.status : undefined,
+        service_type:
+          filters.service_type !== "all" ? filters.service_type : undefined,
+        search: searchTerm || undefined,
+      };
+
+      const response = await requestService.getRequests(params);
+      setRequests(response.data);
+      setPagination(response.pagination);
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+      toast.error("Failed to load requests");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Initial fetch and refetch on filter/page changes
   useEffect(() => {
-    setIsLoading(true);
-
-    // First, filter the requests
-    let result = [...requests];
-
-    // Apply status filter
-    if (filters.status !== "all") {
-      result = result.filter((request) => request.status === filters.status);
-    }
-
-    // Apply service type filter
-    if (filters.serviceType !== "all") {
-      result = result.filter(
-        (request) => request.serviceType === filters.serviceType
-      );
-    }
-
-    // Apply date range filter
-    if (filters.dateRange !== "all") {
-      const now = new Date();
-      let daysToSubtract = 0;
-
-      switch (filters.dateRange) {
-        case "past7days":
-          daysToSubtract = 7;
-          break;
-        case "past30days":
-          daysToSubtract = 30;
-          break;
-        case "past90days":
-          daysToSubtract = 90;
-          break;
-        default:
-          break;
-      }
-
-      if (daysToSubtract > 0) {
-        const cutoffDate = new Date(now);
-        cutoffDate.setDate(now.getDate() - daysToSubtract);
-
-        result = result.filter(
-          (request) => new Date(request.createdAt) >= cutoffDate
-        );
-      }
-    }
-
-    // Apply search term
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(
-        (request) =>
-          request.serviceType.toLowerCase().includes(term) ||
-          request.address.toLowerCase().includes(term) ||
-          request.id.toLowerCase().includes(term)
-      );
-    }
-
-    // Apply sorting
-    result = sortRequests(result, sortOption);
-
-    setFilteredRequests(result);
-    setIsLoading(false);
-  }, [requests, filters, sortOption, searchTerm]);
+    fetchRequests();
+  }, [pagination.page, filters, searchTerm]);
 
   // Sort function
   const sortRequests = (requestsToSort, option) => {
     switch (option) {
       case "dateAsc":
         return [...requestsToSort].sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          (a, b) => new Date(a.created_at) - new Date(b.created_at)
         );
       case "dateDesc":
         return [...requestsToSort].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
         );
       case "serviceAZ":
         return [...requestsToSort].sort((a, b) =>
-          a.serviceType.localeCompare(b.serviceType)
+          a.service_type.localeCompare(b.service_type)
         );
       case "serviceZA":
         return [...requestsToSort].sort((a, b) =>
-          b.serviceType.localeCompare(a.serviceType)
+          b.service_type.localeCompare(a.service_type)
         );
       default:
         return requestsToSort;
@@ -109,34 +80,37 @@ const RequestList = ({ requests: initialRequests }) => {
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filters change
   };
 
   // Handle sort changes
   const handleSortChange = (option) => {
     setSortOption(option);
+    const sortedRequests = sortRequests(requests, option);
+    setRequests(sortedRequests);
   };
 
   // Handle search
   const handleSearch = (term) => {
     setSearchTerm(term);
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when search term changes
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
   // Handle cancel request
-  const handleCancelRequest = (requestId) => {
-    // In a real app, this would call an API
-    const updatedRequests = requests.map((request) =>
-      request.id === requestId ? { ...request, status: "cancelled" } : request
-    );
-    setRequests(updatedRequests);
-
-    // Show success message or notification
-    alert(`Request ${requestId} has been cancelled.`);
-  };
-
-  // Handle leave review
-  const handleLeaveReview = (requestId) => {
-    // In a real app, this would navigate to a review form
-    alert(`Leave a review for request ${requestId}`);
+  const handleCancelRequest = async (requestId) => {
+    try {
+      await requestService.updateRequestStatus(requestId, "cancelled");
+      toast.success("Request cancelled successfully");
+      fetchRequests(); // Refresh the list
+    } catch (error) {
+      console.error("Error cancelling request:", error);
+      toast.error("Failed to cancel request");
+    }
   };
 
   return (
@@ -158,11 +132,11 @@ const RequestList = ({ requests: initialRequests }) => {
           <i className="fas fa-spinner fa-spin"></i>
           <span>Loading requests...</span>
         </div>
-      ) : filteredRequests.length === 0 ? (
+      ) : requests.length === 0 ? (
         <div className="no-requests-found">
           <p>No requests found matching your criteria.</p>
           {(filters.status !== "all" ||
-            filters.serviceType !== "all" ||
+            filters.service_type !== "all" ||
             filters.dateRange !== "all" ||
             searchTerm) && (
             <button
@@ -170,7 +144,7 @@ const RequestList = ({ requests: initialRequests }) => {
               onClick={() => {
                 setFilters({
                   status: "all",
-                  serviceType: "all",
+                  service_type: "all",
                   dateRange: "all",
                 });
                 setSearchTerm("");
@@ -182,27 +156,41 @@ const RequestList = ({ requests: initialRequests }) => {
         </div>
       ) : (
         <>
-          <div className="request-count">
-            Showing {filteredRequests.length} of {requests.length} requests
-          </div>
-
-          <div className="request-header-card card request-card">
-            <div className="request-info-header">Service</div>
-            <div className="request-date-header">Date</div>
-            <div className="request-status-header">Status</div>
-            <div className="request-actions-header">Actions</div>
-          </div>
-
-          <div className="request-cards">
-            {filteredRequests.map((request) => (
+          <div className="requests-grid">
+            {requests.map((request) => (
               <RequestCard
                 key={request.id}
                 request={request}
-                onCancelRequest={handleCancelRequest}
-                onLeaveReview={handleLeaveReview}
+                onCancel={handleCancelRequest}
               />
             ))}
           </div>
+
+          {pagination.total > pagination.limit && (
+            <div className="pagination">
+              <button
+                className="btn btn-outlined"
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
+              >
+                Previous
+              </button>
+              <span className="page-info">
+                Page {pagination.page} of{" "}
+                {Math.ceil(pagination.total / pagination.limit)}
+              </span>
+              <button
+                className="btn btn-outlined"
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={
+                  pagination.page ===
+                  Math.ceil(pagination.total / pagination.limit)
+                }
+              >
+                Next
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -212,15 +200,15 @@ const RequestList = ({ requests: initialRequests }) => {
 RequestList.propTypes = {
   requests: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      serviceType: PropTypes.string.isRequired,
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      service_type: PropTypes.string.isRequired,
       status: PropTypes.string.isRequired,
-      createdAt: PropTypes.string.isRequired,
-      scheduledDate: PropTypes.string.isRequired,
-      scheduledTime: PropTypes.string.isRequired,
-      address: PropTypes.string.isRequired,
+      created_at: PropTypes.string.isRequired,
+      description: PropTypes.string,
+      city: PropTypes.string,
+      region: PropTypes.string,
     })
-  ).isRequired,
+  ),
 };
 
 export default RequestList;

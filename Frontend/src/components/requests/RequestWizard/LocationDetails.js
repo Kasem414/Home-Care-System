@@ -1,79 +1,79 @@
 import React, { useState, useEffect } from "react";
 import "../../../styles/components/requests/LocationDetails.css";
+import syrianLocations from "../../../data/syrianLocations.json";
 
 const LocationDetails = ({ data, onUpdate, onNext, onBack }) => {
-  // Initialize state with existing data or defaults
-  const [location, setLocation] = useState({
-    city: data.location?.city || "",
-    region: data.location?.region || "",
-    additionalInfo: data.location?.additionalInfo || "",
+  const [locationData, setLocationData] = useState({
+    city: data.city || "",
+    region: data.region || "",
+    additional_info: data.additional_info || "",
   });
+
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
+  const [touched, setTouched] = useState({
+    city: false,
+    region: false,
+  });
 
-  // Syrian cities and regions
-  const syrianCities = [
-    "Damascus",
-    "Aleppo",
-    "Homs",
-    "Hama",
-    "Latakia",
-    "Tartus",
-    "Daraa",
-    "As-Suwayda",
-    "Deir ez-Zor",
-    "Al-Hasakah",
-    "Raqqa",
-    "Idlib",
-    "Quneitra",
-  ];
+  const [availableRegions, setAvailableRegions] = useState([]);
 
-  const syrianRegions = [
-    "Damascus Governorate",
-    "Aleppo Governorate",
-    "Homs Governorate",
-    "Hama Governorate",
-    "Latakia Governorate",
-    "Tartus Governorate",
-    "Daraa Governorate",
-    "As-Suwayda Governorate",
-    "Deir ez-Zor Governorate",
-    "Al-Hasakah Governorate",
-    "Raqqa Governorate",
-    "Idlib Governorate",
-    "Quneitra Governorate",
-  ];
+  // Update available regions when city changes
+  useEffect(() => {
+    if (locationData.city) {
+      const cityData = syrianLocations.cities.find(
+        (c) => c.name === locationData.city
+      );
+      if (cityData) {
+        setAvailableRegions(cityData.regions);
+        // Reset region if it's not in the new list of regions
+        if (!cityData.regions.some((r) => r.name === locationData.region)) {
+          setLocationData((prev) => ({ ...prev, region: "" }));
+        }
+      }
+    } else {
+      setAvailableRegions([]);
+    }
+  }, [locationData.city]);
 
   // Validate form
   useEffect(() => {
     const newErrors = {};
 
-    if (!location.city.trim()) {
-      newErrors.city = "City is required";
+    if (touched.city && !locationData.city) {
+      newErrors.city = "Please select a city";
     }
-
-    if (!location.region.trim()) {
-      newErrors.region = "Region is required";
+    if (touched.region && !locationData.region) {
+      newErrors.region = "Please select a region";
     }
 
     setErrors(newErrors);
-    setIsValid(Object.keys(newErrors).length === 0);
-  }, [location]);
+    setIsValid(locationData.city && locationData.region);
+  }, [locationData, touched]);
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setLocation({
-      ...location,
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+    setLocationData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+    setTouched({
+      city: true,
+      region: true,
+    });
+
     if (isValid) {
-      onUpdate({ location });
+      onUpdate(locationData);
       onNext();
     }
   };
@@ -82,70 +82,61 @@ const LocationDetails = ({ data, onUpdate, onNext, onBack }) => {
     <div className="location-details">
       <form onSubmit={handleSubmit}>
         <div className="form-section">
-          <h2>Where is the service needed?</h2>
-          <p className="section-description">
-            Please provide the location where you need the service to be
-            performed.
-          </p>
+          <h2>Location Details</h2>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="city">City *</label>
-              <select
-                id="city"
-                name="city"
-                value={location.city}
-                onChange={handleChange}
-                className={errors.city ? "error" : ""}
-                style={{ appearance: "none", padding: "0.5rem" }}
-              >
-                <option value="">Select a city</option>
-                {syrianCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-              {errors.city && (
-                <div className="error-message">{errors.city}</div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="region">Region *</label>
-              <select
-                id="region"
-                name="region"
-                value={location.region}
-                onChange={handleChange}
-                className={errors.region ? "error" : ""}
-                style={{ appearance: "none", padding: "0.5rem" }}
-              >
-                <option value="">Select a region</option>
-                {syrianRegions.map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
-                ))}
-              </select>
-              {errors.region && (
-                <div className="error-message">{errors.region}</div>
-              )}
-            </div>
+          <div className="form-group">
+            <label htmlFor="city">City *</label>
+            <select
+              id="city"
+              name="city"
+              value={locationData.city}
+              onChange={handleChange}
+              className={errors.city ? "error" : ""}
+            >
+              <option value="">Select a city</option>
+              {syrianLocations.cities.map((city) => (
+                <option key={city.id} value={city.name}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+            {errors.city && <div className="error-message">{errors.city}</div>}
           </div>
 
           <div className="form-group">
-            <label htmlFor="additionalInfo">
+            <label htmlFor="region">Region *</label>
+            <select
+              id="region"
+              name="region"
+              value={locationData.region}
+              onChange={handleChange}
+              className={errors.region ? "error" : ""}
+              disabled={!locationData.city}
+            >
+              <option value="">Select a region</option>
+              {availableRegions.map((region) => (
+                <option key={region.id} value={region.name}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
+            {errors.region && (
+              <div className="error-message">{errors.region}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="additional_info">
               Additional Location Information
             </label>
             <textarea
-              id="additionalInfo"
-              name="additionalInfo"
-              value={location.additionalInfo}
+              id="additional_info"
+              name="additional_info"
+              value={locationData.additional_info}
               onChange={handleChange}
-              placeholder="Building, floor, or any details to help find the location..."
-              rows="3"
-            ></textarea>
+              placeholder="Enter any additional location details that might help the service provider..."
+              rows="4"
+            />
           </div>
         </div>
 

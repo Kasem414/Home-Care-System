@@ -1,22 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { FaUpload, FaTrash, FaCheck, FaInfoCircle } from "react-icons/fa";
+import { FaUpload, FaTrash, FaCheck } from "react-icons/fa";
+import { toast } from "react-toastify";
+import "../../../styles/components/requests/Requirements.css";
 
 const Requirements = ({ data, onUpdate, onNext, onBack }) => {
-  // Initialize state with existing data or defaults
-  const [requirements, setRequirements] = useState({
-    description: data.requirements?.description || "",
-    budget: {
-      min: data.requirements?.budget?.min || 0,
-      max: data.requirements?.budget?.max || 0,
-      type: data.requirements?.budget?.type || "hourly",
-    },
-    preferredQualifications: data.requirements?.preferredQualifications || [],
-    attachments: data.requirements?.attachments || [],
-  });
-  const [errors, setErrors] = useState({});
-  const [isValid, setIsValid] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-
   // Available qualifications for checkbox selection
   const availableQualifications = [
     { id: "certified", label: "Certified Professional", icon: "🎓" },
@@ -27,30 +14,45 @@ const Requirements = ({ data, onUpdate, onNext, onBack }) => {
     { id: "emergency", label: "Emergency Response Trained", icon: "🚨" },
   ];
 
+  const [requirements, setRequirements] = useState({
+    description: data.description || "",
+    budget_type: data.budget_type || "hourly",
+    budget_min_hourly: data.budget_min_hourly || "",
+    budget_max_hourly: data.budget_max_hourly || "",
+    fixed_price_offer: data.fixed_price_offer || "",
+    preferred_qualifications: data.preferred_qualifications || [],
+    attachments: data.attachments || [],
+  });
+
+  const [errors, setErrors] = useState({});
+  const [isValid, setIsValid] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
   // Validate form
   useEffect(() => {
     const newErrors = {};
 
     if (!requirements.description.trim()) {
-      newErrors.description = "Please provide a description";
-    } else if (requirements.description.trim().length < 20) {
-      newErrors.description = "Description should be at least 20 characters";
+      newErrors.description = "Description is required";
     }
 
-    if (requirements.budget.type === "fixed") {
-      if (!requirements.budget.max || requirements.budget.max <= 0) {
-        newErrors.budget = "Please enter a valid budget amount";
+    if (requirements.budget_type === "hourly") {
+      if (!requirements.budget_min_hourly) {
+        newErrors.budget_min_hourly = "Minimum hourly rate is required";
       }
-    } else {
-      if (!requirements.budget.min || requirements.budget.min <= 0) {
-        newErrors.budgetMin = "Please enter a minimum hourly rate";
+      if (!requirements.budget_max_hourly) {
+        newErrors.budget_max_hourly = "Maximum hourly rate is required";
       }
-      if (!requirements.budget.max || requirements.budget.max <= 0) {
-        newErrors.budgetMax = "Please enter a maximum hourly rate";
+      if (
+        Number(requirements.budget_min_hourly) >
+        Number(requirements.budget_max_hourly)
+      ) {
+        newErrors.budget_range =
+          "Minimum rate cannot be greater than maximum rate";
       }
-      if (requirements.budget.min > requirements.budget.max) {
-        newErrors.budgetRange =
-          "Maximum rate should be greater than minimum rate";
+    } else if (requirements.budget_type === "fixed") {
+      if (!requirements.fixed_price_offer) {
+        newErrors.fixed_price_offer = "Fixed price offer is required";
       }
     }
 
@@ -58,49 +60,62 @@ const Requirements = ({ data, onUpdate, onNext, onBack }) => {
     setIsValid(Object.keys(newErrors).length === 0);
   }, [requirements]);
 
-  // Handle text input changes
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "budgetMin" || name === "budgetMax") {
-      setRequirements({
-        ...requirements,
-        budget: {
-          ...requirements.budget,
-          [name === "budgetMin" ? "min" : "max"]: value ? parseFloat(value) : 0,
-        },
-      });
-    } else {
-      setRequirements({
-        ...requirements,
-        [name]: value,
-      });
+
+    // Format budget values as valid numbers
+    let formattedValue = value;
+    if (
+      name === "budget_min_hourly" ||
+      name === "budget_max_hourly" ||
+      name === "fixed_price_offer"
+    ) {
+      // Remove any non-numeric characters except decimal point
+      formattedValue = value.replace(/[^\d.]/g, "");
+
+      // Ensure only one decimal point
+      const parts = formattedValue.split(".");
+      if (parts.length > 2) {
+        formattedValue = parts[0] + "." + parts.slice(1).join("");
+      }
+
+      // Convert to number if valid
+      const numValue = parseFloat(formattedValue);
+      if (!isNaN(numValue)) {
+        formattedValue = numValue.toString();
+      }
     }
+
+    setRequirements((prev) => ({
+      ...prev,
+      [name]: formattedValue,
+    }));
   };
 
-  // Handle budget type selection
+  // Handle budget type change
   const handleBudgetTypeChange = (type) => {
-    setRequirements({
-      ...requirements,
-      budget: {
-        ...requirements.budget,
-        type,
-        min: type === "fixed" ? 0 : requirements.budget.min,
-      },
-    });
+    setRequirements((prev) => ({
+      ...prev,
+      budget_type: type,
+      budget_min_hourly: type === "hourly" ? prev.budget_min_hourly : "0",
+      budget_max_hourly: type === "hourly" ? prev.budget_max_hourly : "0",
+      fixed_price_offer: type === "fixed" ? prev.fixed_price_offer : "0",
+    }));
   };
 
   // Handle qualification toggle
   const handleQualificationToggle = (qualificationId) => {
-    const updatedQualifications = [...requirements.preferredQualifications];
-    if (updatedQualifications.includes(qualificationId)) {
-      const index = updatedQualifications.indexOf(qualificationId);
-      updatedQualifications.splice(index, 1);
-    } else {
-      updatedQualifications.push(qualificationId);
-    }
-    setRequirements({
-      ...requirements,
-      preferredQualifications: updatedQualifications,
+    setRequirements((prev) => {
+      const qualifications = prev.preferred_qualifications.includes(
+        qualificationId
+      )
+        ? prev.preferred_qualifications.filter((q) => q !== qualificationId)
+        : [...prev.preferred_qualifications, qualificationId];
+      return {
+        ...prev,
+        preferred_qualifications: qualifications,
+      };
     });
   };
 
@@ -123,48 +138,18 @@ const Requirements = ({ data, onUpdate, onNext, onBack }) => {
   // Handle file upload
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
-    const updatedAttachments = [...requirements.attachments];
-
-    files.forEach((file) => {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size should not exceed 5MB");
-        return;
-      }
-
-      const attachment = {
-        id: Date.now() + Math.random().toString(36).substring(2, 10),
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        file: file,
-      };
-      updatedAttachments.push(attachment);
-    });
-
-    setRequirements({
-      ...requirements,
-      attachments: updatedAttachments,
-    });
+    setRequirements((prev) => ({
+      ...prev,
+      attachments: [...prev.attachments, ...files],
+    }));
   };
 
   // Remove attachment
-  const handleRemoveAttachment = (attachmentId) => {
-    const updatedAttachments = requirements.attachments.filter(
-      (attachment) => attachment.id !== attachmentId
-    );
-    setRequirements({
-      ...requirements,
-      attachments: updatedAttachments,
-    });
-  };
-
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isValid) {
-      onUpdate({ requirements });
-      onNext();
-    }
+  const handleAttachmentRemove = (index) => {
+    setRequirements((prev) => ({
+      ...prev,
+      attachments: prev.attachments.filter((_, i) => i !== index),
+    }));
   };
 
   // Format file size
@@ -174,31 +159,32 @@ const Requirements = ({ data, onUpdate, onNext, onBack }) => {
     else return (bytes / 1048576).toFixed(1) + " MB";
   };
 
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (isValid) {
+      onUpdate(requirements);
+      onNext();
+    }
+  };
+
   return (
-    <div className="requirements">
+    <div className="requirements-form">
       <form onSubmit={handleSubmit}>
         <div className="form-section">
-          <h2>Details & Requirements</h2>
-          <p className="section-description">
-            Provide more details about your requirements and preferences.
-          </p>
+          <h2>Service Requirements</h2>
 
           <div className="form-group">
             <label htmlFor="description">Detailed Description *</label>
-            <div className="input-wrapper">
-              <textarea
-                id="description"
-                name="description"
-                value={requirements.description}
-                onChange={handleChange}
-                className={errors.description ? "error" : ""}
-                placeholder="Describe in detail what you need help with, including any specific requirements or expectations..."
-                rows="5"
-              ></textarea>
-              <div className="character-counter">
-                {requirements.description.length}/500
-              </div>
-            </div>
+            <textarea
+              id="description"
+              name="description"
+              value={requirements.description}
+              onChange={handleChange}
+              className={errors.description ? "error" : ""}
+              placeholder="Please provide detailed requirements for your service request..."
+              rows="4"
+            />
             {errors.description && (
               <div className="error-message">{errors.description}</div>
             )}
@@ -206,120 +192,108 @@ const Requirements = ({ data, onUpdate, onNext, onBack }) => {
 
           <div className="form-group">
             <h3>Budget</h3>
-            <p className="section-description">
-              What is your budget for this service?
-            </p>
-
-            <div className="budget-type-selection">
+            <div className="budget-type-selector">
               <button
                 type="button"
-                className={`budget-type-option ${
-                  requirements.budget.type === "hourly" ? "selected" : ""
+                className={`budget-type-btn ${
+                  requirements.budget_type === "hourly" ? "active" : ""
                 }`}
                 onClick={() => handleBudgetTypeChange("hourly")}
               >
-                <span className="option-icon">⏱️</span>
-                <span className="option-label">Hourly Rate</span>
+                <span className="icon">⏱️</span>
+                <span>Hourly Rate</span>
               </button>
-
               <button
                 type="button"
-                className={`budget-type-option ${
-                  requirements.budget.type === "fixed" ? "selected" : ""
+                className={`budget-type-btn ${
+                  requirements.budget_type === "fixed" ? "active" : ""
                 }`}
                 onClick={() => handleBudgetTypeChange("fixed")}
               >
-                <span className="option-icon">💰</span>
-                <span className="option-label">Fixed Price</span>
+                <span className="icon">💰</span>
+                <span>Fixed Price</span>
               </button>
             </div>
 
-            {requirements.budget.type === "hourly" ? (
-              <div className="hourly-rate-inputs">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="budgetMin">Minimum Rate ($/hr) *</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="number"
-                        id="budgetMin"
-                        name="budgetMin"
-                        value={requirements.budget.min || ""}
-                        onChange={handleChange}
-                        className={errors.budgetMin ? "error" : ""}
-                        placeholder="0"
-                        min="0"
-                        step="0.1"
-                      />
+            {requirements.budget_type === "hourly" ? (
+              <div className="budget-inputs">
+                <div className="input-group">
+                  <label htmlFor="budget_min_hourly">
+                    Minimum Rate ($/hr) *
+                  </label>
+                  <input
+                    type="number"
+                    id="budget_min_hourly"
+                    name="budget_min_hourly"
+                    value={requirements.budget_min_hourly}
+                    onChange={handleChange}
+                    className={errors.budget_min_hourly ? "error" : ""}
+                    placeholder="0"
+                    min="0"
+                  />
+                  {errors.budget_min_hourly && (
+                    <div className="error-message">
+                      {errors.budget_min_hourly}
                     </div>
-                    {errors.budgetMin && (
-                      <div className="error-message">{errors.budgetMin}</div>
-                    )}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="budgetMax">Maximum Rate ($/hr) *</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="number"
-                        id="budgetMax"
-                        name="budgetMax"
-                        value={requirements.budget.max || ""}
-                        onChange={handleChange}
-                        className={errors.budgetMax ? "error" : ""}
-                        placeholder="0"
-                        min="0"
-                        step="0.1"
-                      />
-                    </div>
-                    {errors.budgetMax && (
-                      <div className="error-message">{errors.budgetMax}</div>
-                    )}
-                  </div>
+                  )}
                 </div>
-                {errors.budgetRange && (
-                  <div className="error-message">{errors.budgetRange}</div>
-                )}
-              </div>
-            ) : (
-              <div className="fixed-price-input">
-                <div className="form-group">
-                  <label htmlFor="budgetMax">Budget Amount ($) *</label>
-                  <div className="input-wrapper">
-                    <input
-                      type="number"
-                      id="budgetMax"
-                      name="budgetMax"
-                      value={requirements.budget.max || ""}
-                      onChange={handleChange}
-                      className={errors.budget ? "error" : ""}
-                      placeholder="0"
-                      min="0"
-                      step="0.1"
-                    />
-                  </div>
-                  {errors.budget && (
-                    <div className="error-message">{errors.budget}</div>
+                <div className="input-group">
+                  <label htmlFor="budget_max_hourly">
+                    Maximum Rate ($/hr) *
+                  </label>
+                  <input
+                    type="number"
+                    id="budget_max_hourly"
+                    name="budget_max_hourly"
+                    value={requirements.budget_max_hourly}
+                    onChange={handleChange}
+                    className={errors.budget_max_hourly ? "error" : ""}
+                    placeholder="0"
+                    min="0"
+                  />
+                  {errors.budget_max_hourly && (
+                    <div className="error-message">
+                      {errors.budget_max_hourly}
+                    </div>
                   )}
                 </div>
               </div>
+            ) : (
+              <div className="budget-inputs">
+                <div className="input-group">
+                  <label htmlFor="fixed_price_offer">Fixed Price ($) *</label>
+                  <input
+                    type="number"
+                    id="fixed_price_offer"
+                    name="fixed_price_offer"
+                    value={requirements.fixed_price_offer}
+                    onChange={handleChange}
+                    className={errors.fixed_price_offer ? "error" : ""}
+                    placeholder="Enter your fixed price offer"
+                    min="0"
+                  />
+                  {errors.fixed_price_offer && (
+                    <div className="error-message">
+                      {errors.fixed_price_offer}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {errors.budget_range && (
+              <div className="error-message">{errors.budget_range}</div>
             )}
           </div>
 
           <div className="form-group">
             <h3>Preferred Provider Qualifications</h3>
-            <p className="section-description">
-              Select any specific qualifications you prefer for the service
-              provider.
-            </p>
-
             <div className="qualifications-grid">
               {availableQualifications.map((qualification) => (
-                <button
+                <div
                   key={qualification.id}
-                  type="button"
-                  className={`qualification-option ${
-                    requirements.preferredQualifications.includes(
+                  className={`qualification-card ${
+                    requirements.preferred_qualifications.includes(
                       qualification.id
                     )
                       ? "selected"
@@ -333,25 +307,20 @@ const Requirements = ({ data, onUpdate, onNext, onBack }) => {
                   <span className="qualification-label">
                     {qualification.label}
                   </span>
-                  {requirements.preferredQualifications.includes(
+                  {requirements.preferred_qualifications.includes(
                     qualification.id
                   ) && (
                     <span className="check-icon">
                       <FaCheck />
                     </span>
                   )}
-                </button>
+                </div>
               ))}
             </div>
           </div>
 
           <div className="form-group">
             <h3>Attachments</h3>
-            <p className="section-description">
-              Upload photos or documents that will help service providers better
-              understand your needs.
-            </p>
-
             <div
               className={`file-upload-container ${
                 isDragging ? "dragging" : ""
@@ -377,25 +346,23 @@ const Requirements = ({ data, onUpdate, onNext, onBack }) => {
 
             {requirements.attachments.length > 0 && (
               <div className="attachments-list">
-                {requirements.attachments.map((attachment) => (
-                  <div key={attachment.id} className="attachment-item">
+                {requirements.attachments.map((file, index) => (
+                  <div key={index} className="attachment-item">
                     <div className="attachment-info">
                       <span className="attachment-icon">
-                        {attachment.type.startsWith("image/") ? "🖼️" : "📄"}
+                        {file.type.startsWith("image/") ? "🖼️" : "📄"}
                       </span>
                       <div className="attachment-details">
-                        <span className="attachment-name">
-                          {attachment.name}
-                        </span>
+                        <span className="attachment-name">{file.name}</span>
                         <span className="attachment-size">
-                          {formatFileSize(attachment.size)}
+                          {formatFileSize(file.size)}
                         </span>
                       </div>
                     </div>
                     <button
                       type="button"
                       className="attachment-remove"
-                      onClick={() => handleRemoveAttachment(attachment.id)}
+                      onClick={() => handleAttachmentRemove(index)}
                     >
                       <FaTrash />
                     </button>

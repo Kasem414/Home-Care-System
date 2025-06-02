@@ -1,7 +1,23 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 // API base URL
 const API_BASE_URL = "http://localhost:9000";
+
+// Function to get user ID from token
+export const getUserIdFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.user_id;
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return null;
+    }
+  }
+  return null;
+};
 
 // Create an axios instance with default config
 const apiClient = axios.create({
@@ -174,6 +190,20 @@ export const adminService = {
       };
     } catch (error) {
       console.error("Error deleting service:", error);
+      throw error;
+    }
+  },
+};
+
+// Service Categories API
+export const serviceCategories = {
+  // Get all service categories
+  getCategories: async () => {
+    try {
+      const response = await apiClient.get("/api/service-categories/");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching service categories:", error);
       throw error;
     }
   },

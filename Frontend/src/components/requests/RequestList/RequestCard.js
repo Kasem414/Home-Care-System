@@ -3,27 +3,39 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { motion } from "framer-motion";
 
-const RequestCard = ({ request, onCancelRequest, onLeaveReview }) => {
+const RequestCard = ({ request, onCancel }) => {
   // Format date for display
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  // Format time for display
+  const formatTime = (timeString) => {
+    if (!timeString) return "Flexible";
+    return timeString;
+  };
+
   // Status badge color classes and icons
   const getStatusDetails = (status) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "pending":
         return {
           className: "status-pending",
           icon: "fa-clock",
           label: "Pending",
         };
-      case "approved":
+      case "matched":
         return {
-          className: "status-approved",
-          icon: "fa-check-circle",
-          label: "Approved",
+          className: "status-matched",
+          icon: "fa-handshake",
+          label: "Matched",
+        };
+      case "in_progress":
+        return {
+          className: "status-in-progress",
+          icon: "fa-spinner",
+          label: "In Progress",
         };
       case "completed":
         return {
@@ -37,6 +49,12 @@ const RequestCard = ({ request, onCancelRequest, onLeaveReview }) => {
           icon: "fa-times-circle",
           label: "Cancelled",
         };
+      case "expired":
+        return {
+          className: "status-expired",
+          icon: "fa-calendar-times",
+          label: "Expired",
+        };
       default:
         return {
           className: "",
@@ -47,6 +65,7 @@ const RequestCard = ({ request, onCancelRequest, onLeaveReview }) => {
   };
 
   const statusDetails = getStatusDetails(request.status);
+  const address = `${request.street_address}, ${request.city}, ${request.region}`;
 
   return (
     <motion.div
@@ -57,19 +76,36 @@ const RequestCard = ({ request, onCancelRequest, onLeaveReview }) => {
       whileHover={{ y: -5 }}
     >
       <div className="request-info">
-        <h3>{request.serviceType}</h3>
+        <h3>{request.service_type}</h3>
         <p className="request-address">
-          <i className="fas fa-map-marker-alt"></i> {request.address}
+          <i className="fas fa-map-marker-alt"></i> {address}
         </p>
+        {request.is_urgent && (
+          <span className="urgent-badge">
+            <i className="fas fa-exclamation-circle"></i> Urgent
+          </span>
+        )}
       </div>
-      <div className="request-date">
-        <p className="scheduled-date">
-          <i className="fas fa-calendar-alt"></i>{" "}
-          {formatDate(request.scheduledDate)}
-        </p>
-        <p className="scheduled-time">
-          <i className="fas fa-clock"></i> {request.scheduledTime}
-        </p>
+      <div className="request-schedule">
+        {request.schedule_type === "specific" ? (
+          <>
+            <p className="scheduled-date">
+              <i className="fas fa-calendar-alt"></i>{" "}
+              {formatDate(request.preferred_date)}
+            </p>
+            <p className="scheduled-time">
+              <i className="fas fa-clock"></i>{" "}
+              {formatTime(request.preferred_time)}
+            </p>
+          </>
+        ) : (
+          <div className="flexible-schedule">
+            <p>
+              <i className="fas fa-calendar-week"></i> Flexible Schedule
+            </p>
+            <small>{request.flexible_schedule_days.join(", ")}</small>
+          </div>
+        )}
       </div>
       <div className="request-status">
         <span className={`status-badge ${statusDetails.className}`}>
@@ -84,22 +120,13 @@ const RequestCard = ({ request, onCancelRequest, onLeaveReview }) => {
         >
           <i className="fas fa-eye"></i> View Details
         </Link>
-        {request.status === "pending" && (
+        {request.status.toLowerCase() === "pending" && (
           <motion.button
             className="btn btn-danger btn-sm"
-            onClick={() => onCancelRequest(request.id)}
+            onClick={() => onCancel(request.id)}
             whileTap={{ scale: 0.95 }}
           >
             <i className="fas fa-ban"></i> Cancel
-          </motion.button>
-        )}
-        {request.status === "completed" && (
-          <motion.button
-            className="btn btn-secondary btn-sm"
-            onClick={() => onLeaveReview(request.id)}
-            whileTap={{ scale: 0.95 }}
-          >
-            <i className="fas fa-star"></i> Leave Review
           </motion.button>
         )}
       </div>
@@ -109,15 +136,21 @@ const RequestCard = ({ request, onCancelRequest, onLeaveReview }) => {
 
 RequestCard.propTypes = {
   request: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    serviceType: PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    service_type: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
-    scheduledDate: PropTypes.string.isRequired,
-    scheduledTime: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
+    is_urgent: PropTypes.bool,
+    street_address: PropTypes.string.isRequired,
+    city: PropTypes.string.isRequired,
+    region: PropTypes.string.isRequired,
+    schedule_type: PropTypes.oneOf(["specific", "flexible"]).isRequired,
+    preferred_date: PropTypes.string,
+    preferred_time: PropTypes.string,
+    flexible_schedule_days: PropTypes.arrayOf(PropTypes.string),
+    flexible_time_slots: PropTypes.arrayOf(PropTypes.string),
+    created_at: PropTypes.string.isRequired,
   }).isRequired,
-  onCancelRequest: PropTypes.func.isRequired,
-  onLeaveReview: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default RequestCard;

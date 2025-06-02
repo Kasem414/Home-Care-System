@@ -18,7 +18,7 @@ import ResetPassword from "./components/auth/ResetPassword";
 import ServicesManagement from "./components/admin/ServicesManagement";
 import AdminLayout from "./components/admin/AdminLayout";
 import DashboardPage from "./components/admin/AdminDashboard";
-import RequestWizardTester from "./components/requests/RequestWizardTester";
+import RequestWizard from "./components/requests/RequestWizard/RequestWizard";
 import RequestsPage from "./pages/Requests/RequestsPage";
 import RequestDetailsPage from "./pages/Requests/RequestDetailsPage";
 import ProviderDashboardPage from "./pages/Provider/ProviderDashboardPage";
@@ -86,10 +86,10 @@ function App() {
 
             {/* Requests Routes */}
             <Route
-              path="/request-test"
+              path="/request/new"
               element={
-                <ProtectedRoute requiredRole="admin">
-                  <RequestWizardTester />
+                <ProtectedRoute>
+                  <RequestWizard />
                 </ProtectedRoute>
               }
             />
