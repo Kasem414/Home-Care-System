@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ServiceSelection from "./ServiceSelection";
 import LocationDetails from "./LocationDetails";
@@ -6,52 +6,49 @@ import SchedulePreference from "./SchedulePreference";
 import Requirements from "./Requirements";
 import RequestSummary from "./RequestSummary";
 import { useAuth } from "../../../contexts/AuthContext";
+import { getUserIdFromToken } from "../../../services/api";
+import { requestService } from "../../../services/requestService";
+import { toast } from "react-toastify";
 
 const RequestWizard = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [requestData, setRequestData] = useState({
-    serviceType: "",
-    serviceDetails: "",
-    location: {
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      additionalInfo: "",
-    },
-    schedule: {
-      preferredDate: null,
-      preferredTime: null,
-      flexibility: "exact", // or "flexible"
-      flexibleDays: [],
-      flexibleTimes: [],
-    },
-    requirements: {
-      description: "",
-      budget: {
-        min: 0,
-        max: 0,
-        type: "hourly", // or "fixed"
-      },
-      attachments: [],
-      preferredQualifications: [],
-    },
-    status: "draft",
-    customerId: user?.id || "",
-    createdAt: new Date(),
+    customer_id: getUserIdFromToken() || "",
+    service_type: "",
+    street_address: "123 Main Street", // Hardcoded as per requirement
+    city: "",
+    region: "",
+    additional_info: "",
+    preferred_date: "",
+    preferred_time: "",
+    schedule_type: "specific",
+    flexible_schedule_days: [],
+    flexible_time_slots: [],
+    description: "",
+    budget_type: "hourly",
+    budget_min_hourly: "0",
+    budget_max_hourly: "0",
+    fixed_price_offer: "0",
+    preferred_qualifications: [],
+    attachments: [],
+    is_urgent: false,
   });
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    navigate("/login", { state: { from: "/request" } });
+    navigate("/login", { state: { from: "/request/new" } });
     return null;
   }
 
   // Update request data based on step input
   const updateRequestData = (stepData) => {
-    setRequestData({ ...requestData, ...stepData });
+    setRequestData((prevData) => ({
+      ...prevData,
+      ...stepData,
+    }));
   };
 
   // Go to next step
@@ -70,15 +67,94 @@ const RequestWizard = () => {
     }
   };
 
+  // Prepare request data for submission
+  const prepareRequestData = () => {
+    const data = { ...requestData };
+
+    // Convert empty strings to null for required fields
+    Object.keys(data).forEach((key) => {
+      if (data[key] === "") {
+        data[key] = null;
+      }
+    });
+
+    // Handle budget values
+    if (data.budget_type === "hourly") {
+      delete data.fixed_price_offer;
+      data.budget_min_hourly = parseFloat(data.budget_min_hourly) || 0;
+      data.budget_max_hourly = parseFloat(data.budget_max_hourly) || 0;
+    } else {
+      delete data.budget_min_hourly;
+      delete data.budget_max_hourly;
+      data.fixed_price_offer = parseFloat(data.fixed_price_offer) || 0;
+    }
+
+    // Handle schedule data
+    if (data.schedule_type === "specific") {
+      // Ensure date is in YYYY-MM-DD format
+      if (data.preferred_date) {
+        const date = new Date(data.preferred_date);
+        if (!isNaN(date.getTime())) {
+          data.preferred_date = date.toISOString().split("T")[0];
+        }
+      }
+
+      // Ensure time is in HH:mm format
+      if (data.preferred_time) {
+        const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+        if (!timeRegex.test(data.preferred_time)) {
+          // Convert to 24-hour format if needed
+          const timeParts = data.preferred_time.split(":");
+          if (timeParts.length >= 2) {
+            data.preferred_time = `${timeParts[0].padStart(
+              2,
+              "0"
+            )}:${timeParts[1].padStart(2, "0")}`;
+          }
+        }
+      }
+
+      delete data.flexible_schedule_days;
+      delete data.flexible_time_slots;
+    } else {
+      delete data.preferred_date;
+      delete data.preferred_time;
+    }
+
+    // Ensure customer_id is a number
+    data.customer_id = parseInt(data.customer_id);
+
+    data.is_urgent = data.is_urgent ? true : false;
+
+    return data;
+  };
+
   // Submit the request
   const submitRequest = async () => {
+    if (isSubmitting) return;
+
     try {
-      // Here we would call an API to save the request
-      console.log("Submitting request:", requestData);
-      // On success, redirect to requests list
+      setIsSubmitting(true);
+
+      // Prepare the request data
+      const preparedData = prepareRequestData();
+
+      // Create the request
+      await requestService.createRequest(preparedData);
+
+      toast.success("Service request created successfully!");
       navigate("/requests");
     } catch (error) {
       console.error("Error submitting request:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        Object.values(error.response?.data?.errors || {})
+          .flat()
+          .join(", ") ||
+        "Failed to create service request";
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -122,6 +198,7 @@ const RequestWizard = () => {
         onUpdate={updateRequestData}
         onSubmit={submitRequest}
         onBack={prevStep}
+        isSubmitting={isSubmitting}
       />
     ),
   };

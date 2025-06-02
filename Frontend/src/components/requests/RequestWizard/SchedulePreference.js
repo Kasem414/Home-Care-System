@@ -1,254 +1,288 @@
 import React, { useState, useEffect } from "react";
+import "../../../styles/components/requests/SchedulePreference.css";
 
 const SchedulePreference = ({ data, onUpdate, onNext, onBack }) => {
-  // Initialize state with existing data or defaults
-  const [schedule, setSchedule] = useState({
-    preferredDate: data.schedule?.preferredDate || "",
-    preferredTime: data.schedule?.preferredTime || "",
-    flexibility: data.schedule?.flexibility || "exact",
-    flexibleDays: data.schedule?.flexibleDays || [],
-    flexibleTimes: data.schedule?.flexibleTimes || [],
+  const [scheduleData, setScheduleData] = useState({
+    schedule_type: data.schedule_type || "specific",
+    preferred_date: data.preferred_date || "",
+    preferred_time: data.preferred_time || "",
+    flexible_schedule_days: data.flexible_schedule_days || [],
+    flexible_time_slots: data.flexible_time_slots || [],
   });
+
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState(false);
+  const [touched, setTouched] = useState({
+    preferred_date: false,
+    preferred_time: false,
+    flexible_schedule_days: false,
+    flexible_time_slots: false,
+  });
+
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  const timeSlots = [
+    "Morning (8AM - 12PM)",
+    "Afternoon (12PM - 4PM)",
+    "Evening (4PM - 8PM)",
+  ];
 
   // Validate form
   useEffect(() => {
     const newErrors = {};
-    
-    if (schedule.flexibility === "exact") {
-      if (!schedule.preferredDate) {
-        newErrors.preferredDate = "Please select a date";
+
+    if (scheduleData.schedule_type === "specific") {
+      if (touched.preferred_date && !scheduleData.preferred_date) {
+        newErrors.preferred_date = "Please select a date";
       }
-      if (!schedule.preferredTime) {
-        newErrors.preferredTime = "Please select a time";
+      if (touched.preferred_time && !scheduleData.preferred_time) {
+        newErrors.preferred_time = "Please select a time";
       }
-    } else if (schedule.flexibility === "flexible") {
-      if (schedule.flexibleDays.length === 0) {
-        newErrors.flexibleDays = "Please select at least one day";
+    } else {
+      if (
+        touched.flexible_schedule_days &&
+        scheduleData.flexible_schedule_days.length === 0
+      ) {
+        newErrors.flexible_schedule_days = "Please select at least one day";
       }
-      if (schedule.flexibleTimes.length === 0) {
-        newErrors.flexibleTimes = "Please select at least one time slot";
+      if (
+        touched.flexible_time_slots &&
+        scheduleData.flexible_time_slots.length === 0
+      ) {
+        newErrors.flexible_time_slots = "Please select at least one time slot";
       }
     }
-    
+
     setErrors(newErrors);
     setIsValid(Object.keys(newErrors).length === 0);
-  }, [schedule]);
+  }, [scheduleData, touched]);
 
-  // Handle radio input changes
-  const handleFlexibilityChange = (flexibility) => {
-    setSchedule({
-      ...schedule,
-      flexibility,
-    });
+  // Handle schedule type change
+  const handleScheduleTypeChange = (type) => {
+    setScheduleData((prev) => ({
+      ...prev,
+      schedule_type: type,
+      preferred_date: type === "specific" ? prev.preferred_date : "",
+      preferred_time: type === "specific" ? prev.preferred_time : "",
+      flexible_schedule_days:
+        type === "flexible" ? prev.flexible_schedule_days : [],
+      flexible_time_slots: type === "flexible" ? prev.flexible_time_slots : [],
+    }));
   };
 
-  // Handle date & time input changes
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setSchedule({
-      ...schedule,
-      [name]: value,
-    });
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+
+    // Format date and time values
+    let formattedValue = value;
+    if (name === "preferred_date") {
+      // Ensure date is in YYYY-MM-DD format
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        formattedValue = date.toISOString().split("T")[0];
+      }
+    } else if (name === "preferred_time") {
+      // Ensure time is in HH:mm format
+      const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+      if (timeRegex.test(value)) {
+        formattedValue = value;
+      }
+    }
+
+    setScheduleData((prev) => ({
+      ...prev,
+      [name]: formattedValue,
+    }));
   };
 
-  // Handle checkbox input changes for flexible days
+  // Handle day selection
   const handleDayToggle = (day) => {
-    const updatedDays = [...schedule.flexibleDays];
-    if (updatedDays.includes(day)) {
-      const index = updatedDays.indexOf(day);
-      updatedDays.splice(index, 1);
-    } else {
-      updatedDays.push(day);
-    }
-    setSchedule({
-      ...schedule,
-      flexibleDays: updatedDays,
+    setTouched((prev) => ({
+      ...prev,
+      flexible_schedule_days: true,
+    }));
+    setScheduleData((prev) => {
+      const days = prev.flexible_schedule_days.includes(day)
+        ? prev.flexible_schedule_days.filter((d) => d !== day)
+        : [...prev.flexible_schedule_days, day];
+      return {
+        ...prev,
+        flexible_schedule_days: days,
+      };
     });
   };
 
-  // Handle checkbox input changes for flexible time slots
-  const handleTimeSlotToggle = (timeSlot) => {
-    const updatedTimeSlots = [...schedule.flexibleTimes];
-    if (updatedTimeSlots.includes(timeSlot)) {
-      const index = updatedTimeSlots.indexOf(timeSlot);
-      updatedTimeSlots.splice(index, 1);
-    } else {
-      updatedTimeSlots.push(timeSlot);
-    }
-    setSchedule({
-      ...schedule,
-      flexibleTimes: updatedTimeSlots,
+  // Handle time slot selection
+  const handleTimeSlotToggle = (slot) => {
+    setTouched((prev) => ({
+      ...prev,
+      flexible_time_slots: true,
+    }));
+    setScheduleData((prev) => {
+      const slots = prev.flexible_time_slots.includes(slot)
+        ? prev.flexible_time_slots.filter((s) => s !== slot)
+        : [...prev.flexible_time_slots, slot];
+      return {
+        ...prev,
+        flexible_time_slots: slots,
+      };
     });
   };
 
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+    setTouched({
+      preferred_date: true,
+      preferred_time: true,
+      flexible_schedule_days: true,
+      flexible_time_slots: true,
+    });
+
     if (isValid) {
-      onUpdate({ schedule });
+      onUpdate(scheduleData);
       onNext();
     }
   };
 
-  // Get tomorrow's date for minimum date selection
-  const getTomorrowDate = () => {
+  // Get minimum date (tomorrow)
+  const getMinDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
+    return tomorrow.toISOString().split("T")[0];
   };
-
-  // Time slots for checkbox selection
-  const timeSlots = [
-    { value: "morning", label: "Morning (8am - 12pm)" },
-    { value: "afternoon", label: "Afternoon (12pm - 5pm)" },
-    { value: "evening", label: "Evening (5pm - 9pm)" },
-  ];
-
-  // Days of the week for checkbox selection
-  const daysOfWeek = [
-    { value: "monday", label: "Monday" },
-    { value: "tuesday", label: "Tuesday" },
-    { value: "wednesday", label: "Wednesday" },
-    { value: "thursday", label: "Thursday" },
-    { value: "friday", label: "Friday" },
-    { value: "saturday", label: "Saturday" },
-    { value: "sunday", label: "Sunday" },
-  ];
 
   return (
     <div className="schedule-preference">
       <form onSubmit={handleSubmit}>
         <div className="form-section">
-          <h2>When do you need this service?</h2>
-          <p className="section-description">
-            Let us know when you would like the service to be performed.
-          </p>
+          <h2>Schedule Preference</h2>
 
-          <div className="schedule-options">
-            <div className="schedule-option">
-              <div 
-                className={`option-card ${schedule.flexibility === "exact" ? "selected" : ""}`}
-                onClick={() => handleFlexibilityChange("exact")}
-              >
-                <div className="option-radio">
-                  <input 
-                    type="radio" 
-                    name="flexibility" 
-                    value="exact" 
-                    checked={schedule.flexibility === "exact"} 
-                    onChange={() => handleFlexibilityChange("exact")}
-                  />
-                </div>
-                <div className="option-content">
-                  <h3>Specific Date & Time</h3>
-                  <p>I need the service at an exact date and time</p>
-                </div>
-              </div>
-              
-              {schedule.flexibility === "exact" && (
-                <div className="option-details">
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="preferredDate">Preferred Date *</label>
-                      <input
-                        type="date"
-                        id="preferredDate"
-                        name="preferredDate"
-                        value={schedule.preferredDate}
-                        onChange={handleChange}
-                        min={getTomorrowDate()}
-                        className={errors.preferredDate ? "error" : ""}
-                      />
-                      {errors.preferredDate && <div className="error-message">{errors.preferredDate}</div>}
-                    </div>
-
-                    <div className="form-group">
-                      <label htmlFor="preferredTime">Preferred Time *</label>
-                      <input
-                        type="time"
-                        id="preferredTime"
-                        name="preferredTime"
-                        value={schedule.preferredTime}
-                        onChange={handleChange}
-                        className={errors.preferredTime ? "error" : ""}
-                      />
-                      {errors.preferredTime && <div className="error-message">{errors.preferredTime}</div>}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="schedule-option">
-              <div 
-                className={`option-card ${schedule.flexibility === "flexible" ? "selected" : ""}`}
-                onClick={() => handleFlexibilityChange("flexible")}
-              >
-                <div className="option-radio">
-                  <input 
-                    type="radio" 
-                    name="flexibility" 
-                    value="flexible" 
-                    checked={schedule.flexibility === "flexible"} 
-                    onChange={() => handleFlexibilityChange("flexible")}
-                  />
-                </div>
-                <div className="option-content">
-                  <h3>Flexible Schedule</h3>
-                  <p>I'm flexible with multiple days and times</p>
-                </div>
-              </div>
-              
-              {schedule.flexibility === "flexible" && (
-                <div className="option-details">
-                  <div className="form-group">
-                    <label>Preferred Days *</label>
-                    <div className="checkbox-group">
-                      {daysOfWeek.map((day) => (
-                        <div key={day.value} className="checkbox-item">
-                          <input
-                            type="checkbox"
-                            id={day.value}
-                            name="flexibleDays"
-                            checked={schedule.flexibleDays.includes(day.value)}
-                            onChange={() => handleDayToggle(day.value)}
-                          />
-                          <label htmlFor={day.value}>{day.label}</label>
-                        </div>
-                      ))}
-                    </div>
-                    {errors.flexibleDays && <div className="error-message">{errors.flexibleDays}</div>}
-                  </div>
-
-                  <div className="form-group">
-                    <label>Preferred Time Slots *</label>
-                    <div className="checkbox-group">
-                      {timeSlots.map((slot) => (
-                        <div key={slot.value} className="checkbox-item">
-                          <input
-                            type="checkbox"
-                            id={slot.value}
-                            name="flexibleTimes"
-                            checked={schedule.flexibleTimes.includes(slot.value)}
-                            onChange={() => handleTimeSlotToggle(slot.value)}
-                          />
-                          <label htmlFor={slot.value}>{slot.label}</label>
-                        </div>
-                      ))}
-                    </div>
-                    {errors.flexibleTimes && <div className="error-message">{errors.flexibleTimes}</div>}
-                  </div>
-                </div>
-              )}
-            </div>
+          <div className="schedule-type-selector">
+            <button
+              type="button"
+              className={`schedule-type-btn ${
+                scheduleData.schedule_type === "specific" ? "active" : ""
+              }`}
+              onClick={() => handleScheduleTypeChange("specific")}
+            >
+              <span className="icon">📅</span>
+              <span>Specific Date & Time</span>
+            </button>
+            <button
+              type="button"
+              className={`schedule-type-btn ${
+                scheduleData.schedule_type === "flexible" ? "active" : ""
+              }`}
+              onClick={() => handleScheduleTypeChange("flexible")}
+            >
+              <span className="icon">🔄</span>
+              <span>Flexible Schedule</span>
+            </button>
           </div>
+
+          {scheduleData.schedule_type === "specific" ? (
+            <div className="specific-schedule">
+              <div className="form-group">
+                <label htmlFor="preferred_date">Preferred Date *</label>
+                <input
+                  type="date"
+                  id="preferred_date"
+                  name="preferred_date"
+                  value={scheduleData.preferred_date}
+                  onChange={handleChange}
+                  min={getMinDate()}
+                  className={errors.preferred_date ? "error" : ""}
+                />
+                {errors.preferred_date && (
+                  <div className="error-message">{errors.preferred_date}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="preferred_time">Preferred Time *</label>
+                <input
+                  type="time"
+                  id="preferred_time"
+                  name="preferred_time"
+                  value={scheduleData.preferred_time}
+                  onChange={handleChange}
+                  className={errors.preferred_time ? "error" : ""}
+                />
+                {errors.preferred_time && (
+                  <div className="error-message">{errors.preferred_time}</div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flexible-schedule">
+              <div className="form-group">
+                <label>Available Days *</label>
+                <div className="days-grid">
+                  {daysOfWeek.map((day) => (
+                    <div
+                      key={day}
+                      className={`day-card ${
+                        scheduleData.flexible_schedule_days.includes(day)
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => handleDayToggle(day)}
+                    >
+                      <span className="day-name">{day}</span>
+                    </div>
+                  ))}
+                </div>
+                {errors.flexible_schedule_days && (
+                  <div className="error-message">
+                    {errors.flexible_schedule_days}
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Preferred Time Slots *</label>
+                <div className="time-slots-grid">
+                  {timeSlots.map((slot) => (
+                    <div
+                      key={slot}
+                      className={`time-slot-card ${
+                        scheduleData.flexible_time_slots.includes(slot)
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => handleTimeSlotToggle(slot)}
+                    >
+                      <span className="time-slot-name">{slot}</span>
+                    </div>
+                  ))}
+                </div>
+                {errors.flexible_time_slots && (
+                  <div className="error-message">
+                    {errors.flexible_time_slots}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="wizard-actions">
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="btn btn-outlined back-button"
             onClick={onBack}
           >

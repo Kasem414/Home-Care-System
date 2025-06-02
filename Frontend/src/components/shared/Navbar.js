@@ -96,7 +96,7 @@ const Navbar = () => {
             >
               Provider Dash
             </Link>
-            <Link to="/request-test" className="navbar-item highlight">
+            <Link to="/request/new" className="navbar-item highlight">
               Request Service
             </Link>
             <Link

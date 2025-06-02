@@ -5,109 +5,157 @@
   padding: 2rem;
 }
 
-/* Form Section */
-.request-summary .form-section {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.request-summary .form-section h2 {
-  font-size: 1.75rem;
+.request-summary h2 {
+  font-size: 2rem;
   color: var(--text-primary);
-  margin-bottom: 1rem;
-}
-
-.request-summary .section-description {
-  color: var(--text-secondary);
   margin-bottom: 2rem;
-  font-size: 1rem;
+  text-align: center;
+  font-weight: 600;
 }
 
-/* Summary Container */
-.request-summary .summary-container {
-  background-color: var(--bg-light);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+/* Summary Content */
+.summary-content {
+  background: var(--bg-light);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-.request-summary .summary-section {
-  margin-bottom: 1.5rem;
-}
-
-.request-summary .summary-section h3 {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  color: var(--text-dark);
+/* Summary Sections */
+.summary-section {
+  padding: 2rem;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 0.5rem;
+  transition: background-color 0.3s ease;
 }
 
-.request-summary .summary-item {
-  display: flex;
-  margin-bottom: 0.75rem;
-}
-
-.request-summary .summary-label {
-  flex: 0 0 150px;
-  font-weight: 500;
-  color: var(--text-medium);
-}
-
-.request-summary .summary-value {
-  flex: 1;
-  color: var(--text-dark);
-}
-
-.request-summary .summary-value.description {
-  white-space: pre-line;
-}
-
-/* Attachments List */
-.request-summary .attachments-summary-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.request-summary .attachments-summary-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.request-summary .attachments-summary-list li:last-child {
+.summary-section:last-child {
   border-bottom: none;
 }
 
-/* Terms Agreement */
-.request-summary .terms-agreement {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-.request-summary .terms-agreement label{
-  font-size: var(--font-size-sm);
-  color: var(--text-medium);
+.summary-section:hover {
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* Wizard Actions */
-.request-summary .wizard-actions {
+.summary-section h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Summary Items */
+.summary-item {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: baseline;
+}
+
+.summary-item label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.summary-item span,
+.summary-item p {
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Qualifications */
+.qualifications-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.qualification-tag {
+  background-color: var(--primary-light);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: transform 0.2s ease;
+}
+
+.qualification-tag:hover {
+  transform: translateY(-2px);
+}
+
+/* Attachments */
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.attachment-item:hover {
+  border-color: var(--primary-color);
+  background-color: var(--primary-light);
+}
+
+/* Action Buttons */
+.wizard-actions {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  border-radius: 0 0 16px 16px;
+  padding: 2rem;
+  background-color: var(--bg-light);
+  border-top: 1px solid var(--border-color);
 }
 
-.request-summary .back-button,
-.request-summary .submit-button {
+.wizard-actions button {
+  min-width: 150px;
   padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: 500;
-  cursor: pointer;
+  font-size: 1rem;
   transition: all 0.3s ease;
+}
+
+.wizard-actions .back-button {
+  background-color: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.wizard-actions .back-button:hover {
+  background-color: var(--primary-light);
+}
+
+.wizard-actions .submit-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.wizard-actions .submit-button:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.wizard-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Responsive Design */
@@ -116,53 +164,62 @@
     padding: 1rem;
   }
 
-  .request-summary .form-section {
+  .summary-section {
     padding: 1.5rem;
   }
 
-  .request-summary .summary-item {
-    flex-direction: column;
+  .summary-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 
-  .request-summary .summary-label {
+  .summary-item label {
     margin-bottom: 0.25rem;
   }
 
-  .request-summary .wizard-actions {
+  .wizard-actions {
     flex-direction: column;
+    padding: 1.5rem;
   }
 
-  .request-summary .wizard-actions button {
+  .wizard-actions button {
     width: 100%;
   }
 }
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .request-summary .form-section,
-  .request-summary .summary-container {
+  .summary-content {
     background: var(--surface-dark);
+  }
+
+  .summary-section:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .qualification-tag {
+    background-color: rgba(var(--primary-rgb), 0.2);
+  }
+
+  .attachment-item {
+    background-color: var(--surface-dark);
     border-color: var(--border-dark);
   }
 
-  .request-summary .form-section h2,
-  .request-summary .summary-section h3 {
-    color: var(--text-light);
+  .attachment-item:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
   }
 
-  .request-summary .section-description {
-    color: var(--text-light-secondary);
+  .wizard-actions {
+    background-color: var(--surface-dark);
   }
 
-  .request-summary .summary-label {
-    color: var(--text-light-secondary);
+  .wizard-actions .back-button {
+    color: var(--primary-light);
+    border-color: var(--primary-light);
   }
 
-  .request-summary .summary-value {
-    color: var(--text-light);
-  }
-
-  .request-summary .attachments-summary-list li {
-    border-color: var(--border-dark);
+  .wizard-actions .back-button:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
   }
 }
