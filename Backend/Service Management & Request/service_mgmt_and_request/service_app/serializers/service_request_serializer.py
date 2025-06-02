@@ -68,27 +68,27 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
             'matched_provider_id', 'auto_expire_at'
         ]
 
-    def to_internal_value(self, data):
-        # Flatten keys from nested frontend structure
-        data.update({
-            'city': data.get('location[city]'),
-            'region': data.get('location[region]'),
-            'additional_info': data.get('location[additional_info]'),
+    # def to_internal_value(self, data):
+    #     # Flatten keys from nested frontend structure
+    #     data.update({
+    #         'city': data.get('location[city]'),
+    #         'region': data.get('location[region]'),
+    #         'additional_info': data.get('location[additional_info]'),
 
-            'preferred_date': data.get('schedule[preferredDate]'),
-            'preferred_time': data.get('schedule[preferredTime]'),
-            'schedule_type': data.get('schedule[flexibility]'),
-            'flexible_schedule_days': data.get('schedule[flexibleDays]'),
-            'flexible_time_slots': data.get('schedule[flexibleTimes]'),
+    #         'preferred_date': data.get('schedule[preferredDate]'),
+    #         'preferred_time': data.get('schedule[preferredTime]'),
+    #         'schedule_type': data.get('schedule[flexibility]'),
+    #         'flexible_schedule_days': data.get('schedule[flexibleDays]'),
+    #         'flexible_time_slots': data.get('schedule[flexibleTimes]'),
 
-            'description': data.get('requirements[description]'),
-            'budget_type': data.get('requirements[budget][type]'),
-            'budget_min_hourly': data.get('requirements[budget][min]'),
-            'budget_max_hourly': data.get('requirements[budget][max]'),
-            'fixed_price_offer': data.get('requirements[budget][fixed_price_offer]'),
-            'preferred_qualifications': data.get('requirements[preferredQualifications]'),
-        })
-        return super().to_internal_value(data)
+    #         'description': data.get('requirements[description]'),
+    #         'budget_type': data.get('requirements[budget][type]'),
+    #         'budget_min_hourly': data.get('requirements[budget][min]'),
+    #         'budget_max_hourly': data.get('requirements[budget][max]'),
+    #         'fixed_price_offer': data.get('requirements[budget][fixed_price_offer]'),
+    #         'preferred_qualifications': data.get('requirements[preferredQualifications]'),
+    #     })
+    #     return super().to_internal_value(data)
     def validate(self, attrs):
         schedule_type = attrs.get('schedule_type')
 

@@ -58,7 +58,7 @@ class ServiceRequestCreateView(APIView):
 
     @swagger_auto_schema(request_body=ServiceRequestSerializer)
     def post(self, request):
-        user_id = request.data.get('customerId')
+        # user_id = request.data.get('customerId')
         # user_role = request.headers.get('X-User-Role')
 
         # if  not user_id:
@@ -66,7 +66,7 @@ class ServiceRequestCreateView(APIView):
         #                      status=status.HTTP_403_FORBIDDEN)
 
         form_data = request.data.copy()
-        form_data['customer_id'] = user_id
+        # form_data['customer_id'] = user_id
         serializer = ServiceRequestSerializer(data=form_data, context={'request': request})
         if serializer.is_valid():
             request_instance = ServiceRequestRepository.create_service_request(serializer.validated_data)
@@ -78,7 +78,7 @@ class ServiceRequestCreateView(APIView):
             event_data = {
                  "event": "SERVICE_REQUEST_CREATED",
                  "request_id": request_instance.id,
-                 "customer_id": int(user_id),
+                 "customer_id": int(form_data['customer_id']),
                  "service_type": form_data.get("service_type"),
                  "location": {
                      "city": form_data.get("city"),
