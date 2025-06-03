@@ -143,7 +143,6 @@ class ProviderRequestDetailView(APIView):
             "flexibleDays": service_request.flexible_schedule_days,
             "flexibleTimes": service_request.flexible_time_slots,
             "address": {
-                "street_address": service_request.street_address,
                 "city": service_request.city,
                 "region": service_request.region,
                 "additional_info": service_request.additional_info,
