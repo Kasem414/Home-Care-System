@@ -11,13 +11,13 @@ const RequestsWithOffersPage = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="page-container">
-        <div className="page-header">
+        {/* <div className="page-header">
           <h1>Your Service Requests & Offers</h1>
           <p className="page-description">
             View all your service requests and the offers you've received from service providers.
             You can expand each request to see its offers and accept or reject them.
           </p>
-        </div>
+        </div> */}
         
         <RequestsWithOffers />
       </div>

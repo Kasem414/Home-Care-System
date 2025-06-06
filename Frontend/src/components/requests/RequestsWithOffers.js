@@ -1,13 +1,65 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaTimes,
+} from "react-icons/fa";
 import OffersList from "./OffersList";
+import "./ResponseDialog.css";
 
 // API endpoints
 const API_BASE_URL = "http://127.0.0.1:9000/api";
 const REQUESTS_ENDPOINT = `${API_BASE_URL}/service-requests`;
 const OFFERS_ENDPOINT = `${API_BASE_URL}/offers`;
+
+// Response Dialog Component
+const ResponseDialog = ({ isOpen, onClose, message, type }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        className="dialog-overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      >
+        <motion.div
+          className={`response-dialog ${type}`}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: "spring", damping: 25 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="dialog-header">
+            {type === "success" ? (
+              <FaCheckCircle className="dialog-icon success" />
+            ) : (
+              <FaTimesCircle className="dialog-icon error" />
+            )}
+            <button className="close-button" onClick={onClose}>
+              <FaTimes />
+            </button>
+          </div>
+          <div className="dialog-content">
+            <p>{message}</p>
+          </div>
+          <div className="dialog-actions">
+            <button className="btn btn-primary" onClick={onClose}>
+              OK
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 const RequestsWithOffers = () => {
   const [requests, setRequests] = useState([]);
@@ -18,6 +70,12 @@ const RequestsWithOffers = () => {
     total: 0,
     page: 1,
     limit: 5,
+  });
+  // Dialog state
+  const [dialog, setDialog] = useState({
+    isOpen: false,
+    message: "",
+    type: "success", // success or error
   });
 
   useEffect(() => {
@@ -36,7 +94,7 @@ const RequestsWithOffers = () => {
       if (requestsResponse.data && requestsResponse.data.data) {
         const requestsData = requestsResponse.data.data;
         setPagination(requestsResponse.data.pagination);
-        
+
         // Fetch all offers at once since the API doesn't support filtering by requestId
         let allOffers = [];
         try {
@@ -47,18 +105,20 @@ const RequestsWithOffers = () => {
         } catch (error) {
           console.error("Error fetching offers:", error);
         }
-        
+
         // Map offers to their respective requests
-        const requestsWithOffers = requestsData.map(request => {
+        const requestsWithOffers = requestsData.map((request) => {
           // Filter offers that belong to this request
-          const requestOffers = allOffers.filter(offer => offer.requestId === request.id);
-          
+          const requestOffers = allOffers.filter(
+            (offer) => offer.requestId === request.id
+          );
+
           return {
             ...request,
             offers: requestOffers || [],
           };
         });
-        
+
         setRequests(requestsWithOffers);
       }
     } catch (err) {
@@ -78,30 +138,54 @@ const RequestsWithOffers = () => {
 
   const handleAcceptOffer = async (requestId, offerId) => {
     try {
-      // Call the API to accept the offer
-      await axios.put(`${OFFERS_ENDPOINT}/${offerId}/accept`);
-
-      // Update the local state
-      setRequests(
-        requests.map((request) => {
-          if (request.id === requestId) {
-            return {
-              ...request,
-              offers: request.offers.map((offer) =>
-                offer.id === offerId ? { ...offer, status: "accepted" } : offer
-              ),
-              status: "in_progress", // Update request status as well
-            };
-          }
-          return request;
-        })
+      // Call the API to accept the offer with the new endpoint format
+      const response = await axios.put(
+        `${API_BASE_URL}/requests/${requestId}/offers/${offerId}/accept/`
       );
+
+      // Check if the response contains the expected data
+      if (
+        response.data &&
+        response.data.message === "Offer accepted successfully."
+      ) {
+        // Update the local state
+        setRequests(
+          requests.map((request) => {
+            if (request.id === requestId) {
+              return {
+                ...request,
+                offers: request.offers.map((offer) =>
+                  offer.id === offerId
+                    ? { ...offer, status: "accepted" }
+                    : offer
+                ),
+                status: "in_progress", // Update request status as well
+              };
+            }
+            return request;
+          })
+        );
+
+        // Show success dialog
+        setDialog({
+          isOpen: true,
+          message:
+            "Offer accepted successfully! The service provider will be notified.",
+          type: "success",
+        });
+      }
     } catch (err) {
       console.error("Error accepting offer:", err);
-      alert("Failed to accept offer. Please try again.");
+      // Show error dialog instead of alert
+      setDialog({
+        isOpen: true,
+        message: "Failed to accept offer. Please try again.",
+        type: "error",
+      });
     }
   };
 
+  // Remove handleRejectOffer function as it's no longer needed
   const handleRejectOffer = async (requestId, offerId) => {
     try {
       // Call the API to reject the offer
@@ -121,10 +205,27 @@ const RequestsWithOffers = () => {
           return request;
         })
       );
+
+      // Show success dialog
+      setDialog({
+        isOpen: true,
+        message: "Offer rejected successfully.",
+        type: "success",
+      });
     } catch (err) {
       console.error("Error rejecting offer:", err);
-      alert("Failed to reject offer. Please try again.");
+      // Show error dialog instead of alert
+      setDialog({
+        isOpen: true,
+        message: "Failed to reject offer. Please try again.",
+        type: "error",
+      });
     }
+  };
+
+  // Close dialog handler
+  const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, isOpen: false }));
   };
 
   // Format date for display
@@ -162,7 +263,8 @@ const RequestsWithOffers = () => {
       default:
         return {
           className: "",
-          label: status.charAt(0).toUpperCase() + status.slice(1).replace("_", " "),
+          label:
+            status.charAt(0).toUpperCase() + status.slice(1).replace("_", " "),
         };
     }
   };
@@ -187,6 +289,14 @@ const RequestsWithOffers = () => {
     <div className="requests-with-offers-container">
       <h1>Your Service Requests</h1>
 
+      {/* Response Dialog */}
+      <ResponseDialog
+        isOpen={dialog.isOpen}
+        onClose={closeDialog}
+        message={dialog.message}
+        type={dialog.type}
+      />
+
       <div className="requests-list">
         {requests.map((request) => {
           const statusDetails = getStatusDetails(request.status);
@@ -209,12 +319,21 @@ const RequestsWithOffers = () => {
                   <h3>{request.service_type}</h3>
                   <p className="request-date">
                     {request.schedule_type === "specific" ? (
-                      <>Scheduled: {formatDate(request.preferred_date)} at {request.preferred_time && request.preferred_time.substring(0, 5)}</>
+                      <>
+                        Scheduled: {formatDate(request.preferred_date)} at{" "}
+                        {request.preferred_time &&
+                          request.preferred_time.substring(0, 5)}
+                      </>
                     ) : (
-                      <>Flexible Schedule: {request.flexible_schedule_days?.join(", ")}</>
+                      <>
+                        Flexible Schedule:{" "}
+                        {request.flexible_schedule_days?.join(", ")}
+                      </>
                     )}
                   </p>
-                  <p className="request-address">{request.city}, {request.region}</p>
+                  <p className="request-address">
+                    {request.city}, {request.region}
+                  </p>
                 </div>
 
                 <div className="request-meta">
@@ -255,9 +374,6 @@ const RequestsWithOffers = () => {
                         offers={request.offers}
                         onAcceptOffer={(offerId) =>
                           handleAcceptOffer(request.id, offerId)
-                        }
-                        onRejectOffer={(offerId) =>
-                          handleRejectOffer(request.id, offerId)
                         }
                       />
                     ) : (

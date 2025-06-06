@@ -63,19 +63,22 @@ const OffersList = ({
 
   const handleAcceptOffer = async (offerId) => {
     try {
-      // Call the API to accept the offer
-      await axios.put(`http://127.0.0.1:9000/api/offers/${offerId}/accept`);
+      // Call the API to accept the offer with the new endpoint format
+      const response = await axios.put(`http://127.0.0.1:9000/api/requests/${requestId}/offers/${offerId}/accept/`);
+      
+      // Check if the response contains the expected data
+      if (response.data && response.data.message === "Offer accepted successfully.") {
+        // Update the local state
+        setOffers(
+          offers.map((offer) =>
+            offer.id === offerId ? { ...offer, status: "accepted" } : offer
+          )
+        );
 
-      // Update the local state
-      setOffers(
-        offers.map((offer) =>
-          offer.id === offerId ? { ...offer, status: "accepted" } : offer
-        )
-      );
-
-      // Call the parent component callback if provided
-      if (onAcceptOffer) {
-        onAcceptOffer(offerId);
+        // Call the parent component callback if provided
+        if (onAcceptOffer) {
+          onAcceptOffer(offerId);
+        }
       }
     } catch (err) {
       console.error("Error accepting offer:", err);
@@ -83,6 +86,7 @@ const OffersList = ({
     }
   };
 
+  // Remove the handleRejectOffer function as it's no longer needed
   const handleRejectOffer = async (offerId) => {
     try {
       // Call the API to reject the offer
@@ -234,12 +238,7 @@ const OffersList = ({
               >
                 Accept Offer
               </button>
-              <button
-                className="btn btn-secondary"
-                onClick={() => handleRejectOffer(offer.id)}
-              >
-                Reject
-              </button>
+              {/* Removed the reject button */}
             </div>
           )}
         </motion.div>

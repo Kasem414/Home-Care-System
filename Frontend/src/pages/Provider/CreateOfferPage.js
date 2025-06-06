@@ -141,7 +141,7 @@ const CreateOfferPage = () => {
 
       // Create the offer object
       const offer = {
-        request_id: Number(requestId), // Changed from requestId to request_id to match backend expectations
+        requestId: Number(requestId), // Changed from requestId to request_id to match backend expectations
         providerId: user?.id || 42, // Fallback to 42 as specified in the API example
         price: offerData.price,
         estimatedDuration: offerData.estimatedDuration,
