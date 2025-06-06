@@ -1,12 +1,12 @@
 /* Service Selection Component */
 .service-selection {
-  max-width: 800px;
+  /* max-width: 800px; */
   margin: 0 auto;
   padding: 20px;
 }
 
 /* Form Section */
-.form-section {
+.service-selection .form-section {
   background: white;
   border-radius: 12px;
   padding: 2rem;
@@ -14,21 +14,21 @@
   margin-bottom: 30px;
 }
 
-.form-section h2 {
+.service-selection .form-section h2 {
   font-size: 1.75rem;
   color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
 /* Service Category Grid */
-.service-category-grid {
+.service-selection .service-category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   margin: 20px 0;
 }
 
-.service-category-card {
+.service-selection .service-category-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,22 +40,22 @@
   background: #fff;
 }
 
-.service-category-card:hover {
+.service-selection .service-category-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.service-category-card.selected {
-  border-color: #007bff;
+.service-selection .service-category-card.selected {
+  border-color: var(--primary-color);
   background-color: #f8f9ff;
 }
 
-.category-icon {
+.service-selection .category-icon {
   font-size: 24px;
   margin-bottom: 10px;
 }
 
-.category-name {
+.service-selection .category-name {
   font-size: 16px;
   font-weight: 500;
   text-align: center;
@@ -63,7 +63,7 @@
 }
 
 /* Service Details */
-.service-details-textarea {
+.service-selection .service-details-textarea {
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
@@ -73,31 +73,31 @@
   min-height: 120px;
 }
 
-.service-details-textarea.error {
+.service-selection .service-details-textarea.error {
   border-color: #dc3545;
 }
 
-.details-counter {
+.service-selection .details-counter {
   margin-top: 8px;
   font-size: 12px;
   color: #666;
 }
 
 /* Error Message */
-.error-message {
+.service-selection .error-message {
   color: #dc3545;
   font-size: 12px;
   margin-top: 4px;
 }
 
 /* Wizard Actions */
-.wizard-actions {
+.service-selection .wizard-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
 }
 
-.btn {
+.service-selection .btn {
   padding: 10px 20px;
   border-radius: 4px;
   font-weight: 500;
@@ -105,48 +105,48 @@
   transition: all 0.3s ease;
 }
 
-.btn-primary {
-  background-color: #007bff;
+.service-selection .btn-primary {
+  background-color: var(--primary-color);
   color: white;
   border: none;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.service-selection .btn-primary:hover {
+  background-color: var(--primary-dark);
 }
 
-.btn-primary:disabled {
+.service-selection .btn-primary:disabled {
   background-color: #b3d7ff;
   cursor: not-allowed;
 }
 
-.btn-outlined {
+.service-selection .btn-outlined {
   background-color: transparent;
-  border: 1px solid #007bff;
-  color: #007bff;
+  border: 1px solid var(--primary-dark);
+  color: var(--primary-dark);
 }
 
-.btn-outlined:hover {
+.service-selection .btn-outlined:hover {
   background-color: #f8f9ff;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .service-selection {
+  .service-selection .service-selection {
     padding: 1rem;
   }
 
-  .form-section {
+  .service-selection .form-section {
     padding: 1.5rem;
   }
 
-  .service-category-grid {
+  .service-selection .service-category-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  .service-category-grid {
+  .service-selection .service-category-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -154,34 +154,34 @@
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   .form-section,
-  .service-category-card {
+  .service-selection .service-category-card {
     background: var(--surface-dark);
     border-color: var(--border-dark);
   }
 
-  .form-section h2 {
+  .service-selection .form-section h2 {
     color: var(--text-light);
   }
 
-  .service-category-card:hover {
+  .service-selection .service-category-card:hover {
     background: var(--primary-color-dark);
   }
 
-  .service-category-card.selected {
+  .service-selection .service-category-card.selected {
     background: var(--primary-color);
   }
 
-  .service-details-textarea {
+  .service-selection .service-details-textarea {
     background: var(--surface-dark);
     border-color: var(--border-dark);
     color: var(--text-light);
   }
 
-  .service-details-textarea:focus {
+  .service-selection .service-details-textarea:focus {
     border-color: var(--primary-color);
   }
 
-  .details-counter {
+  .service-selection .details-counter {
     color: var(--text-light-secondary);
   }
 }

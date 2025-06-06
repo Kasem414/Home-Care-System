@@ -35,6 +35,7 @@ class CustomPagination(PageNumberPagination):
 
  
 class ListUsersView(UserBaseView):
+    print("test")
     pagination_class = CustomPagination
     def get(self, request):
         users = self.user_service.list_users()

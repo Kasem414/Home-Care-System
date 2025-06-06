@@ -4,12 +4,17 @@
 .provider-dashboard {
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
   background-color: var(--bg-light);
+  padding: 2rem 0;
 }
 
 .provider-dashboard .dashboard-header {
-  background-color: var(--primary-color);
-  color: white;
+  background-color: #f8f9fa;
   padding: 2rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.provider-dashboard .dashboard-welcome {
   margin-bottom: 2rem;
 }
 
@@ -26,32 +31,26 @@
 .provider-dashboard .dashboard-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+  gap: 1rem;
 }
 
 .provider-dashboard .stat-card {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
+  background-color: white;
   padding: 1.5rem;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-.provider-dashboard .stat-card:hover {
-  background-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-3px);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .provider-dashboard .stat-value {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
   margin-bottom: 0.5rem;
 }
 
 .provider-dashboard .stat-label {
+  color: #6c757d;
   font-size: 0.9rem;
-  opacity: 0.9;
 }
 
 .provider-dashboard .star {
@@ -64,64 +63,44 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
 .provider-dashboard .dashboard-tabs {
   display: flex;
-  overflow-x: auto;
-  gap: 0.5rem;
-  padding: 1rem 0;
+  gap: 1rem;
 }
 
 .provider-dashboard .tab-btn {
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  padding: 0.75rem 1.25rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: none;
+  color: #6c757d;
   font-weight: 500;
-  white-space: nowrap;
+  cursor: pointer;
   position: relative;
-  color: var(--text-medium);
+  transition: color 0.3s;
 }
 
 .provider-dashboard .tab-btn.active {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-}
-
-.provider-dashboard .tab-btn:hover:not(.active) {
-  background-color: var(--bg-light);
-  color: var(--primary-color);
-}
-
-.provider-dashboard .tab-btn i {
-  margin-right: 0.5rem;
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
 }
 
 .provider-dashboard .notification-badge {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: var(--danger-color);
+  top: 0;
+  right: 0;
+  background-color: #dc3545;
   color: white;
-  font-size: 0.7rem;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+  transform: translate(50%, -50%);
 }
 
 .provider-dashboard .dashboard-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .provider-dashboard .dashboard-actions .btn i {
@@ -148,6 +127,246 @@
 
 .provider-dashboard .placeholder-content p {
   color: var(--text-medium);
+}
+
+/* Request Feed Styles */
+.provider-dashboard .requests-feed {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.provider-dashboard .provider-request-filters {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.provider-dashboard .filter-group {
+  margin-bottom: 1.5rem;
+}
+
+.provider-dashboard .filter-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.provider-dashboard .filter-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.provider-dashboard .budget-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.provider-dashboard .budget-slider {
+  flex: 1;
+}
+
+.provider-dashboard .budget-value {
+  min-width: 60px;
+  color: #6c757d;
+}
+
+.provider-dashboard .checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.provider-dashboard .filter-reset {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Request Item Styles */
+.provider-dashboard .request-item {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+}
+
+.provider-dashboard .request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.provider-dashboard .request-type {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.provider-dashboard .request-type h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2c3e50;
+}
+
+.provider-dashboard .new-badge {
+  background-color: #28a745;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.provider-dashboard .urgent-badge {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.provider-dashboard .request-time {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.provider-dashboard .request-details {
+  margin-bottom: 1rem;
+}
+
+.provider-dashboard .detail-row {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.provider-dashboard .detail-label {
+  width: 100px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.provider-dashboard .detail-value {
+  flex: 1;
+  color: #2c3e50;
+}
+
+.provider-dashboard .request-description {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.provider-dashboard .request-attachments {
+  margin-bottom: 1rem;
+}
+
+.provider-dashboard .attachment-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.provider-dashboard .attachment-thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.provider-dashboard .attachment-thumbnail {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.provider-dashboard .more-attachments {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.provider-dashboard .request-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* Pagination Styles */
+.provider-dashboard .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.provider-dashboard .pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ced4da;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.provider-dashboard .pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.provider-dashboard .pagination button:not(:disabled):hover {
+  background-color: #f8f9fa;
+}
+
+.provider-dashboard .pagination span {
+  color: #6c757d;
+}
+
+/* Loading and Error States */
+.provider-dashboard .loading-spinner {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+}
+
+.provider-dashboard .loading-spinner i {
+  margin-right: 0.5rem;
+}
+
+.provider-dashboard .error-message {
+  text-align: center;
+  padding: 2rem;
+  color: #dc3545;
+  background-color: #f8d7da;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.provider-dashboard .error-message i {
+  margin-right: 0.5rem;
+}
+
+.provider-dashboard .no-requests {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.provider-dashboard .no-requests i {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #adb5bd;
 }
 
 /* Responsive Design */
@@ -198,5 +417,28 @@
   .provider-dashboard .tab-btn {
     padding: 0.6rem 1rem;
     font-size: 0.9rem;
+  }
+
+  .provider-dashboard .dashboard-nav {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .provider-dashboard .dashboard-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .provider-dashboard .dashboard-actions .btn {
+    flex: 1;
+  }
+
+  .provider-dashboard .detail-row {
+    flex-direction: column;
+  }
+
+  .provider-dashboard .detail-label {
+    width: auto;
+    margin-bottom: 0.25rem;
   }
 }

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 import {
   FaStar,
   FaCheck,
@@ -9,75 +10,101 @@ import {
   FaDollarSign,
 } from "react-icons/fa";
 
-// Sample data for testing
-const sampleOffers = [
-  {
-    id: 1,
-    providerName: "John Smith",
-    providerImage: "https://randomuser.me/api/portraits/men/1.jpg",
-    rating: 4.8,
-    reviewsCount: 124,
-    status: "pending",
-    price: 150,
-    priceType: "hour",
-    availability: "Available tomorrow",
-    responseTime: "2 hours",
-    description:
-      "I have extensive experience in home care services and can provide professional assistance with your needs. I'm certified in first aid and have worked with elderly clients for over 5 years.",
-    qualifications: [
-      "Certified Professional",
-      "First Aid Trained",
-      "5+ Years Experience",
-      "Background Checked",
-    ],
-  },
-  {
-    id: 2,
-    providerName: "Sarah Johnson",
-    providerImage: "https://randomuser.me/api/portraits/women/2.jpg",
-    rating: 4.9,
-    reviewsCount: 98,
-    status: "pending",
-    price: 180,
-    priceType: "hour",
-    availability: "Available today",
-    responseTime: "1 hour",
-    description:
-      "Professional home care provider with a focus on personalized care. I specialize in elderly care and can provide both medical and non-medical assistance. Available for both short-term and long-term care.",
-    qualifications: [
-      "Licensed Nurse",
-      "Elderly Care Specialist",
-      "Emergency Response Trained",
-      "Insured",
-    ],
-  },
-  {
-    id: 3,
-    providerName: "Michael Brown",
-    providerImage: "https://randomuser.me/api/portraits/men/3.jpg",
-    rating: 4.7,
-    reviewsCount: 156,
-    status: "accepted",
-    price: 165,
-    priceType: "hour",
-    availability: "Available next week",
-    responseTime: "3 hours",
-    description:
-      "Experienced home care professional with a background in physical therapy. I can help with mobility assistance, exercise programs, and daily living activities. I'm also trained in handling medical equipment.",
-    qualifications: [
-      "Physical Therapist",
-      "Medical Equipment Trained",
-      "8+ Years Experience",
-      "Background Checked",
-    ],
-  },
-];
+// API endpoints
+const API_BASE_URL = "http://127.0.0.1:9000/api";
+const OFFERS_ENDPOINT = `${API_BASE_URL}/offers`;
 
 const OffersList = ({
-  offers = sampleOffers,
+  requestId,
+  offers: initialOffers,
   onAcceptOffer,
   onRejectOffer,
 }) => {
+  const [offers, setOffers] = useState(initialOffers || []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 10,
+  });
+
+  useEffect(() => {
+    if (!initialOffers) {
+      fetchOffers();
+    }
+  }, [pagination.page, requestId, initialOffers]);
+
+  const fetchOffers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = requestId
+        ? `http://127.0.0.1:9000/api/offers/?requestId=${requestId}&page=${pagination.page}&limit=${pagination.limit}`
+        : `http://127.0.0.1:9000/api/offers/?page=${pagination.page}&limit=${pagination.limit}`;
+
+      const response = await axios.get(url);
+
+      if (response.data && response.data.data && response.data.data.offers) {
+        setOffers(response.data.data.offers);
+        setPagination(response.data.pagination);
+      }
+    } catch (err) {
+      console.error("Error fetching offers:", err);
+      setError("Failed to load offers. Please try again later.");
+      // // Fallback to sample data in development
+      // if (process.env.NODE_ENV === "development") {
+      //   setOffers(sampleOffers);
+      // }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAcceptOffer = async (offerId) => {
+    try {
+      // Call the API to accept the offer
+      await axios.put(`http://127.0.0.1:9000/api/offers/${offerId}/accept`);
+
+      // Update the local state
+      setOffers(
+        offers.map((offer) =>
+          offer.id === offerId ? { ...offer, status: "accepted" } : offer
+        )
+      );
+
+      // Call the parent component callback if provided
+      if (onAcceptOffer) {
+        onAcceptOffer(offerId);
+      }
+    } catch (err) {
+      console.error("Error accepting offer:", err);
+      setError("Failed to accept offer. Please try again.");
+    }
+  };
+
+  const handleRejectOffer = async (offerId) => {
+    try {
+      // Call the API to reject the offer
+      await axios.put(`http://127.0.0.1:9000/api/offers/${offerId}/reject`);
+
+      // Update the local state
+      setOffers(
+        offers.map((offer) =>
+          offer.id === offerId ? { ...offer, status: "rejected" } : offer
+        )
+      );
+
+      // Call the parent component callback if provided
+      if (onRejectOffer) {
+        onRejectOffer(offerId);
+      }
+    } catch (err) {
+      console.error("Error rejecting offer:", err);
+      setError("Failed to reject offer. Please try again.");
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -99,6 +126,14 @@ const OffersList = ({
     },
   };
 
+  if (loading) {
+    return <div className="offers-loading">Loading offers...</div>;
+  }
+
+  if (error) {
+    return <div className="offers-error">{error}</div>;
+  }
+
   if (!offers || offers.length === 0) {
     return (
       <div className="offers-empty">
@@ -106,6 +141,18 @@ const OffersList = ({
       </div>
     );
   }
+
+  // Format date and time for display
+  const formatDate = (dateString) => {
+    if (!dateString) return "Not specified";
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  const formatTime = (timeString) => {
+    if (!timeString) return "Not specified";
+    return timeString.substring(0, 5); // Extract HH:MM from HH:MM:SS
+  };
 
   return (
     <motion.div
@@ -123,19 +170,12 @@ const OffersList = ({
         >
           <div className="offer-header">
             <div className="provider-info">
-              {/* <img
-                src={offer.providerImage || "/images/default-avatar.png"}
-                alt={offer.providerName}
-                className="provider-avatar"
-              /> */}
               <div className="provider-details">
-                <h3 className="provider-name">{offer.providerName}</h3>
-                <div className="provider-rating">
-                  <FaStar className="star-icon" />
-                  <span>{offer.rating}</span>
-                  <span className="reviews-count">
-                    ({offer.reviewsCount} reviews)
-                  </span>
+                <h3 className="provider-name">
+                  Provider ID: {offer.providerId}
+                </h3>
+                <div className="service-type">
+                  <span>Service: {offer.serviceType}</span>
                 </div>
               </div>
             </div>
@@ -156,17 +196,21 @@ const OffersList = ({
             <div className="offer-price">
               <FaDollarSign />
               <span className="price">{offer.price}</span>
-              <span className="price-type">/{offer.priceType}</span>
+              <span className="price-type">/hour</span>
             </div>
 
             <div className="offer-meta">
               <div className="meta-item">
                 <FaCalendarAlt />
-                <span>Available: {offer.availability}</span>
+                <span>Available Date: {formatDate(offer.availableDate)}</span>
               </div>
               <div className="meta-item">
                 <FaClock />
-                <span>Response time: {offer.responseTime}</span>
+                <span>Available Time: {formatTime(offer.availableTime)}</span>
+              </div>
+              <div className="meta-item">
+                <FaClock />
+                <span>Estimated Duration: {offer.estimatedDuration} hours</span>
               </div>
             </div>
 
@@ -174,14 +218,10 @@ const OffersList = ({
               <p>{offer.description}</p>
             </div>
 
-            {offer.qualifications && (
-              <div className="provider-qualifications">
-                {offer.qualifications.map((qualification, index) => (
-                  <span key={index} className="qualification-badge">
-                    <FaCheck />
-                    {qualification}
-                  </span>
-                ))}
+            {offer.materials && (
+              <div className="offer-materials">
+                <h4>Materials:</h4>
+                <p>{offer.materials}</p>
               </div>
             )}
           </div>
@@ -190,13 +230,13 @@ const OffersList = ({
             <div className="offer-actions">
               <button
                 className="btn btn-primary"
-                onClick={() => onAcceptOffer(offer.id)}
+                onClick={() => handleAcceptOffer(offer.id)}
               >
                 Accept Offer
               </button>
               <button
                 className="btn btn-secondary"
-                onClick={() => onRejectOffer(offer.id)}
+                onClick={() => handleRejectOffer(offer.id)}
               >
                 Reject
               </button>
@@ -204,6 +244,35 @@ const OffersList = ({
           )}
         </motion.div>
       ))}
+
+      {pagination.total > pagination.limit && (
+        <div className="pagination-controls">
+          <button
+            disabled={pagination.page === 1}
+            onClick={() =>
+              setPagination({ ...pagination, page: pagination.page - 1 })
+            }
+            className="btn btn-secondary"
+          >
+            Previous
+          </button>
+          <span>
+            Page {pagination.page} of{" "}
+            {Math.ceil(pagination.total / pagination.limit)}
+          </span>
+          <button
+            disabled={
+              pagination.page >= Math.ceil(pagination.total / pagination.limit)
+            }
+            onClick={() =>
+              setPagination({ ...pagination, page: pagination.page + 1 })
+            }
+            className="btn btn-secondary"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 };

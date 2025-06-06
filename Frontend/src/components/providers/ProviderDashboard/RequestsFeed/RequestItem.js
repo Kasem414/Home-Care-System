@@ -1,12 +1,19 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import "./RequestItem.css";
 
-const RequestItem = ({ request, onCreateOffer }) => {
+const RequestItem = ({ request }) => {
+  const navigate = useNavigate();
+
   // Format date for display
   const formatDate = (dateString) => {
-    const options = { year: "numeric", month: "short", day: "numeric" };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   // Calculate time difference to show recency
@@ -29,37 +36,75 @@ const RequestItem = ({ request, onCreateOffer }) => {
 
   // Determine if request is new (less than 24 hours old)
   const isNew = () => {
-    const requestDate = new Date(request.createdAt);
+    const requestDate = new Date(request.created_at);
     const now = new Date();
     return now - requestDate < 24 * 60 * 60 * 1000;
+  };
+
+  // Format budget display
+  const formatBudget = () => {
+    if (request.budget_type === "fixed") {
+      return `$${request.fixed_price_offer} (Fixed)`;
+    } else {
+      const min = request.budget_min_hourly || "Any";
+      const max = request.budget_max_hourly || "Any";
+      return `$${min} - $${max} /hr`;
+    }
+  };
+
+  // Format schedule display
+  const formatSchedule = () => {
+    if (request.schedule_type === "specific") {
+      return `${formatDate(request.preferred_date)} at ${
+        request.preferred_time
+      }`;
+    } else {
+      return (
+        <>
+          <div>Days: {request.flexible_schedule_days.join(", ")}</div>
+          <div>Time: {request.flexible_time_slots.join(", ")}</div>
+        </>
+      );
+    }
+  };
+
+  const handleCreateOffer = () => {
+    navigate(`/provider/request/${request.id}/create-offer`);
   };
 
   return (
     <div className="request-item">
       <div className="request-header">
         <div className="request-type">
-          <h3>{request.serviceType}</h3>
+          <h3>{request.service_type}</h3>
           {isNew() && <span className="new-badge">New</span>}
+          {request.status === "urgent" && (
+            <span className="urgent-badge">Urgent</span>
+          )}
         </div>
-        <span className="request-time">{getTimeAgo(request.createdAt)}</span>
+        <span className="request-time">{getTimeAgo(request.created_at)}</span>
       </div>
 
       <div className="request-details">
         <div className="detail-row">
           <span className="detail-label">Location:</span>
-          <span className="detail-value">{request.address}</span>
-        </div>
-        <div className="detail-row">
-          <span className="detail-label">Date:</span>
           <span className="detail-value">
-            {formatDate(request.scheduledDate)} at {request.scheduledTime}
+            {request.city}, {request.region}
           </span>
         </div>
-        {request.budget && (
+        <div className="detail-row">
+          <span className="detail-label">Schedule:</span>
+          <span className="detail-value">{formatSchedule()}</span>
+        </div>
+        <div className="detail-row">
+          <span className="detail-label">Budget:</span>
+          <span className="detail-value budget">{formatBudget()}</span>
+        </div>
+        {request.preferred_qualifications?.length > 0 && (
           <div className="detail-row">
-            <span className="detail-label">Budget:</span>
-            <span className="detail-value budget">
-              ${request.budget.min} - ${request.budget.max}
+            <span className="detail-label">Required:</span>
+            <span className="detail-value qualifications">
+              {request.preferred_qualifications.join(", ")}
             </span>
           </div>
         )}
@@ -75,17 +120,35 @@ const RequestItem = ({ request, onCreateOffer }) => {
         </div>
       )}
 
+      {request.attachments?.length > 0 && (
+        <div className="request-attachments">
+          <span className="attachment-label">Attachments:</span>
+          <div className="attachment-thumbnails">
+            {request.attachments.slice(0, 3).map((attachment) => (
+              <img
+                key={attachment.id}
+                src={attachment.image}
+                alt="Request attachment"
+                className="attachment-thumbnail"
+              />
+            ))}
+            {request.attachments.length > 3 && (
+              <span className="more-attachments">
+                +{request.attachments.length - 3} more
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="request-actions">
         <Link
-          to={`/provider/request/${request.id}`}
+          to={`/provider/requests/${request.id}`}
           className="btn btn-outlined btn-sm"
         >
           View Details
         </Link>
-        <button
-          className="btn btn-primary btn-sm"
-          onClick={() => onCreateOffer(request.id)}
-        >
+        <button className="btn btn-primary" onClick={handleCreateOffer}>
           Create Offer
         </button>
       </div>
@@ -95,20 +158,31 @@ const RequestItem = ({ request, onCreateOffer }) => {
 
 RequestItem.propTypes = {
   request: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    serviceType: PropTypes.string.isRequired,
-    createdAt: PropTypes.string.isRequired,
-    scheduledDate: PropTypes.string.isRequired,
-    scheduledTime: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+    service_type: PropTypes.string.isRequired,
+    city: PropTypes.string.isRequired,
+    region: PropTypes.string.isRequired,
+    created_at: PropTypes.string.isRequired,
+    preferred_date: PropTypes.string,
+    preferred_time: PropTypes.string,
+    schedule_type: PropTypes.oneOf(["specific", "flexible"]).isRequired,
+    flexible_schedule_days: PropTypes.arrayOf(PropTypes.string),
+    flexible_time_slots: PropTypes.arrayOf(PropTypes.string),
     description: PropTypes.string,
-    budget: PropTypes.shape({
-      min: PropTypes.number,
-      max: PropTypes.number,
-      type: PropTypes.string,
-    }),
+    budget_type: PropTypes.oneOf(["fixed", "hourly"]).isRequired,
+    budget_min_hourly: PropTypes.number,
+    budget_max_hourly: PropTypes.number,
+    fixed_price_offer: PropTypes.string,
+    preferred_qualifications: PropTypes.arrayOf(PropTypes.string),
+    status: PropTypes.string.isRequired,
+    attachments: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        image: PropTypes.string.isRequired,
+        uploaded_at: PropTypes.string.isRequired,
+      })
+    ),
   }).isRequired,
-  onCreateOffer: PropTypes.func.isRequired,
 };
 
 export default RequestItem;

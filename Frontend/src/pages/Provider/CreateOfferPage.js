@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import axios from "axios";
+import { requestService } from "../../services/requestService";
 
 const CreateOfferPage = () => {
   const { requestId } = useParams();
@@ -35,39 +37,20 @@ const CreateOfferPage = () => {
         setLoading(true);
         setError(null);
 
-        // In a real app, make an API call to fetch the request details
-        // For demo purposes, using mock data
+        // Make an API call to fetch the request details
+        const response = await requestService.getRequestById(requestId);
+        const requestData = response.data || response;
 
-        // Simulate API call
-        setTimeout(() => {
-          // Mock request data
-          const mockRequest = {
-            id: requestId,
-            serviceType: "Home Cleaning",
-            status: "open",
-            createdAt: new Date(
-              Date.now() - 2 * 24 * 60 * 60 * 1000
-            ).toISOString(), // 2 days ago
-            scheduledDate: "2023-12-15",
-            scheduledTime: "14:00",
-            address: "123 Main St, Boston, MA 02108",
-            description:
-              "Need help with deep cleaning of a 2-bedroom apartment, including kitchen and bathrooms.",
-            budget: { min: 80, max: 120, type: "fixed" },
-            isUrgent: false,
-          };
+        setRequest(requestData);
 
-          setRequest(mockRequest);
+        // Pre-fill the date and time fields with the requested schedule
+        setOfferData((prev) => ({
+          ...prev,
+          availableDate: requestData.scheduledDate,
+          availableTime: requestData.scheduledTime,
+        }));
 
-          // Pre-fill the date and time fields with the requested schedule
-          setOfferData((prev) => ({
-            ...prev,
-            availableDate: mockRequest.scheduledDate,
-            availableTime: mockRequest.scheduledTime,
-          }));
-
-          setLoading(false);
-        }, 1000);
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching request details:", err);
         setError("Failed to load request details. Please try again.");
@@ -156,36 +139,40 @@ const CreateOfferPage = () => {
     try {
       setSubmitting(true);
 
-      // In a real app, make an API call to submit the offer
-      // For demo purposes, simulate a success response after a delay
-
       // Create the offer object
       const offer = {
-        requestId,
-        providerId: user?.id || "provider123",
-        price: Number(offerData.price),
-        estimatedDuration: Number(offerData.estimatedDuration),
+        request_id: Number(requestId), // Changed from requestId to request_id to match backend expectations
+        providerId: user?.id || 42, // Fallback to 42 as specified in the API example
+        price: offerData.price,
+        estimatedDuration: offerData.estimatedDuration,
         description: offerData.description,
         availableDate: offerData.availableDate,
         availableTime: offerData.availableTime,
-        materials: offerData.materials,
-        status: "pending",
-        createdAt: new Date().toISOString(),
+        materials: offerData.materials || "",
       };
 
-      // Simulate API call
-      setTimeout(() => {
-        console.log("Offer submitted:", offer);
-        setSuccessMessage(
-          "Your offer has been successfully submitted! The client will be notified."
-        );
-        setSubmitting(false);
+      // Make API call to submit the offer
+      const response = await axios.post(
+        `http://127.0.0.1:9000/api/offers/?requestId=${requestId}`, // Added requestId as query parameter for additional clarity
+        offer,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-        // Redirect after a delay
-        setTimeout(() => {
-          navigate("/provider/dashboard");
-        }, 3000);
-      }, 1500);
+      console.log("Offer submitted:", response.data);
+      setSuccessMessage(
+        "Your offer has been successfully submitted! The client will be notified."
+      );
+      setSubmitting(false);
+
+      // Redirect after a delay
+      setTimeout(() => {
+        navigate("/provider/dashboard");
+      }, 3000);
     } catch (err) {
       console.error("Error submitting offer:", err);
       setError("Failed to submit your offer. Please try again.");
@@ -294,7 +281,10 @@ const CreateOfferPage = () => {
               <div className="request-detail">
                 <i className="fas fa-money-bill-wave"></i>
                 <span>
-                  Budget: ${request.budget.min} - ${request.budget.max}
+                  Budget:{" "}
+                  {request.budget
+                    ? `$${request.budget.min} - $${request.budget.max}`
+                    : "Not specified"}
                 </span>
               </div>
               <div className="request-detail description">
@@ -332,8 +322,10 @@ const CreateOfferPage = () => {
                     <div className="error-message">{formErrors.price}</div>
                   )}
                   <small>
-                    The client's budget is ${request.budget.min} - $
-                    {request.budget.max}
+                    The client's budget is{" "}
+                    {request.budget
+                      ? `$${request.budget.min} - $${request.budget.max}`
+                      : "not specified"}
                   </small>
                 </div>
 

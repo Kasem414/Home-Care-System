@@ -11,7 +11,7 @@
   z-index: 1000;
 }
 
-.modal {
+.modal-overlay .modal {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -32,7 +32,7 @@
   }
 }
 
-.modal-header {
+.modal-overlay .modal-header {
   padding: 20px;
   border-bottom: 1px solid #eee;
   display: flex;
@@ -40,13 +40,13 @@
   align-items: center;
 }
 
-.modal-header h2 {
+.modal-overlay .modal-header h2 {
   margin: 0;
   font-size: 1.5rem;
   color: #2c3e50;
 }
 
-.modal-close {
+.modal-overlay .modal-close {
   background: none;
   border: none;
   font-size: 1.2rem;
@@ -56,27 +56,27 @@
   transition: color 0.2s;
 }
 
-.modal-close:hover {
+.modal-overlay .modal-close:hover {
   color: #e74c3c;
 }
 
-.modal-body {
+.modal-overlay .modal-body {
   padding: 20px;
 }
 
-.form-group {
+.modal-overlay .form-group {
   margin-bottom: 20px;
 }
 
-.form-group label {
+.modal-overlay .form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
   color: #2c3e50;
 }
 
-.form-input,
-.form-textarea {
+.modal-overlay .form-input,
+.modal-overlay .form-textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ddd;
@@ -86,19 +86,19 @@
   background-color: #fff;
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.modal-overlay .form-input:focus,
+.modal-overlay .form-textarea:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
-.form-textarea {
+.modal-overlay .form-textarea {
   resize: vertical;
   min-height: 100px;
 }
 
-.modal-footer {
+.modal-overlay .modal-footer {
   padding: 20px;
   border-top: 1px solid #eee;
   display: flex;
@@ -106,7 +106,7 @@
   gap: 10px;
 }
 
-.btn {
+.modal-overlay .btn {
   padding: 10px 20px;
   border-radius: 4px;
   font-size: 1rem;
@@ -116,36 +116,36 @@
   border: none;
 }
 
-.btn-primary {
-  background-color: #3498db;
+.modal-overlay .btn-primary {
+  background-color: var(--primary-color);
   color: white;
 }
 
-.btn-primary:hover {
-  background-color: #2980b9;
+.modal-overlay .btn-primary:hover {
+  background-color: var(--primary-dark);
 }
 
-.btn-secondary {
+.modal-overlay .btn-secondary {
   background-color: #ecf0f1;
   color: #2c3e50;
 }
 
-.btn-secondary:hover {
+.modal-overlay .btn-secondary:hover {
   background-color: #bdc3c7;
 }
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
-  .modal {
+  .modal-overlay .modal {
     width: 90%;
     margin: 20px;
   }
 
-  .modal-header h2 {
+  .modal-overlay .modal-header h2 {
     font-size: 1.2rem;
   }
 
-  .btn {
+  .modal-overlay .btn {
     padding: 8px 16px;
     font-size: 0.9rem;
   }

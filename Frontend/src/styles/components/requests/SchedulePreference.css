@@ -1,12 +1,12 @@
 /* Schedule Preference Component */
 .schedule-preference {
-  max-width: 800px;
+  /* max-width: 800px; */
   margin: 0 auto;
   padding: 20px;
 }
 
 /* Form Section */
-.form-section {
+.schedule-preference .form-section {
   background: #fff;
   border-radius: 8px;
   padding: 30px;
@@ -14,19 +14,19 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+.schedule-preference h2 {
   color: #333;
   margin-bottom: 20px;
 }
 
 /* Schedule Type Selector */
-.schedule-type-selector {
+.schedule-preference .schedule-type-selector {
   display: flex;
   gap: 16px;
   margin-bottom: 30px;
 }
 
-.schedule-type-btn {
+.schedule-preference .schedule-type-btn {
   flex: 1;
   padding: 16px;
   border: 2px solid #e0e0e0;
@@ -40,27 +40,27 @@ h2 {
   gap: 8px;
 }
 
-.schedule-type-btn:hover {
-  border-color: #007bff;
+.schedule-preference .schedule-type-btn:hover {
+  border-color: var(--primary-dark);
   background-color: #f8f9ff;
 }
 
-.schedule-type-btn.active {
-  border-color: #007bff;
+.schedule-preference .schedule-type-btn.active {
+  border-color: var(--primary-dark);
   background-color: #f8f9ff;
-  color: #007bff;
+  color: var(--primary-dark);
 }
 
-.schedule-type-btn .icon {
+.schedule-preference .schedule-type-btn .icon {
   font-size: 20px;
 }
 
 /* Form Groups */
-.form-group {
+.schedule-preference .form-group {
   margin-bottom: 24px;
 }
 
-label {
+.schedule-preference label {
   display: block;
   margin-bottom: 8px;
   color: #555;
@@ -68,14 +68,14 @@ label {
 }
 
 /* Specific Schedule */
-.specific-schedule {
+.schedule-preference .specific-schedule {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
 }
 
 input[type="date"],
-input[type="time"] {
+.schedule-preference input[type="time"] {
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
@@ -85,21 +85,21 @@ input[type="time"] {
 }
 
 input[type="date"]:focus,
-input[type="time"]:focus {
+.schedule-preference input[type="time"]:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
 }
 
 /* Flexible Schedule */
-.days-grid {
+.schedule-preference .days-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
 
-.day-card {
+.schedule-preference .day-card {
   padding: 12px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
@@ -109,29 +109,29 @@ input[type="time"]:focus {
   background: #fff;
 }
 
-.day-card:hover {
-  border-color: #007bff;
+.schedule-preference .day-card:hover {
+  border-color: var(--primary-dark);
   background-color: #f8f9ff;
 }
 
-.day-card.selected {
-  border-color: #007bff;
+.schedule-preference .day-card.selected {
+  border-color: var(--primary-dark);
   background-color: #f8f9ff;
-  color: #007bff;
+  color: var(--primary-dark);
 }
 
-.day-name {
+.schedule-preference .day-name {
   font-weight: 500;
   font-size: 14px;
 }
 
-.time-slots-grid {
+.schedule-preference .time-slots-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
 }
 
-.time-slot-card {
+.schedule-preference .time-slot-card {
   padding: 16px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
@@ -141,41 +141,41 @@ input[type="time"]:focus {
   background: #fff;
 }
 
-.time-slot-card:hover {
-  border-color: #007bff;
+.schedule-preference .time-slot-card:hover {
+  border-color: var(--primary-dark);
   background-color: #f8f9ff;
 }
 
-.time-slot-card.selected {
-  border-color: #007bff;
+.schedule-preference .time-slot-card.selected {
+  border-color: var(--primary-dark);
   background-color: #f8f9ff;
-  color: #007bff;
+  color: var(--primary-dark);
 }
 
-.time-slot-name {
+.schedule-preference .time-slot-name {
   font-weight: 500;
   font-size: 14px;
 }
 
 /* Error Messages */
-.error {
+.schedule-preference .error {
   border-color: #dc3545;
 }
 
-.error-message {
+.schedule-preference .error-message {
   color: #dc3545;
   font-size: 12px;
   margin-top: 4px;
 }
 
 /* Wizard Actions */
-.wizard-actions {
+.schedule-preference .wizard-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
 }
 
-.btn {
+.schedule-preference .btn {
   padding: 10px 20px;
   border-radius: 4px;
   font-weight: 500;
@@ -183,89 +183,89 @@ input[type="time"]:focus {
   transition: all 0.3s ease;
 }
 
-.btn-primary {
-  background-color: #007bff;
+.schedule-preference .btn-primary {
+  background-color: var(--primary-color);
   color: white;
   border: none;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.schedule-preference .btn-primary:hover {
+  background-color: var(--primary-dark);
 }
 
-.btn-primary:disabled {
+.schedule-preference .btn-primary:disabled {
   background-color: #b3d7ff;
   cursor: not-allowed;
 }
 
-.btn-outlined {
+.schedule-preference .btn-outlined {
   background-color: transparent;
-  border: 1px solid #007bff;
-  color: #007bff;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
 }
 
-.btn-outlined:hover {
+.schedule-preference .btn-outlined:hover {
   background-color: #f8f9ff;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .schedule-type-selector {
+  .schedule-preference .schedule-type-selector {
     flex-direction: column;
   }
 
-  .specific-schedule {
+  .schedule-preference .specific-schedule {
     grid-template-columns: 1fr;
   }
 
-  .days-grid {
+  .schedule-preference .days-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 
-  .time-slots-grid {
+  .schedule-preference .time-slots-grid {
     grid-template-columns: 1fr;
   }
 }
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  .form-section,
-  .day-card,
-  .time-slot-card {
+  .schedule-preference .form-section,
+  .schedule-preference .day-card,
+  .schedule-preference .schedule-preference .time-slot-card {
     background: var(--surface-dark);
     border-color: var(--border-dark);
   }
 
   h2,
-  label {
+  .schedule-preference label {
     color: var(--text-light);
   }
 
-  .error-message {
+  .schedule-preference .error-message {
     color: var(--danger-color);
   }
 
-  .schedule-type-btn:hover {
-    background-color: var(--primary-color-dark);
+  .schedule-preference .schedule-type-btn:hover {
+    background-color: var(--primary-dark);
   }
 
-  .schedule-type-btn.active {
+  .schedule-preference .schedule-type-btn.active {
     background-color: var(--primary-color);
   }
 
-  .day-card:hover {
-    background-color: var(--primary-color-dark);
+  .schedule-preference .day-card:hover {
+    background-color: var(--primary-dark);
   }
 
-  .day-card.selected {
+  .schedule-preference .day-card.selected {
     background-color: var(--primary-color);
   }
 
-  .time-slot-card:hover {
-    background-color: var(--primary-color-dark);
+  .schedule-preference .time-slot-card:hover {
+    background-color: var(--primary-dark);
   }
 
-  .time-slot-card.selected {
+  .schedule-preference .time-slot-card.selected {
     background-color: var(--primary-color);
   }
 }

@@ -20,15 +20,69 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(null);
 
+  // Check if user is already logged in from localStorage
+  useEffect(() => {
+    const checkLoggedIn = () => {
+      try {
+        console.log("Checking logged in state...");
+        const savedToken = localStorage.getItem("token");
+        const savedUser = localStorage.getItem("user");
+
+        console.log("Saved auth state:", {
+          hasToken: !!savedToken,
+          hasUser: !!savedUser,
+        });
+
+        if (savedToken && savedUser) {
+          const decodedToken = jwtDecode(savedToken);
+          const userData = JSON.parse(savedUser);
+
+          console.log("Decoded token:", decodedToken);
+          console.log("Loaded user data:", userData);
+
+          // Update user data with role and id from token
+          userData.role = decodedToken.role;
+          userData.id = decodedToken.user_id;
+
+          setToken(savedToken);
+          setUser(userData);
+          setIsAuthenticated(true);
+
+          // Set up axios authorization header for future requests
+          axios.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${savedToken}`;
+
+          console.log(
+            "Auth state restored successfully with user_id:",
+            userData.id
+          );
+        } else {
+          console.log("No saved auth state found");
+        }
+      } catch (error) {
+        console.error("Error loading auth state:", error);
+        // Clear potentially corrupted auth state
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkLoggedIn();
+  }, []);
+
   // Login function
   const login = async (email, password, onSuccess) => {
     try {
+      console.log("Attempting login...");
       const response = await axios.post(`${API_BASE_URL}/login`, {
         email,
         password,
       });
 
-      console.log("Full response:", response.data);
+      console.log("Login response:", response.data);
 
       // Check if we have the token in the response
       if (response.data && response.data.token) {
@@ -41,9 +95,10 @@ export const AuthProvider = ({ children }) => {
         const userData = {
           ...response.data.user,
           role: decodedToken.role,
+          id: decodedToken.user_id,
         };
 
-        console.log("Final user data:", userData);
+        console.log("Setting user data with user_id:", userData);
 
         // Save user data and token
         setUser(userData);
@@ -56,6 +111,8 @@ export const AuthProvider = ({ children }) => {
         // Save to localStorage for persistence
         localStorage.setItem("user", JSON.stringify(userData));
         localStorage.setItem("token", authToken);
+
+        console.log("Login successful, navigating...");
 
         // Navigate based on role from token
         if (onSuccess) {
@@ -76,7 +133,7 @@ export const AuthProvider = ({ children }) => {
 
         return { success: true };
       } else {
-        console.log("Response structure invalid:", response.data);
+        console.log("Invalid response structure:", response.data);
         return {
           success: false,
           error: "Invalid response structure from server",
@@ -92,42 +149,6 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
-
-  // Check if user is already logged in from localStorage
-  useEffect(() => {
-    const checkLoggedIn = () => {
-      try {
-        const savedToken = localStorage.getItem("token");
-        const savedUser = localStorage.getItem("user");
-
-        if (savedToken && savedUser) {
-          const decodedToken = jwtDecode(savedToken);
-          const userData = JSON.parse(savedUser);
-
-          // Update user data with role from token
-          userData.role = decodedToken.role;
-
-          setToken(savedToken);
-          setUser(userData);
-          setIsAuthenticated(true);
-
-          // Set up axios authorization header for future requests
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${savedToken}`;
-        }
-      } catch (error) {
-        console.error("Error loading auth state:", error);
-        // Clear potentially corrupted auth state
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkLoggedIn();
-  }, []);
 
   // Logout function
   const logout = () => {
@@ -351,9 +372,9 @@ export const AuthProvider = ({ children }) => {
   // Value object that will be passed to any consuming components
   const value = {
     user,
-    token,
-    isAuthenticated,
     loading,
+    isAuthenticated,
+    token,
     login,
     logout,
     registerHomeowner,

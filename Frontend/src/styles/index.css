@@ -8,6 +8,7 @@
 /* Shared Components */
 @import "./components/shared/Navbar.css";
 @import "./components/shared/Footer.css";
+@import "./RequestsWithOffers.css";
 
 /* Home Components */
 @import "./components/home/HeroSection.css";

@@ -25,6 +25,8 @@ import ProviderDashboardPage from "./pages/Provider/ProviderDashboardPage";
 import ProviderRequestDetailPage from "./pages/Provider/RequestDetailPage";
 import CreateOfferPage from "./pages/Provider/CreateOfferPage";
 import OffersList from "./components/requests/OffersList";
+import ProviderOffersList from "./components/providers/ProviderDashboard/ProviderOffers/ProviderOffersList";
+import RequestsWithOffersPage from "./pages/Requests/RequestsWithOffersPage";
 
 function App() {
   return (
@@ -59,6 +61,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
 
+            {/* Admin Routes */}
             <Route
               path="/admin"
               element={
@@ -93,7 +96,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/requests"
               element={
@@ -102,7 +104,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/requests/:requestId"
               element={
@@ -112,7 +113,7 @@ function App() {
               }
             />
 
-            {/* Providers Routes */}
+            {/* Provider Routes */}
             <Route
               path="/provider/dashboard"
               element={
@@ -130,15 +131,23 @@ function App() {
               }
             />
             <Route
-              path="/provider/create-offer/:requestId"
+              path="/provider/request/:requestId/create-offer"
               element={
                 <ProtectedRoute>
                   <CreateOfferPage />
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/provider/offers"
+              element={
+                <ProtectedRoute>
+                  <ProviderOffersList />
+                </ProtectedRoute>
+              }
+            />
 
-            {/* Offers Routes */}
+            {/* Customer Offers Routes */}
             <Route
               path="/offers"
               element={
@@ -146,7 +155,15 @@ function App() {
                   <OffersList />
                 </ProtectedRoute>
               }
-            ></Route>
+            />
+            <Route
+              path="/requests-with-offers"
+              element={
+                <ProtectedRoute>
+                  <RequestsWithOffersPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
           <Footer />
         </div>

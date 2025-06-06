@@ -2,29 +2,29 @@
   padding: 2rem;
 }
 
-.table-header {
+.user-management .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
 }
 
-.table-header h2 {
+.user-management .table-header h2 {
   font-size: 1.5rem;
   color: var(--text-dark);
   margin: 0;
 }
 
-.header-actions {
+.user-management .header-actions {
   display: flex;
   gap: 1rem;
 }
 
-.search-box {
+.user-management .search-box {
   position: relative;
 }
 
-.search-icon {
+.user-management .search-icon {
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -32,14 +32,14 @@
   color: var(--text-light);
 }
 
-.search-box input {
+.user-management .search-box input {
   padding: 0.75rem 1rem 0.75rem 2.5rem;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   width: 300px;
 }
 
-.filter-toggle {
+.user-management .filter-toggle {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -51,18 +51,18 @@
   transition: all 0.3s ease;
 }
 
-.filter-toggle:hover {
+.user-management .filter-toggle:hover {
   background-color: var(--gray-50);
 }
 
 /* Role Tabs */
-.role-tabs {
+.user-management .role-tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-.role-tab {
+.user-management .role-tab {
   padding: 0.75rem 1.5rem;
   background: none;
   border: 1px solid var(--border-color);
@@ -74,18 +74,18 @@
   transition: all 0.3s ease;
 }
 
-.role-tab:hover {
+.user-management .role-tab:hover {
   background-color: var(--gray-50);
 }
 
-.role-tab.active {
+.user-management .role-tab.active {
   background-color: var(--primary-color);
   color: white;
   border-color: var(--primary-color);
 }
 
 /* Filters Panel */
-.filters-panel {
+.user-management .filters-panel {
   background-color: var(--white);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -96,18 +96,18 @@
   align-items: center;
 }
 
-.filter-group {
+.user-management .filter-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.filter-group label {
+.user-management .filter-group label {
   font-size: 0.875rem;
   color: var(--text-medium);
 }
 
-.filter-group select {
+.user-management .filter-group select {
   padding: 0.5rem;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -115,14 +115,14 @@
 }
 
 /* Users Grid */
-.users-grid {
+.user-management .users-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.user-card {
+.user-management .user-card {
   background-color: var(--white);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -130,62 +130,62 @@
   transition: all 0.3s ease;
 }
 
-.user-card:hover {
+.user-management .user-card:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.user-header {
+.user-management .user-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
 }
 
-.user-title {
+.user-management .user-title {
   flex: 1;
 }
 
-.user-title h3 {
+.user-management .user-title h3 {
   margin: 0 0 0.25rem;
   font-size: 1.125rem;
   color: var(--text-dark);
 }
 
-.user-role {
+.user-management .user-role {
   font-size: 0.875rem;
   color: var(--text-medium);
 }
 
-.status-badge {
+.user-management .status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.75rem;
   font-weight: 500;
 }
 
-.status-badge.active {
+.user-management .status-badge.active {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.status-badge.inactive {
+.user-management .status-badge.inactive {
   background-color: #fee2e2;
   color: #991b1b;
 }
 
-.status-badge.pending {
+.user-management .status-badge.pending {
   background-color: #fef3c7;
   color: #92400e;
 }
 
-.user-info {
+.user-management .user-info {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
-.info-item {
+.user-management .info-item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -193,16 +193,16 @@
   color: var(--text-medium);
 }
 
-.info-item svg {
+.user-management .info-item svg {
   color: var(--text-light);
 }
 
-.user-actions {
+.user-management .user-actions {
   display: flex;
   gap: 1rem;
 }
 
-.btn {
+.user-management .btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -215,33 +215,33 @@
   transition: all 0.3s ease;
 }
 
-.btn-success {
+.user-management .btn-success {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.btn-success:hover {
+.user-management .btn-success:hover {
   background-color: #bbf7d0;
 }
 
-.btn-danger {
+.user-management .btn-danger {
   background-color: #fee2e2;
   color: #991b1b;
 }
 
-.btn-danger:hover {
+.user-management .btn-danger:hover {
   background-color: #fecaca;
 }
 
 /* Pagination */
-.pagination {
+.user-management .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
 }
 
-.pagination button {
+.user-management .pagination button {
   padding: 0.5rem 1rem;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -250,28 +250,28 @@
   transition: all 0.3s ease;
 }
 
-.pagination button:hover:not(:disabled) {
+.user-management .pagination button:hover:not(:disabled) {
   background-color: var(--gray-50);
 }
 
-.pagination button:disabled {
+.user-management .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.pagination span {
+.user-management .pagination span {
   font-size: 0.875rem;
   color: var(--text-medium);
 }
 
 /* Loading and Error States */
-.loading-spinner {
+.user-management .loading-spinner {
   text-align: center;
   padding: 2rem;
   color: var(--text-medium);
 }
 
-.error-message {
+.user-management .error-message {
   background-color: #fee2e2;
   color: #991b1b;
   padding: 1rem;
@@ -279,7 +279,7 @@
   margin-bottom: 1rem;
 }
 
-.no-results {
+.user-management .no-results {
   text-align: center;
   padding: 2rem;
   color: var(--text-medium);
@@ -293,22 +293,22 @@
     padding: 1rem;
   }
 
-  .table-header {
+  .user-management .table-header {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
   }
 
-  .search-box input {
+  .user-management .search-box input {
     width: 100%;
   }
 
-  .filters-panel {
+  .user-management .filters-panel {
     flex-direction: column;
     gap: 1rem;
   }
 
-  .users-grid {
+  .user-management .users-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -89,40 +89,76 @@ const Navbar = () => {
               Services
             </Link>
             <Link
-              to="/provider/dashboard"
+              to="/learn-more"
               className={`navbar-item ${
-                isActive("/provider/dashboard") ? "active" : ""
+                isActive("/learn-more") ? "active" : ""
               }`}
             >
-              Provider Dash
-            </Link>
-            <Link to="/request/new" className="navbar-item highlight">
-              Request Service
+              Learn More
             </Link>
             <Link
-              to="/requests"
-              className={`navbar-item ${isActive("/requests") ? "active" : ""}`}
-            >
-              Requests
-            </Link>
-            <Link
-              to="/offers"
-              className={`navbar-item ${isActive("/offers") ? "active" : ""}`}
-            >
-              Offers
-            </Link>
-            <Link
-              to="/admin"
-              className={`navbar-item ${isActive("/admin") ? "active" : ""}`}
-            >
-              Admin
-            </Link>
-            {/* <Link
               to="/contact"
               className={`navbar-item ${isActive("/contact") ? "active" : ""}`}
             >
-              Contact
-            </Link> */}
+              Contact Us
+            </Link>
+
+            {/* Conditional navigation based on user role */}
+            {isAuthenticated && user?.role === "service_provider" && (
+              <>
+                <Link
+                  to="/provider/dashboard"
+                  className={`navbar-item ${
+                    isActive("/provider/dashboard") ? "active" : ""
+                  }`}
+                >
+                  Provider Dashboard
+                </Link>
+                <Link
+                  to="/offers"
+                  className={`navbar-item ${
+                    isActive("/offers") ? "active" : ""
+                  }`}
+                >
+                  My Offers
+                </Link>
+              </>
+            )}
+
+            {isAuthenticated && user?.role === "customer" && (
+              <>
+                <Link to="/request/new" className="navbar-item highlight">
+                  Request Service
+                </Link>
+                <Link
+                  to="/requests"
+                  className={`navbar-item ${
+                    isActive("/requests") ? "active" : ""
+                  }`}
+                >
+                  My Requests
+                </Link>
+                <Link
+                  to="/requests-with-offers"
+                  className={`navbar-item ${
+                    isActive("/requests-with-offers") ? "active" : ""
+                  }`}
+                >
+                  Requests & Offers
+                </Link>
+              </>
+            )}
+
+            {isAuthenticated && user?.role === "administrator" && (
+              <Link
+                to="/admin"
+                className={`navbar-item ${isActive("/admin") ? "active" : ""}`}
+              >
+                Admin Dashboard
+              </Link>
+            )}
+
+            {/* Removed the commented out Contact link */}
           </div>
 
           <div className="navbar-end">
@@ -145,14 +181,6 @@ const Navbar = () => {
 
                 {isUserMenuOpen && (
                   <div className="user-dropdown">
-                    <Link
-                      to="/account/settings"
-                      className="dropdown-item"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <FaCog /> Account Settings
-                    </Link>
-
                     {user?.role === "administrator" && (
                       <Link
                         to="/admin"
@@ -164,23 +192,62 @@ const Navbar = () => {
                     )}
 
                     {user?.role === "provider" && (
-                      <Link
-                        to="/provider/dashboard"
-                        className="dropdown-item"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <FaBriefcase /> Provider Dashboard
-                      </Link>
+                      <>
+                        <Link
+                          to="/provider/dashboard"
+                          className="dropdown-item"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <FaBriefcase /> Provider Dashboard
+                        </Link>
+                        <Link
+                          to="/provider/offers"
+                          className="dropdown-item"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          My Offers
+                        </Link>
+                        <Link
+                          to="/account/provider/settings"
+                          className="dropdown-item"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Settings
+                        </Link>
+                      </>
                     )}
 
                     {user?.role === "client" && (
-                      <Link
-                        to="/requests"
-                        className="dropdown-item"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <FaClipboardList /> My Requests
-                      </Link>
+                      <>
+                        <Link
+                          to="/requests"
+                          className="dropdown-item"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          My Requests
+                        </Link>
+                        <Link
+                          to="/offers"
+                          className="dropdown-item"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Received Offers
+                        </Link>
+                        <Link
+                          to="/requests-with-offers"
+                          className="dropdown-item"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Requests & Offers
+                        </Link>
+                        <Link
+                          to="/account/settings"
+                          className="dropdown-item"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          Settings
+                        </Link>
+                      </>
                     )}
 
                     <button onClick={handleLogout} className="dropdown-item">

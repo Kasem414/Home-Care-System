@@ -40,25 +40,7 @@ const RequestFilters = ({ filters, onFilterChange, serviceCategories }) => {
       </div>
 
       <div className="filter-group">
-        <label htmlFor="distance">Distance</label>
-        <select
-          id="distance"
-          name="distance"
-          value={filters.distance}
-          onChange={handleFilterChange}
-          className="filter-select"
-        >
-          <option value="5">Within 5 miles</option>
-          <option value="10">Within 10 miles</option>
-          <option value="25">Within 25 miles</option>
-          <option value="50">Within 50 miles</option>
-          <option value="100">Within 100 miles</option>
-          <option value="any">Any distance</option>
-        </select>
-      </div>
-
-      <div className="filter-group">
-        <label htmlFor="timeframe">Timeframe</label>
+        <label htmlFor="timeframe">Schedule Type</label>
         <select
           id="timeframe"
           name="timeframe"
@@ -105,29 +87,14 @@ const RequestFilters = ({ filters, onFilterChange, serviceCategories }) => {
         </label>
       </div>
 
-      <div className="filter-group checkbox-group">
-        <label className="checkbox-container">
-          <input
-            type="checkbox"
-            name="showUrgentOnly"
-            checked={filters.showUrgentOnly}
-            onChange={handleCheckboxChange}
-          />
-          <span className="checkmark"></span>
-          Show urgent requests only
-        </label>
-      </div>
-
       <button
         className="btn btn-outlined btn-sm filter-reset"
         onClick={() =>
           onFilterChange({
             serviceType: "all",
-            distance: "25",
             timeframe: "any",
             minBudget: 0,
             showNewOnly: false,
-            showUrgentOnly: false,
           })
         }
       >
@@ -140,11 +107,9 @@ const RequestFilters = ({ filters, onFilterChange, serviceCategories }) => {
 RequestFilters.propTypes = {
   filters: PropTypes.shape({
     serviceType: PropTypes.string.isRequired,
-    distance: PropTypes.string.isRequired,
     timeframe: PropTypes.string.isRequired,
     minBudget: PropTypes.number.isRequired,
     showNewOnly: PropTypes.bool.isRequired,
-    showUrgentOnly: PropTypes.bool.isRequired,
   }).isRequired,
   onFilterChange: PropTypes.func.isRequired,
   serviceCategories: PropTypes.arrayOf(

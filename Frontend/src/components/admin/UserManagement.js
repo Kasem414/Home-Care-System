@@ -24,7 +24,7 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
-  const [roleFilter, setRoleFilter] = useState("customer");
+  const [roleFilter, setRoleFilter] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,32 +62,26 @@ const UserManagement = () => {
       if (error.message === "Invalid token specified") {
         console.error("Token format is invalid");
       }
-      logout();
-      navigate("/login");
+      // logout();
+      // navigate("/login");
       return false;
     }
   };
 
   useEffect(() => {
-    if (checkTokenValidity()) {
-      fetchUsers();
-    }
+    fetchUsers();
   }, [currentPage, roleFilter, searchTerm]);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      console.log("Making request with token:", token);
-
       const response = await axios.get(`${API_BASE_URL}/users/users/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         params: {
           page: currentPage,
-          role: roleFilter,
           search: searchTerm,
+        },
+        headers: {
+          Authorization: undefined,
         },
       });
 
@@ -95,17 +89,8 @@ const UserManagement = () => {
       setTotalUsers(response.data.count);
       setTotalPages(response.data.total_pages);
     } catch (err) {
-      console.error("Full error object:", err);
-      console.error("Error response:", err.response?.data);
-
-      if (err.response?.data?.code === "token_not_valid") {
-        console.error("Token validation failed:", err.response.data);
-        logout();
-        navigate("/login");
-      } else {
-        setError("An error occurred while fetching users");
-        console.error(err);
-      }
+      console.error("Error fetching users:", err);
+      setError("An error occurred while fetching users");
     } finally {
       setLoading(false);
     }
@@ -160,10 +145,15 @@ const UserManagement = () => {
     setSortConfig({ key, direction });
   };
 
-  const sortedUsers = useMemo(() => {
-    if (!sortConfig.key) return users;
+  const filteredUsers = useMemo(() => {
+    if (roleFilter === "all") return users;
+    return users.filter((user) => user.role === roleFilter);
+  }, [users, roleFilter]);
 
-    return [...users].sort((a, b) => {
+  const sortedUsers = useMemo(() => {
+    if (!sortConfig.key) return filteredUsers;
+
+    return [...filteredUsers].sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === "asc" ? -1 : 1;
       }
@@ -172,7 +162,11 @@ const UserManagement = () => {
       }
       return 0;
     });
-  }, [users, sortConfig]);
+  }, [filteredUsers, sortConfig]);
+
+  const filteredTotalUsers = useMemo(() => {
+    return roleFilter === "all" ? totalUsers : filteredUsers.length;
+  }, [totalUsers, filteredUsers, roleFilter]);
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort />;
@@ -249,7 +243,7 @@ const UserManagement = () => {
   return (
     <div className="user-management">
       <div className="table-header">
-        <h2>User Management</h2>
+        <h2>User Management ({filteredTotalUsers} Users)</h2>
         <div className="header-actions">
           <div className="search-box">
             <FaSearch className="search-icon" />
@@ -271,10 +265,16 @@ const UserManagement = () => {
 
       <div className="role-tabs">
         <button
+          className={`role-tab ${roleFilter === "all" ? "active" : ""}`}
+          onClick={() => setRoleFilter("all")}
+        >
+          All Users ({totalUsers})
+        </button>
+        <button
           className={`role-tab ${roleFilter === "customer" ? "active" : ""}`}
           onClick={() => setRoleFilter("customer")}
         >
-          Customers
+          Customers ({users.filter((u) => u.role === "customer").length})
         </button>
         <button
           className={`role-tab ${
@@ -282,7 +282,8 @@ const UserManagement = () => {
           }`}
           onClick={() => setRoleFilter("service_provider")}
         >
-          Service Providers
+          Service Providers (
+          {users.filter((u) => u.role === "service_provider").length})
         </button>
       </div>
 
@@ -328,7 +329,7 @@ const UserManagement = () => {
           Previous
         </button>
         <span>
-          Page {currentPage} of {totalPages} ({totalUsers} total users)
+          Page {currentPage} of {totalPages} ({filteredTotalUsers} total users)
         </span>
         <button
           onClick={() =>

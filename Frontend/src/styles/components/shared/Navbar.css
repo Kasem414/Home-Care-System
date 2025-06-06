@@ -52,7 +52,9 @@
 .navbar .navbar-start {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .navbar .navbar-item {
@@ -251,6 +253,9 @@
   font-weight: 500;
   font-size: 0.95rem;
   transition: all 0.3s ease;
+  width: auto;
+  min-width: 120px;
+  white-space: nowrap;
 }
 
 .navbar .btn-outlined {
@@ -316,11 +321,12 @@
   .navbar .auth-buttons {
     flex-direction: column;
     width: 100%;
+    align-items: center;
   }
 
   .navbar .btn {
-    width: 100%;
     text-align: center;
+    width: 100%;
   }
 
   .navbar .user-dropdown {
