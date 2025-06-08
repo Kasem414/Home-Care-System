@@ -13,7 +13,8 @@
             ],
             "django": true,
             "autoStartBrowser": false,
-            "program": "${workspaceFolder}\\Service Management & Request\\service_mgmt_and_request\\manage.py"
+            // "program": "${workspaceFolder}\\Service Management & Request\\service_mgmt_and_request\\manage.py"
+            "program": "${workspaceFolder}\\User_Management\\manage.py"
         },
         {
             "name": "Python Debugger: Django",
@@ -24,7 +25,8 @@
             ],
             "django": true,
             "autoStartBrowser": false,
-            "program": "${workspaceFolder}\\Service Management & Request\\service_mgmt_and_request\\manage.py"
+            // "program": "${workspaceFolder}\\Service Management & Request\\service_mgmt_and_request\\manage.py"
+            "program": "${workspaceFolder}\\User_Management\\manage.py"
         }
     ]
 }

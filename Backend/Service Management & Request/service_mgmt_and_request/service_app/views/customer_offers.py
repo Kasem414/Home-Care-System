@@ -6,7 +6,43 @@ from service_app.models import ServiceOffer,ServiceRequest
 from service_app.pagination import CustomPagePagination
 from service_app.repositories.service_request_repository import ServiceRequestRepository
 from service_app.events.event_publisher import publish_event
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
+pagination_parameters = [
+    openapi.Parameter('page', openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER),
+    openapi.Parameter('limit', openapi.IN_QUERY, description="Items per page", type=openapi.TYPE_INTEGER),
+]
 class CustomerOffersView(APIView):
+    @swagger_auto_schema(
+        operation_summary="List offers for a specific request",
+        operation_description="",
+        manual_parameters=[
+            openapi.Parameter(
+                'requestId',
+                openapi.IN_QUERY,
+                description="",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'page',
+                openapi.IN_QUERY,
+                description="Page number for pagination",
+                type=openapi.TYPE_INTEGER
+            ),
+            openapi.Parameter(
+                'limit',
+                openapi.IN_QUERY,
+                description="Number of items per page",
+                type=openapi.TYPE_INTEGER
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description="List of offers related to a specific request", 
+            )
+        }
+    )
     def get(self, request):
         request_id = request.query_params.get('requestId')
 
