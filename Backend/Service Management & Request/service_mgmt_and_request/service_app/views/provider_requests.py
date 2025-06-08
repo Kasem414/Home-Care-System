@@ -64,8 +64,8 @@ class ProviderRequestListView(APIView):
             }, status=400)
 
         # Optional filters
-        service_type = request.query_params.get("serviceType")
-        show_new_only = request.query_params.get("showNewOnly") == "true"
+        service_type = request.query_params.get("service_type")
+        show_new_only = request.query_params.get("show_new_only") == "true"
 
         # Get provider profile (to filter by region/city if needed)
         try:
