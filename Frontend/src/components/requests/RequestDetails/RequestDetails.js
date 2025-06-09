@@ -6,28 +6,78 @@ import RequestStatusTimeline from "./RequestStatusTimeline";
 import RequestActionButtons from "./RequestActionButtons";
 import RequestComments from "./RequestComments";
 
-const RequestDetails = ({ onCancelRequest }) => {
+const mapBackendToUI = (data) => {
+  // Map backend fields to UI fields
+  return {
+    id: data.id,
+    serviceType: data.service_type || data.serviceType,
+    serviceName: data.service_type || data.serviceName,
+    status: data.status,
+    createdAt: data.created_at || data.createdAt,
+    scheduledDate: data.preferred_date || data.scheduledDate,
+    scheduledTime: data.preferred_time || data.scheduledTime,
+    address: `${data.region ? data.region + ", " : ""}${data.city || ""}`,
+    pricing: {
+      rate: data.budget_min_hourly ? Number(data.budget_min_hourly) : 0,
+      type: data.budget_type || "hourly",
+      estimatedTotal: data.budget_max_hourly
+        ? Number(data.budget_max_hourly)
+        : 0,
+      currency: "USD",
+    },
+    client: {
+      name: data.customer_id ? `Customer #${data.customer_id}` : "",
+      phone: "",
+      email: "",
+    },
+    serviceProvider: data.matched_provider_id
+      ? {
+          name: `Provider #${data.matched_provider_id}`,
+          phone: "",
+          specialization: "",
+          rating: "",
+          qualifications: data.preferred_qualifications || [],
+          servicesProvided: [],
+        }
+      : null,
+    details: {
+      description: data.description || "",
+      duration: "",
+      notes: data.additional_info || "",
+      specialRequirements: "",
+    },
+    statusHistory: [],
+    comments: [],
+  };
+};
+
+const RequestDetails = ({ request: requestProp, onCancelRequest }) => {
   const { requestId } = useParams();
   const navigate = useNavigate();
-  const [request, setRequest] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [request, setRequest] = useState(
+    requestProp ? mapBackendToUI(requestProp) : null
+  );
+  const [loading, setLoading] = useState(!requestProp);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (requestProp) {
+      setRequest(mapBackendToUI(requestProp));
+      setLoading(false);
+      setError(null);
+      return;
+    }
     const fetchRequestDetails = async () => {
       try {
         setLoading(true);
         // In a real app, this would be an API call
         // Example: const response = await axios.get(`/api/requests/${requestId}`);
-
         // Simulate API delay
         await new Promise((resolve) => setTimeout(resolve, 800));
-
         // Mocked data for the selected request
         const mockRequest = {
           id: requestId,
           serviceType: "maintenance",
-          // serviceCategory: "Home",
           serviceName: "Plumbing Repair",
           status: "approved",
           createdAt: "2023-10-28T15:45:00Z",
@@ -110,7 +160,6 @@ const RequestDetails = ({ onCancelRequest }) => {
             },
           ],
         };
-
         setRequest(mockRequest);
         setLoading(false);
       } catch (err) {
@@ -119,9 +168,8 @@ const RequestDetails = ({ onCancelRequest }) => {
         setLoading(false);
       }
     };
-
     fetchRequestDetails();
-  }, [requestId]);
+  }, [requestId, requestProp]);
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -590,7 +638,7 @@ const RequestDetails = ({ onCancelRequest }) => {
             />
           </motion.section>
 
-          <motion.section
+          {/* <motion.section
             className="request-comments card"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -604,9 +652,9 @@ const RequestDetails = ({ onCancelRequest }) => {
               onAddComment={handleAddComment}
               formatDateTime={formatDateTime}
             />
-          </motion.section>
+          </motion.section> */}
 
-          {request.serviceProvider && request.status !== "cancelled" && (
+          {/* {request.serviceProvider && request.status !== "cancelled" && (
             <motion.a
               href={`tel:${request.serviceProvider.phone}`}
               className="btn btn-outlined"
@@ -614,7 +662,7 @@ const RequestDetails = ({ onCancelRequest }) => {
             >
               <i className="fas fa-phone"></i> Call Service Provider
             </motion.a>
-          )}
+          )} */}
         </div>
       </div>
     </div>
@@ -622,6 +670,7 @@ const RequestDetails = ({ onCancelRequest }) => {
 };
 
 RequestDetails.propTypes = {
+  request: PropTypes.object,
   onCancelRequest: PropTypes.func,
 };
 
