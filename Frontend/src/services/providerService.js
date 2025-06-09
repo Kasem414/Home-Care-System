@@ -48,7 +48,7 @@ export const providerService = {
         headers: { Authorization: `Bearer ${token}` },
       };
       const response = await axios.get(
-        "http://127.0.0.1:9000/api/offers/?page=1&limit=10",
+        "http://127.0.0.1:9000/api/offers/?page=1&limit=20",
         config
       );
       return response.data;
