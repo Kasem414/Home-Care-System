@@ -115,9 +115,9 @@ const Navbar = () => {
                   Provider Dashboard
                 </Link>
                 <Link
-                  to="/offers"
+                  to="/provider/offers"
                   className={`navbar-item ${
-                    isActive("/offers") ? "active" : ""
+                    isActive("/provider/offers") ? "active" : ""
                   }`}
                 >
                   My Offers
