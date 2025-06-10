@@ -40,6 +40,23 @@ export const providerService = {
       throw error;
     }
   },
+  getOffers: async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token found");
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      const response = await axios.get(
+        "http://127.0.0.1:9000/api/offers/?page=1&limit=20",
+        config
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error in getOffers:", error.response || error);
+      throw error;
+    }
+  },
 };
 
 export default providerService;

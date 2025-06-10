@@ -17,7 +17,6 @@ const ProviderOffersList = () => {
         setLoading(true);
         setError(null);
         const response = await providerService.getOffers();
-        console.log("Fetched offers:", response);
         setOffers(response.data.offers || []);
       } catch (err) {
         console.error("Error fetching offers:", err);
@@ -30,7 +29,12 @@ const ProviderOffersList = () => {
     fetchOffers();
   }, []);
 
-  const filteredOffers = offers.filter((offer) => {
+  // Only show offers that match the logged-in provider's id
+  const providerOffers = offers.filter(
+    (offer) => offer.providerId === user?.id
+  );
+
+  const filteredOffers = providerOffers.filter((offer) => {
     if (filter === "all") return true;
     return offer.status === filter;
   });
@@ -177,7 +181,7 @@ const ProviderOffersList = () => {
 
               <div className="offer-footer">
                 <Link
-                  to={`/provider/requests/${offer.requestId}`}
+                  to={`/requests/${offer.requestId}`}
                   className="btn btn-outlined"
                 >
                   View Request
