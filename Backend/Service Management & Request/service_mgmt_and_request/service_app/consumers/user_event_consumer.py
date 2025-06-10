@@ -76,7 +76,9 @@ def handle_user_event(body, message):
             "name": user_data.get("name"),
             "phone": user_data.get("phone"),
             "email": user_data.get("email"),
-            "role": user_data.get("role")
+            "role": user_data.get("role"),
+            "city": user_data.get("city"),
+            "region": user_data.get("region")
         }
 
         from service_app.models import UserProfile

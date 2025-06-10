@@ -48,7 +48,9 @@ class EventEmitter:
                 "name": user.firstName,
                 "phone": user.phone,
                 "email": user.email,
-                "role": user.role
+                "role": user.role,
+                "city": user.city,
+                "region": user.region
             }
         }
 

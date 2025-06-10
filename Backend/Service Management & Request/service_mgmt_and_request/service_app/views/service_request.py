@@ -71,7 +71,7 @@ class ServiceRequestCreateView(APIView):
         if serializer.is_valid():
             request_instance = ServiceRequestRepository.create_service_request(serializer.validated_data)
 
-            files = request.FILES.getlist('attachments')
+            files = request.FILES.getlist('attachments[]')
             for file in files:
                 ServiceRequestAttachmentRepository.create_attachment(request_instance, file)
             # Build event payload
