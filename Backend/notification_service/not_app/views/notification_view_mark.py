@@ -22,35 +22,34 @@ class MarkNotificationAsReadView(APIView):
 
 
 class BulkMarkAsReadView(APIView):
-
     @swagger_auto_schema(
         operation_description="Mark multiple notifications as read.",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                "notification_ids": openapi.Schema(
+                'notification_ids': openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Items(type=openapi.TYPE_INTEGER),
-                    description="List of notification IDs to mark as read."
+                    description="List of notification IDs to mark as read"
                 )
             },
-            required=["notification_ids"]
+            required=['notification_ids']
         ),
         responses={
-            200: openapi.Response(description="Success"),
-            400: openapi.Response(description="Invalid request")
+            200: openapi.Response(description="Successfully updated"),
+            400: openapi.Response(description="Invalid input")
         }
     )
     def patch(self, request):
         ids = request.data.get("notification_ids", [])
-        if not isinstance(ids, list):
-            return Response({
-                "message": "notification_ids must be a list."
-            }, status=status.HTTP_400_BAD_REQUEST)
+        if not isinstance(ids, list) or not all(isinstance(i, int) for i in ids):
+            return Response({"message": "Invalid input. Provide a list of integers."}, status=status.HTTP_400_BAD_REQUEST)
 
-        updated_count = Notification.objects.filter(id__in=ids).update(is_read=True)
+        # Only update notifications where is_read is False
+        updated_count = Notification.objects.filter(id__in=ids, is_read=False).update(is_read=True)
+
         return Response({
-            "message": "Notifications marked as read.",
+            "message": f"{updated_count} notifications marked as read.",
             "updated_count": updated_count
         }, status=status.HTTP_200_OK)
     
