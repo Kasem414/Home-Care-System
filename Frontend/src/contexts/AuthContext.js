@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { userProfileService, providerProfileService } from "../services/api";
 
 // API base URL
 const API_BASE_URL = "http://localhost:8000/auth";
@@ -308,15 +309,23 @@ export const AuthProvider = ({ children }) => {
   // Update profile function
   const updateProfile = async (profileData) => {
     try {
-      // This would be implemented once you have a profile update API endpoint
-      const updatedUser = {
-        ...user,
-        ...profileData,
-      };
+      let updatedUser;
+      if (user.role === "customer") {
+        // Home owner
+        await userProfileService.updateProfile(user.id, profileData);
+        updatedUser = { ...user, ...profileData };
+      } else if (user.role === "service_provider") {
+        // Provider
 
+        await providerProfileService.updateProfile(user.id, {
+          ...profileData,
+        });
+        updatedUser = { ...user, ...profileData };
+      } else {
+        throw new Error("Unknown user role");
+      }
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
-
       return { success: true };
     } catch (error) {
       console.error("Profile update error:", error);
@@ -348,7 +357,15 @@ export const AuthProvider = ({ children }) => {
   // Delete account function
   const deleteAccount = async () => {
     try {
-      // This would be implemented once you have an account deletion API endpoint
+      if (user.role === "customer") {
+        await userProfileService.deleteProfile(user.id);
+      } else if (user.role === "service_provider") {
+        // Get provider profile id first
+
+        await providerProfileService.deleteProfile(user.id);
+      } else {
+        throw new Error("Unknown user role");
+      }
       // Clear user data after successful deletion
       setUser(null);
       setToken(null);
@@ -356,7 +373,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       delete axios.defaults.headers.common["Authorization"];
-
       return { success: true };
     } catch (error) {
       console.error("Account deletion error:", error);

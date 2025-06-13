@@ -6,8 +6,9 @@ import SchedulePreference from "./SchedulePreference";
 import Requirements from "./Requirements";
 import RequestSummary from "./RequestSummary";
 import { useAuth } from "../../../contexts/AuthContext";
-import { getUserIdFromToken } from "../../../services/api";
+import { getUserIdFromToken, techProfileService } from "../../../services/api";
 import { requestService } from "../../../services/requestService";
+import { notificationService } from "../../../services/notificationService";
 import { toast } from "react-toastify";
 
 const RequestWizard = () => {
@@ -15,6 +16,7 @@ const RequestWizard = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [techProfiles, setTechProfiles] = useState([]);
   const [requestData, setRequestData] = useState({
     customer_id: getUserIdFromToken() || "",
     service_type: "",
@@ -36,6 +38,22 @@ const RequestWizard = () => {
     attachments: [],
     is_urgent: false,
   });
+
+  // Fetch tech profiles when component mounts
+  useEffect(() => {
+    fetchTechProfiles();
+  }, []);
+
+  const fetchTechProfiles = async () => {
+    try {
+      const profiles = await techProfileService.getAllProfiles();
+      if (Array.isArray(profiles)) {
+        setTechProfiles(profiles);
+      }
+    } catch (error) {
+      console.error("Error fetching tech profiles:", error);
+    }
+  };
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
@@ -140,7 +158,46 @@ const RequestWizard = () => {
       const preparedData = prepareRequestData();
 
       // Create the request
-      await requestService.createRequest(preparedData);
+      const response = await requestService.createRequest(preparedData);
+
+      // Get the created request data with ID
+      const createdRequest = response.data || response;
+
+      // Notify relevant providers based on tech profiles
+      try {
+        if (createdRequest.id) {
+          // Filter tech profiles by service type and (optionally) region/city
+          const relevantProfiles = techProfiles.filter((profile) => {
+            const matchesCategory =
+              Array.isArray(profile.serviceCategories) &&
+              profile.serviceCategories.includes(preparedData.service_type);
+            // Optionally, also match region/city if needed:
+            // const matchesRegion = Array.isArray(profile.serviceRegions) && (profile.serviceRegions.includes(preparedData.region) || profile.serviceRegions.includes(preparedData.city));
+            // return matchesCategory && matchesRegion;
+            return matchesCategory;
+          });
+
+          // Send notifications to all relevant provider user IDs
+          for (const profile of relevantProfiles) {
+            if (profile.user) {
+              await notificationService.notifyServiceRequest(
+                profile.user,
+                createdRequest
+              );
+              console.log(
+                `Notification sent to provider user ${profile.user} about new service request`
+              );
+            }
+          }
+
+          console.log(
+            `Service request created, notifications sent to ${relevantProfiles.length} providers`
+          );
+        }
+      } catch (notificationError) {
+        console.error("Error sending notifications:", notificationError);
+        // We don't want to fail the request creation if notifications fail
+      }
 
       toast.success("Service request created successfully!");
       navigate("/requests");

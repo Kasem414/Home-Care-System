@@ -4,6 +4,9 @@ import { jwtDecode } from "jwt-decode";
 // API base URL
 const API_BASE_URL = "http://localhost:9000";
 
+// Tech Profile API (for provider matching)
+const TECH_PROFILE_API_URL = "http://127.0.0.1:8000";
+
 // Function to get user ID from token
 export const getUserIdFromToken = () => {
   const token = localStorage.getItem("token");
@@ -40,6 +43,14 @@ apiClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Tech Profile API (for provider matching)
+const techProfileClient = axios.create({
+  baseURL: TECH_PROFILE_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // Admin API services
 export const adminService = {
@@ -204,6 +215,100 @@ export const serviceCategories = {
       return response.data;
     } catch (error) {
       console.error("Error fetching service categories:", error);
+      throw error;
+    }
+  },
+};
+
+// Tech Profile API (for provider matching)
+export const techProfileService = {
+  // Get all tech profiles
+  getAllProfiles: async () => {
+    try {
+      const response = await techProfileClient.get("/users/tech-profiles/all/");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching tech profiles:", error);
+      throw error;
+    }
+  },
+};
+
+// User Profile API
+export const userProfileService = {
+  // Get home owner info
+  getProfile: async (userId) => {
+    try {
+      const response = await techProfileClient.get(`/users/me/${userId}/`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      throw error;
+    }
+  },
+  // Update home owner info
+  updateProfile: async (userId, profileData) => {
+    try {
+      const response = await techProfileClient.put(
+        `/users/users/${userId}/update/`,
+        profileData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      throw error;
+    }
+  },
+  // Delete home owner account
+  deleteProfile: async (userId) => {
+    try {
+      const response = await techProfileClient.delete(
+        `/users/users/${userId}/delete/`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting user profile:", error);
+      throw error;
+    }
+  },
+};
+
+// Provider Profile API
+export const providerProfileService = {
+  // Get provider info
+  getProfile: async (userId) => {
+    try {
+      const response = await techProfileClient.get(
+        `/users/tech-profiles/by-user/${userId}/`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching provider profile:", error);
+      throw error;
+    }
+  },
+  // Update provider info
+  updateProfile: async (profileId, profileData) => {
+    try {
+      const response = await techProfileClient.put(
+        `/users/tech-profiles/${profileId}/update/`,
+        profileData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error updating provider profile:", error);
+      throw error;
+    }
+  },
+  // Delete provider account
+  deleteProfile: async (profileId) => {
+    try {
+      const response = await techProfileClient.delete(
+        `/users/tech-profiles/${profileId}/delete/`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting provider profile:", error);
       throw error;
     }
   },

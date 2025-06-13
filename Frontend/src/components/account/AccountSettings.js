@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
+import { userProfileService } from "../../services/api";
+import syrianLocations from "../../data/syrianLocations.json";
 
 // Mock user data for testing without authentication
 const mockUser = {
@@ -36,19 +38,65 @@ const AccountSettings = () => {
     confirmPassword: "",
   });
 
+  // Add state for city/region options
+  const [cityOptions] = useState(syrianLocations.cities);
+  const [regionOptions, setRegionOptions] = useState([]);
+
+  // Update region options when city changes
+  useEffect(() => {
+    const selectedCity = cityOptions.find((c) => c.name === formData.city);
+    setRegionOptions(selectedCity ? selectedCity.regions : []);
+    // If the current region is not in the new city, clear it
+    if (
+      formData.region &&
+      selectedCity &&
+      !selectedCity.regions.some((r) => r.name === formData.region)
+    ) {
+      setFormData((f) => ({ ...f, region: "" }));
+    }
+  }, [formData.city, cityOptions]);
+
   // Load user data when component mounts
   useEffect(() => {
-    if (userData) {
-      setFormData({
-        ...formData,
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        email: userData.email || "",
-        phone: userData.phone || "",
-        city: userData.city || "",
-        region: userData.region || "",
-      });
-    }
+    const fetchProfile = async () => {
+      if (userData && userData.id && userData.role === "customer") {
+        try {
+          const profile = await userProfileService.getProfile(userData.id);
+          setFormData({
+            ...formData,
+            firstName: profile.firstName || "",
+            lastName: profile.lastName || "",
+            email: profile.email || "",
+            phone: profile.phone || "",
+            city: profile.city || "",
+            region: profile.region || "",
+          });
+        } catch (error) {
+          // fallback to local userData if API fails
+          setFormData({
+            ...formData,
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            email: userData.email || "",
+            phone: userData.phone || "",
+            city: userData.city || "",
+            region: userData.region || "",
+          });
+        }
+      } else {
+        setFormData({
+          ...formData,
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          city: userData.city || "",
+          region: userData.region || "",
+        });
+      }
+    };
+    fetchProfile();
+    // eslint-disable-next-line
   }, [userData]);
 
   const handleChange = (e) => {
@@ -261,23 +309,45 @@ const AccountSettings = () => {
             <div className="form-row">
               <div className="form-group half">
                 <label htmlFor="city">City</label>
-                <input
-                  type="text"
+                <select
                   id="city"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                />
+                  required
+                >
+                  <option value="">Select City</option>
+                  {cityOptions.map((city) => (
+                    <option key={city.id} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="form-group half">
                 <label htmlFor="region">Region</label>
-                <input
-                  type="text"
+                <select
                   id="region"
                   name="region"
                   value={formData.region}
                   onChange={handleChange}
-                />
+                  required
+                  disabled={!formData.city}
+                >
+                  <option value="">Select Region</option>
+                  {/* Always show the current region if not in the options */}
+                  {formData.region &&
+                    !regionOptions.some((r) => r.name === formData.region) && (
+                      <option value={formData.region}>
+                        {formData.region} (not in list)
+                      </option>
+                    )}
+                  {regionOptions.map((region) => (
+                    <option key={region.id} value={region.name}>
+                      {region.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 

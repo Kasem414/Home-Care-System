@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 import { requestService } from "../../services/requestService";
+import { notificationService } from "../../services/notificationService";
 
 const CreateOfferPage = () => {
   const { requestId } = useParams();
@@ -164,6 +165,26 @@ const CreateOfferPage = () => {
       );
 
       console.log("Offer submitted:", response.data);
+      
+      // Get the created offer data
+      const createdOffer = response.data;
+      
+      // Send notification to the homeowner
+      try {
+        // We need to get the homeowner ID from the request data
+        if (request && request.customer_id) {
+          await notificationService.notifyNewOffer(request.customer_id, {
+            serviceType: request.service_type,
+            requestId: requestId,
+            providerId: offer.providerId
+          });
+          console.log("Notification sent to homeowner about new offer");
+        }
+      } catch (notificationError) {
+        console.error("Error sending notification to homeowner:", notificationError);
+        // We don't want to fail the offer submission if notification fails
+      }
+      
       setSuccessMessage(
         "Your offer has been successfully submitted! The client will be notified."
       );

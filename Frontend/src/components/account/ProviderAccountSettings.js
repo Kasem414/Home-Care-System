@@ -2,19 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
+import { providerProfileService, serviceCategories } from "../../services/api";
+import syrianLocations from "../../data/syrianLocations.json";
 
 // Available service categories
-const serviceCategories = [
-  { value: "plumbing", label: "Plumbing" },
-  { value: "electrical", label: "Electrical" },
-  { value: "cleaning", label: "Cleaning" },
-  { value: "painting", label: "Painting" },
-  { value: "gardening", label: "Gardening" },
-  { value: "carpentry", label: "Carpentry" },
-  { value: "hvac", label: "HVAC" },
-  { value: "roofing", label: "Roofing" },
-  { value: "flooring", label: "Flooring" },
-];
+// const serviceCategories = [
+//   { value: "plumbing", label: "Plumbing" },
+//   { value: "electrical", label: "Electrical" },
+//   { value: "cleaning", label: "Cleaning" },
+//   { value: "painting", label: "Painting" },
+//   { value: "gardening", label: "Gardening" },
+//   { value: "carpentry", label: "Carpentry" },
+//   { value: "hvac", label: "HVAC" },
+//   { value: "roofing", label: "Roofing" },
+//   { value: "flooring", label: "Flooring" },
+// ];
 
 // Available regions
 const availableRegions = [
@@ -79,82 +81,100 @@ const ProviderAccountSettings = () => {
     confirmPassword: "",
   });
 
+  // Add state for city/region options
+  const [cityOptions] = useState(syrianLocations.cities);
+  const [regionOptions, setRegionOptions] = useState([]);
+
+  // Service categories state
+  const [serviceCategoryOptions, setServiceCategoryOptions] = useState([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
+  const [servicesError, setServicesError] = useState(null);
+
+  // Update region options when city changes
+  useEffect(() => {
+    const selectedCity = cityOptions.find(
+      (c) => c.name === basicProfileData.city
+    );
+    setRegionOptions(selectedCity ? selectedCity.regions : []);
+    // If the current region is not in the new city, clear it
+    if (
+      basicProfileData.region &&
+      selectedCity &&
+      !selectedCity.regions.some((r) => r.name === basicProfileData.region)
+    ) {
+      setBasicProfileData((f) => ({ ...f, region: "" }));
+    }
+  }, [basicProfileData.city, cityOptions]);
+
   // Load user data when component mounts
   useEffect(() => {
-    if (user && user.role === "provider") {
-      // Get provider profile from API if available
-      // For now, using the user data directly
-      const providerProfile = user.provider_profile || {};
-
-      // Parse availability if it's stored as comma-separated string
-      let parsedAvailability = availabilityData;
-      if (user.availability && typeof user.availability === "string") {
-        const availabilityItems = user.availability.split(",");
-        availabilityItems.forEach((item) => {
+    const fetchProviderProfile = async () => {
+      if (user && user.role === "service_provider") {
+        try {
+          const providerProfile = await providerProfileService.getProfile(
+            user.id
+          );
+          // Parse availability if it's an array
+          let parsedAvailability = { ...availabilityData };
+          if (
+            providerProfile.availability &&
+            Array.isArray(providerProfile.availability)
+          ) {
+            providerProfile.availability.forEach((item) => {
           const [day, time] = item.split(":");
           if (day && time) {
             const [from, to] = time.trim().split("-");
-            if (from && to && parsedAvailability[day.trim().toLowerCase()]) {
-              parsedAvailability[day.trim().toLowerCase()] = {
+                const dayKey = day.trim().toLowerCase();
+                parsedAvailability[dayKey] = {
                 available: true,
-                from: from.trim(),
-                to: to.trim(),
+                  from: from ? from.trim() : "09:00",
+                  to: to ? to.trim() : "17:00",
               };
-            }
           }
         });
       }
-
-      // Parse service categories if stored as comma-separated string
-      let parsedCategories = [];
-      if (
-        providerProfile.serviceCategories &&
-        typeof providerProfile.serviceCategories === "string"
-      ) {
-        parsedCategories = providerProfile.serviceCategories
-          .split(",")
-          .map((c) => c.trim());
-      } else if (Array.isArray(providerProfile.serviceCategories)) {
-        parsedCategories = providerProfile.serviceCategories;
-      }
-
-      // Parse service regions if stored as comma-separated string
-      let parsedRegions = [];
-      if (
-        providerProfile.serviceRegions &&
-        typeof providerProfile.serviceRegions === "string"
-      ) {
-        parsedRegions = providerProfile.serviceRegions
-          .split(",")
-          .map((r) => r.trim());
-      } else if (Array.isArray(providerProfile.serviceRegions)) {
-        parsedRegions = providerProfile.serviceRegions;
-      }
-
-      // Basic profile data
       setBasicProfileData({
         companyName: providerProfile.companyName || "",
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        city: user.city || "",
-        region: user.region || "",
+            firstName: providerProfile.user.firstName || "",
+            lastName: providerProfile.user.lastName || "",
+            email: providerProfile.user.email || "",
+            phone: providerProfile.user.phone || "",
+            city: providerProfile.user.city || "",
+            region: providerProfile.user.region || "",
         bio: providerProfile.bio || "",
       });
-
-      // Services data
       setServicesData({
-        serviceCategories: parsedCategories,
-        serviceRegions: parsedRegions,
+            serviceCategories: providerProfile.serviceCategories || [],
+            serviceRegions: providerProfile.serviceRegions || [],
         yearsInBusiness: providerProfile.yearsInBusiness || "",
         employeeCount: providerProfile.employeeCount || "",
       });
-
-      // Availability data
       setAvailabilityData(parsedAvailability);
+        } catch (error) {
+          // fallback to local user data if API fails
     }
+      }
+    };
+    fetchProviderProfile();
+    // eslint-disable-next-line
   }, [user]);
+
+  // Fetch service categories on mount
+  useEffect(() => {
+    const fetchServices = async () => {
+      setServicesLoading(true);
+      setServicesError(null);
+      try {
+        const response = await serviceCategories.getCategories();
+        setServiceCategoryOptions(response.data || []);
+      } catch (err) {
+        setServicesError("Failed to load service categories");
+      } finally {
+        setServicesLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   // Handle basic profile field changes
   const handleBasicProfileChange = (e) => {
@@ -422,9 +442,9 @@ const ProviderAccountSettings = () => {
     }
   };
 
-  if (!user || user.role !== "provider") {
+  if (!user || user.role !== "service_provider") {
     return (
-      <div className="account-settings">
+      <div className="provider-account-settings">
         <div className="account-settings-container">
           <h1 className="page-title">Provider Account Settings</h1>
           <div className="alert alert-error">
@@ -437,7 +457,7 @@ const ProviderAccountSettings = () => {
   }
 
   return (
-    <div className="account-settings provider-settings">
+    <div className="provider-account-settings">
       <div className="account-settings-container">
         <h1 className="page-title">Provider Account Settings</h1>
 
@@ -484,18 +504,6 @@ const ProviderAccountSettings = () => {
           <div className="settings-section">
             <h2>Basic Information</h2>
             <form onSubmit={handleBasicProfileUpdate}>
-              <div className="form-group">
-                <label htmlFor="companyName">Company Name</label>
-                <input
-                  type="text"
-                  id="companyName"
-                  name="companyName"
-                  value={basicProfileData.companyName}
-                  onChange={handleBasicProfileChange}
-                  required
-                />
-              </div>
-
               <div className="form-row">
                 <div className="form-group half">
                   <label htmlFor="firstName">First Name</label>
@@ -547,23 +555,47 @@ const ProviderAccountSettings = () => {
               <div className="form-row">
                 <div className="form-group half">
                   <label htmlFor="city">City</label>
-                  <input
-                    type="text"
+                  <select
                     id="city"
                     name="city"
                     value={basicProfileData.city}
                     onChange={handleBasicProfileChange}
-                  />
+                    required
+                  >
+                    <option value="">Select City</option>
+                    {cityOptions.map((city) => (
+                      <option key={city.id} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group half">
                   <label htmlFor="region">Region</label>
-                  <input
-                    type="text"
+                  <select
                     id="region"
                     name="region"
                     value={basicProfileData.region}
                     onChange={handleBasicProfileChange}
-                  />
+                    required
+                    disabled={!basicProfileData.city}
+                  >
+                    <option value="">Select Region</option>
+                    {/* Always show the current region if not in the options */}
+                    {basicProfileData.region &&
+                      !regionOptions.some(
+                        (r) => r.name === basicProfileData.region
+                      ) && (
+                        <option value={basicProfileData.region}>
+                          {basicProfileData.region} (not in list)
+                        </option>
+                      )}
+                    {regionOptions.map((region) => (
+                      <option key={region.id} value={region.name}>
+                        {region.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -595,24 +627,30 @@ const ProviderAccountSettings = () => {
             <form onSubmit={handleServicesUpdate}>
               <div className="form-group">
                 <label>Service Categories</label>
+                {servicesLoading ? (
+                  <div>Loading services...</div>
+                ) : servicesError ? (
+                  <div className="alert alert-error">{servicesError}</div>
+                ) : (
                 <div className="checkbox-group">
-                  {serviceCategories.map((category) => (
-                    <div className="checkbox-item" key={category.value}>
+                    {serviceCategoryOptions.map((category) => (
+                      <div className="checkbox-item" key={category.id}>
                       <input
                         type="checkbox"
-                        id={`category-${category.value}`}
-                        value={category.value}
+                          id={`category-${category.id}`}
+                          value={category.name}
                         checked={servicesData.serviceCategories.includes(
-                          category.value
+                            category.name
                         )}
                         onChange={handleCategoryChange}
                       />
-                      <label htmlFor={`category-${category.value}`}>
-                        {category.label}
+                        <label htmlFor={`category-${category.id}`}>
+                          {category.name}
                       </label>
                     </div>
                   ))}
                 </div>
+                )}
               </div>
 
               <div className="form-group">
