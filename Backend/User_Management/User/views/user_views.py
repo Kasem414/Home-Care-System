@@ -8,9 +8,11 @@ from rest_framework import status
 from django.core.paginator import Paginator
 from ..models import Custom_User
 from rest_framework.pagination import PageNumberPagination
-from ..serializers.user_serializers  import UserSerializer
+from ..serializers.user_serializers  import UserSerializer, UserDetailSerializer
+from rest_framework.permissions import AllowAny
 
 class UserBaseView(APIView):
+    permission_classes = [AllowAny]
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.user_service = UserService(UserRepository())
@@ -104,7 +106,7 @@ class UpdateTechProfileView(UserBaseView):
 class GetMeView(UserBaseView):
     def get(self, request, user_id):
         user = self.user_service.search_users(user_id)
-        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        return Response(UserDetailSerializer(user).data, status=status.HTTP_200_OK)
 
 class GetMyPaymentStateView(UserBaseView):
     def get(self, request, user_id):

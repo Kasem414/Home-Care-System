@@ -14,3 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
             'payment',
             'active',
         ]
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Custom_User
+        fields = '__all__'

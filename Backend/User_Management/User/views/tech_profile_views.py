@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 
-from User.serializers.tech_profile_serializers import CreateTechnicalProfileSerializer, UpdateTechnicalProfileSerializer
+from User.serializers.tech_profile_serializers import CreateTechnicalProfileSerializer, UpdateTechnicalProfileSerializer, TechnicalProfileListSerializer
 from ..repositories.tech_profile_repositories import TechProfileRepository
 from ..services.tech_profile_services import TechProfileService
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 class BaseTechnicalProfileView(APIView):
+    permission_classes = [AllowAny]
     def __init__(self, **kwargs):
         super().__init__(**kwargs)  
         self.TechProfileService = TechProfileService(TechProfileRepository())
@@ -45,3 +47,29 @@ class DeleteTechnicalProfileView(BaseTechnicalProfileView):
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class ListTechnicalProfilesView(BaseTechnicalProfileView):
+    def get(self, request):
+        profiles = self.TechProfileService.get_all_profiles()
+        serializer = TechnicalProfileListSerializer(profiles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class RetrieveTechnicalProfileView(BaseTechnicalProfileView):
+    def get(self, request, pk):
+        from ..models import TechnicalProfile
+        try:
+            profile = TechnicalProfile.objects.get(pk=pk)
+        except TechnicalProfile.DoesNotExist:
+            return Response({'error': 'TechnicalProfile not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = TechnicalProfileListSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class RetrieveTechnicalProfileByUserView(BaseTechnicalProfileView):
+    def get(self, request, user_id):
+        from ..models import TechnicalProfile
+        try:
+            profile = TechnicalProfile.objects.get(user_id=user_id)
+        except TechnicalProfile.DoesNotExist:
+            return Response({'error': 'TechnicalProfile not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = TechnicalProfileListSerializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
