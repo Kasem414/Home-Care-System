@@ -39,24 +39,14 @@ const AdminLayout = () => {
       label: "Services",
       component: <ServicesManagement />,
     },
-    {
-      path: "providers",
-      icon: "fas fa-user-tie",
-      label: "Providers",
-      component: <ProvidersManagement />,
-    },
+
     {
       path: "Users",
       icon: "fas fa-user",
       label: "Users",
       component: <UserManagement />,
     },
-    {
-      path: "bookings",
-      icon: "fas fa-calendar-check",
-      label: "Bookings",
-      component: <div>Bookings Management</div>,
-    },
+
   ];
 
   const handleSectionChange = (path) => {

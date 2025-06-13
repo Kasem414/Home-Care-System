@@ -1,27 +1,43 @@
 /* Provider Account Settings Styles */
 .provider-account-settings {
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
+  background: var(--bg-light);
+  padding: var(--spacing-2xl) 0;
 }
 
-/* Tabs Navigation */
+.provider-account-settings .account-settings-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.provider-account-settings .page-title {
+  font-size: var(--font-size-3xl);
+  color: var(--text-dark);
+  margin-bottom: var(--spacing-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
 .provider-account-settings .settings-tabs {
   display: flex;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-xl);
   border-bottom: 1px solid var(--border-color);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
 }
 
 .provider-account-settings .tab-btn {
-  padding: 1rem 1.5rem;
+  padding: var(--spacing-md) var(--spacing-xl);
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
   color: var(--text-medium);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast) ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -31,6 +47,7 @@
 .provider-account-settings .tab-btn.active {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
+  background: var(--bg-gray);
 }
 
 .provider-account-settings .tab-btn:hover:not(.active) {
@@ -40,6 +57,201 @@
 
 .provider-account-settings .tab-btn i {
   font-size: 1rem;
+}
+
+.provider-account-settings .settings-section {
+  background: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  animation: fadeIn 0.3s ease;
+}
+
+.provider-account-settings .form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.provider-account-settings .form-group label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-dark);
+}
+
+.provider-account-settings .form-group input,
+.provider-account-settings .form-group textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  color: var(--text-dark);
+  background: var(--bg-light);
+  transition: border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.provider-account-settings .form-group input:focus,
+.provider-account-settings .form-group textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  outline: none;
+}
+
+.provider-account-settings .form-group select {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  color: var(--text-dark);
+  background: var(--bg-light);
+  transition: border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.provider-account-settings .form-group select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  outline: none;
+}
+
+.provider-account-settings .checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.provider-account-settings .checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--bg-gray);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.provider-account-settings .availability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.provider-account-settings .availability-day {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  background: var(--bg-gray);
+}
+
+.provider-account-settings .day-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.provider-account-settings .time-range {
+  display: flex;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--border-color);
+  padding-left: 1.5rem;
+}
+
+.provider-account-settings .time-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.provider-account-settings .time-input label {
+  font-size: var(--font-size-xs);
+  color: var(--text-medium);
+}
+
+.provider-account-settings .time-input input {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+}
+
+.provider-account-settings .alert {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-medium);
+  background: var(--info-color-light);
+  border: 1px solid var(--info-color);
+  color: var(--info-color-dark);
+}
+
+.provider-account-settings .alert-success {
+  background: var(--success-color-light);
+  border: 1px solid var(--success-color);
+  color: var(--success-color-dark);
+}
+
+.provider-account-settings .alert-error {
+  background: var(--danger-color-light);
+  border: 1px solid var(--danger-color);
+  color: var(--danger-color-dark);
+}
+
+.provider-account-settings .danger-zone {
+  border: 1px solid var(--danger-color-light);
+  background: var(--danger-color-light);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.provider-account-settings .danger-zone h2 {
+  color: var(--danger-color-dark);
+}
+
+.provider-account-settings .danger-zone p {
+  color: var(--text-medium);
+  margin-bottom: var(--spacing-lg);
+}
+
+.provider-account-settings .btn-danger {
+  background: var(--danger-color);
+  color: var(--bg-white);
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  transition: background var(--transition-fast);
+}
+
+.provider-account-settings .btn-danger:hover {
+  background: var(--danger-color-dark);
+}
+
+.provider-account-settings .delete-confirmation {
+  background: var(--danger-color-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  margin-top: var(--spacing-md);
+}
+
+.provider-account-settings .delete-confirmation p {
+  margin-bottom: var(--spacing-lg);
+  color: var(--danger-color-dark);
+  font-weight: var(--font-weight-medium);
+}
+
+.provider-account-settings .button-group {
+  display: flex;
+  gap: var(--spacing-md);
 }
 
 /* Services Styles */
@@ -145,68 +357,33 @@
   margin-bottom: 1.5rem;
 }
 
-.provider-account-settings .availability-day {
-  padding: 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--bg-light);
-}
-
-.provider-account-settings .day-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.provider-account-settings .day-name {
-  margin-left: 0.5rem;
-  font-weight: 500;
-}
-
-.provider-account-settings .time-range {
-  display: flex;
-  gap: 1rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--border-color);
-  padding-left: 1.75rem;
-}
-
-.provider-account-settings .time-input {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.provider-account-settings .time-input label {
-  font-size: 0.85rem;
-  color: var(--text-medium);
-}
-
-.provider-account-settings .time-input input {
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-}
-
 /* Responsive Styles */
 @media (max-width: 768px) {
-  .provider-account-settings .tab-btn {
-    padding: 0.75rem 1rem;
+  .provider-account-settings {
+    padding: var(--spacing-lg) 0;
   }
-
+  .provider-account-settings .account-settings-container {
+    padding: 0 var(--spacing-md);
+  }
+  .provider-account-settings .settings-section {
+    padding: var(--spacing-md);
+  }
+  .provider-account-settings .page-title {
+    font-size: var(--font-size-2xl);
+  }
+  .provider-account-settings .settings-section h2 {
+    font-size: var(--font-size-lg);
+  }
+  .provider-account-settings .button-group {
+    flex-direction: column;
+  }
   .provider-account-settings .services-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
-
   .provider-account-settings .time-range {
     flex-direction: column;
     gap: 0.75rem;
   }
-}
-
-/* Animation for tab transitions */
-.provider-account-settings .settings-section {
-  animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {

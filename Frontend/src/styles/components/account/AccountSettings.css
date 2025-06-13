@@ -1,6 +1,6 @@
 /* Account Settings Styles */
 .account-settings {
-  padding: 3rem 0;
+  padding: var(--spacing-2xl) 0;
   background-color: var(--bg-light);
   min-height: calc(100vh - var(--header-height) - var(--footer-height));
 }
@@ -8,158 +8,211 @@
 .account-settings .account-settings-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--spacing-lg);
 }
 
 .account-settings .page-title {
-  font-size: 2rem;
+  font-size: var(--font-size-3xl);
   color: var(--text-dark);
-  margin-bottom: 2rem;
-  font-weight: 600;
+  margin-bottom: var(--spacing-xl);
+  font-weight: var(--font-weight-semibold);
 }
 
 .account-settings .settings-section {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  padding: 2rem;
-  margin-bottom: 2rem;
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  animation: fadeIn 0.3s ease;
 }
 
 .account-settings .settings-section h2 {
-  font-size: 1.5rem;
+  font-size: var(--font-size-2xl);
   color: var(--text-dark);
-  margin-bottom: 1.5rem;
-  font-weight: 500;
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-medium);
 }
 
 .account-settings .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .account-settings .form-group label {
   display: block;
-  font-size: 0.95rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
   color: var(--text-dark);
 }
 
-.account-settings.form-group input,
+.account-settings .form-group input,
 .account-settings .form-group textarea {
   width: 100%;
-  padding: 0.75rem;
+  padding: var(--spacing-md);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
   color: var(--text-dark);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  background: var(--bg-light);
+  transition: border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .account-settings .form-group input:focus,
 .account-settings .form-group textarea:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
   outline: none;
 }
 
+.account-settings .form-group select {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-md);
+  color: var(--text-dark);
+  background: var(--bg-light);
+  transition: border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.account-settings .form-group select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+  outline: none;
+}
+
+.account-settings .form-row {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.account-settings .half {
+  flex: 1 1 0;
+}
+
 .account-settings .alert {
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-medium);
+  background: var(--info-color-light);
+  border: 1px solid var(--info-color);
+  color: var(--info-color-dark);
 }
 
 .account-settings .alert-success {
-  background-color: #d1fae5;
-  border: 1px solid #34d399;
-  color: #065f46;
+  background: var(--success-color-light);
+  border: 1px solid var(--success-color);
+  color: var(--success-color-dark);
 }
 
 .account-settings .alert-error {
-  background-color: #fee2e2;
-  border: 1px solid #f87171;
-  color: #b91c1c;
+  background: var(--danger-color-light);
+  border: 1px solid var(--danger-color);
+  color: var(--danger-color-dark);
 }
 
 .account-settings .alert-info {
-  background-color: #e0f2fe;
-  border: 1px solid #38bdf8;
-  color: #0369a1;
+  background: var(--info-color-light);
+  border: 1px solid var(--info-color);
+  color: var(--info-color-dark);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-xs);
 }
 
 .account-settings .alert-info i {
-  font-size: 1.2rem;
+  font-size: var(--font-size-lg);
 }
 
 .account-settings .danger-zone {
-  border: 1px solid #fecaca;
-  background-color: #fff5f5;
+  border: 1px solid var(--danger-color-light);
+  background-color: var(--danger-color-light);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
 }
 
 .account-settings .danger-zone h2 {
-  color: #b91c1c;
+  color: var(--danger-color-dark);
 }
 
 .account-settings .danger-zone p {
   color: var(--text-medium);
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .account-settings .btn-danger {
-  background-color: #ef4444;
-  color: white;
+  background-color: var(--danger-color);
+  color: var(--bg-white);
   border: none;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  transition: background var(--transition-fast);
 }
 
 .account-settings .btn-danger:hover {
-  background-color: #dc2626;
+  background-color: var(--danger-color-dark);
 }
 
 .account-settings .delete-confirmation {
-  background-color: #fee2e2;
-  padding: 1.5rem;
-  border-radius: 4px;
-  margin-top: 1rem;
+  background-color: var(--danger-color-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  margin-top: var(--spacing-md);
 }
 
 .account-settings .delete-confirmation p {
-  margin-bottom: 1.5rem;
-  color: #b91c1c;
-  font-weight: 500;
+  margin-bottom: var(--spacing-lg);
+  color: var(--danger-color-dark);
+  font-weight: var(--font-weight-medium);
 }
 
-.account-settings .confirmation-buttons {
+.account-settings .button-group {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .account-settings {
-    padding: 2rem 0;
+    padding: var(--spacing-lg) 0;
   }
-
   .account-settings .account-settings-container {
-    padding: 0 1rem;
+    padding: 0 var(--spacing-md);
   }
-
   .account-settings .settings-section {
-    padding: 1.5rem;
+    padding: var(--spacing-md);
   }
-
   .account-settings .page-title {
-    font-size: 1.75rem;
+    font-size: var(--font-size-2xl);
   }
-
   .account-settings .settings-section h2 {
-    font-size: 1.25rem;
+    font-size: var(--font-size-lg);
   }
-
-  .account-settings .confirmation-buttons {
+  .account-settings .form-row {
     flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  .account-settings .button-group {
+    flex-direction: column;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

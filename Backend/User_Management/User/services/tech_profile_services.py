@@ -16,3 +16,6 @@ class TechProfileService:
     def delete_profile(self,user_id: int) -> None:
         profile = self.tech_profile_services.get_profile_by_user_id(user_id)
         self.tech_profile_services.delete_user(profile)
+
+    def get_all_profiles(self):
+        return TechnicalProfile.objects.all()

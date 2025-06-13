@@ -1,8 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./styles/index.css";
 
+// Context Providers
 import { AuthProvider } from "./contexts/AuthContext";
+
+// Notification Component
+import NotificationDisplay from "./components/shared/NotificationDisplay";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Navbar from "./components/shared/Navbar";
 import Footer from "./components/shared/Footer";
@@ -35,6 +41,7 @@ function App() {
         <ScrollToTop />
         <div className="App">
           <Navbar />
+          <ToastContainer position="top-right" autoClose={5000} />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/services" element={<ServicesPage />} />

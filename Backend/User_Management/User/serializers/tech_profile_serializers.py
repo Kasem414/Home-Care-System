@@ -21,3 +21,9 @@ class UpdateTechnicalProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = TechnicalProfile
         fields = ('category', 'rate', 'work_state', 'service_ids')
+
+class TechnicalProfileListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TechnicalProfile
+        fields = '__all__'
+        depth = 1

@@ -11,6 +11,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
+import NotificationDisplay from "./NotificationDisplay";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -163,7 +164,7 @@ const Navbar = () => {
 
           <div className="navbar-end">
             {isAuthenticated ? (
-              <div className="navbanr-user" ref={userMenuRef}>
+              <div className="navbar-user" ref={userMenuRef}>
                 <button
                   className="user-profile-toggle"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -177,7 +178,7 @@ const Navbar = () => {
                     )}
                   </div>
                   <span className="user-greeting">{user?.name || "User"}</span>
-                </button>
+                </button>               
 
                 {isUserMenuOpen && (
                   <div className="user-dropdown">
@@ -191,61 +192,26 @@ const Navbar = () => {
                       </Link>
                     )}
 
-                    {user?.role === "provider" && (
+                    {user?.role === "service_provider" && (
                       <>
-                        <Link
-                          to="/provider/dashboard"
-                          className="dropdown-item"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <FaBriefcase /> Provider Dashboard
-                        </Link>
-                        <Link
-                          to="/provider/offers"
-                          className="dropdown-item"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          My Offers
-                        </Link>
                         <Link
                           to="/account/provider/settings"
                           className="dropdown-item"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
-                          Settings
+                          <FaUser /> Profile
                         </Link>
                       </>
                     )}
 
-                    {user?.role === "client" && (
+                    {user?.role === "customer" && (
                       <>
-                        <Link
-                          to="/requests"
-                          className="dropdown-item"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          My Requests
-                        </Link>
-                        <Link
-                          to="/offers"
-                          className="dropdown-item"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Received Offers
-                        </Link>
-                        <Link
-                          to="/requests-with-offers"
-                          className="dropdown-item"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          Requests & Offers
-                        </Link>
                         <Link
                           to="/account/settings"
                           className="dropdown-item"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
-                          Settings
+                          <FaUser /> Profile
                         </Link>
                       </>
                     )}
@@ -254,7 +220,7 @@ const Navbar = () => {
                       <FaSignOutAlt /> Sign Out
                     </button>
                   </div>
-                )}
+                )}            
               </div>
             ) : (
               <div className="auth-buttons">
@@ -265,6 +231,9 @@ const Navbar = () => {
                   Get Started
                 </Link>
               </div>
+            )}
+            {isAuthenticated && (
+            <NotificationDisplay />
             )}
           </div>
         </div>
