@@ -150,9 +150,11 @@ const RequestsWithOffers = () => {
         response.data.message === "Offer accepted successfully."
       ) {
         // Find the accepted offer and request details for notification
-        const currentRequest = requests.find(req => req.id === requestId);
-        const acceptedOffer = currentRequest?.offers.find(offer => offer.id === offerId);
-        
+        const currentRequest = requests.find((req) => req.id === requestId);
+        const acceptedOffer = currentRequest?.offers.find(
+          (offer) => offer.id === offerId
+        );
+
         // Update the local state
         setRequests(
           requests.map((request) => {
@@ -170,18 +172,26 @@ const RequestsWithOffers = () => {
             return request;
           })
         );
-        
+
         // Send notification to the provider
         try {
           if (acceptedOffer) {
-            await notificationService.notifyOfferAccepted(acceptedOffer.providerId, {
-              id: offerId,
-              serviceType: currentRequest?.service_type || acceptedOffer.serviceType
-            });
+            await notificationService.notifyOfferAccepted(
+              acceptedOffer.providerId,
+              "provider",
+              {
+                id: offerId,
+                serviceType:
+                  currentRequest?.service_type || acceptedOffer.serviceType,
+              }
+            );
             console.log("Notification sent to provider about accepted offer");
           }
         } catch (notificationError) {
-          console.error("Error sending notification to provider:", notificationError);
+          console.error(
+            "Error sending notification to provider:",
+            notificationError
+          );
           // We don't want to fail the offer acceptance if notification fails
         }
 

@@ -166,14 +166,21 @@ const RequestWizard = () => {
       // Notify relevant providers based on tech profiles
       try {
         if (createdRequest.id) {
-          // Filter tech profiles by service type and (optionally) region/city
+          // Filter tech profiles by service type and region/city
           const relevantProfiles = techProfiles.filter((profile) => {
             const matchesCategory =
               Array.isArray(profile.serviceCategories) &&
               profile.serviceCategories.includes(preparedData.service_type);
-            // Optionally, also match region/city if needed:
-            // const matchesRegion = Array.isArray(profile.serviceRegions) && (profile.serviceRegions.includes(preparedData.region) || profile.serviceRegions.includes(preparedData.city));
-            // return matchesCategory && matchesRegion;
+            console.log("serviceCategories", profile.serviceCategories);
+            console.log("service_type", preparedData.service_type);
+            const matchesRegion =
+              Array.isArray(profile.serviceRegions) &&
+              (profile.serviceRegions.includes(preparedData.region) ||
+                profile.serviceRegions.includes(preparedData.city));
+            console.log("serviceRegions", profile.serviceRegions);
+            console.log("region", preparedData.region);
+            console.log("city", preparedData.city);
+            console.log("matchesRegion", matchesRegion);
             return matchesCategory;
           });
 
@@ -181,7 +188,8 @@ const RequestWizard = () => {
           for (const profile of relevantProfiles) {
             if (profile.user) {
               await notificationService.notifyServiceRequest(
-                profile.user,
+                profile.user.id,
+                "provider",
                 createdRequest
               );
               console.log(

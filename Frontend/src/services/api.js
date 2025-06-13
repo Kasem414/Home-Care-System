@@ -22,6 +22,16 @@ export const getUserIdFromToken = () => {
   return null;
 };
 
+
+// Function to get user role from token
+export const getUserRoleFromToken = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    const decoded = jwtDecode(token);
+    return decoded.role;
+  }
+  return null;
+};
 // Create an axios instance with default config
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
