@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'not_app',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -128,5 +130,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+<<<<<<< HEAD
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALGORITHM = 'HS256'
+=======
+
+# CORS settings for development
+CORS_ALLOW_ALL_ORIGINS = True
+>>>>>>> 20134e56c85582c62e93cb2db0e7e93dfcd372bf
