@@ -61,3 +61,6 @@ class NotificationRepository:
             return True
         return False
         
+    @staticmethod
+    def mark_all_as_read(user_id):
+        return Notification.objects.filter(user_id=user_id, is_read=False).update(is_read=True)
