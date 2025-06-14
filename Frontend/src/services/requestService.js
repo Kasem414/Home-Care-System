@@ -89,8 +89,8 @@ export const requestService = {
   // Cancel a service request
   cancelRequest: async (requestId) => {
     try {
-      const response = await apiClient.post(
-        `/api/service-requests/${requestId}/cancel/`
+      const response = await apiClient.delete(
+        `/api/service-requests/${requestId}/`
       );
       return response.data;
     } catch (error) {
