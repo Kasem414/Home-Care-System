@@ -130,11 +130,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-<<<<<<< HEAD
+
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALGORITHM = 'HS256'
-=======
 
 # CORS settings for development
 CORS_ALLOW_ALL_ORIGINS = True
->>>>>>> 20134e56c85582c62e93cb2db0e7e93dfcd372bf
+
