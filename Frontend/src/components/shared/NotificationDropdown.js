@@ -88,20 +88,20 @@ const NotificationDropdown = () => {
     }
   };
 
-  const markAllAsRead = async () => {
-    try {
-      await notificationService.markAllAsRead({
-        user_id: userId,
-        user_role: userRole,
-      });
-      setNotifications(
-        notifications.map((note) => ({ ...note, is_read: true }))
-      );
-      setUnreadCount(0);
-    } catch (err) {
-      console.error("Failed to mark all notifications as read:", err);
-    }
-  };
+  // const markAllAsRead = async () => {
+  //   try {
+  //     await notificationService.markAllAsRead({
+  //       user_id: userId,
+  //       user_role: userRole,
+  //     });
+  //     setNotifications(
+  //       notifications.map((note) => ({ ...note, is_read: true }))
+  //     );
+  //     setUnreadCount(0);
+  //   } catch (err) {
+  //     console.error("Failed to mark all notifications as read:", err);
+  //   }
+  // };
 
   const handleNotificationClick = async (notification) => {
     if (!notification.is_read) {
