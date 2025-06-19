@@ -81,29 +81,29 @@ const NotificationDisplay = () => {
     setShowNotifications(!showNotifications);
 
     // If opening the panel, mark notifications as read
-    if (!showNotifications && unreadCount > 0) {
-      markAllAsRead();
-    }
+  //   if (!showNotifications && unreadCount > 0) {
+  //     markAllAsRead();
+  //   }
   };
 
-  // Mark all notifications as read
-  const markAllAsRead = async () => {
-    try {
-      await notificationService.markAllAsRead({
-        user_id: userId,
-        user_role: userRole,
-      });
-      setNotifications(
-        notifications.map((notification) => ({
-          ...notification,
-          is_read: true,
-        }))
-      );
-      setUnreadCount(0);
-    } catch (err) {
-      console.error("Error marking notifications as read:", err);
-    }
-  };
+  // // Mark all notifications as read
+  // const markAllAsRead = async () => {
+  //   try {
+  //     await notificationService.markAllAsRead({
+  //       user_id: userId,
+  //       user_role: userRole,
+  //     });
+  //     setNotifications(
+  //       notifications.map((notification) => ({
+  //         ...notification,
+  //         is_read: true,
+  //       }))
+  //     );
+  //     setUnreadCount(0);
+  //   } catch (err) {
+  //     console.error("Error marking notifications as read:", err);
+  //   }
+  // };
 
   // Mark a single notification as read
   const markAsRead = async (notificationId) => {
@@ -158,11 +158,11 @@ const NotificationDisplay = () => {
         <div className="notification-panel">
           <div className="notification-header">
             <h3>Notifications</h3>
-            {unreadCount > 0 && (
+            {/* {unreadCount > 0 && (
               <button className="mark-read-btn" onClick={markAllAsRead}>
                 Mark all as read
               </button>
-            )}
+            )} */}
           </div>
 
           <div className="notification-list">

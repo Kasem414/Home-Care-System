@@ -130,7 +130,7 @@ function App() {
               }
             />
             <Route
-              path="/provider/request/:requestId"
+              path="/provider/requests/:requestId"
               element={
                 <ProtectedRoute>
                   <ProviderRequestDetailPage />

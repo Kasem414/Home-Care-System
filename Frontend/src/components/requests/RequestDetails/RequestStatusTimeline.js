@@ -58,34 +58,38 @@ const RequestStatusTimeline = ({ statusHistory }) => {
 
   return (
     <div className="status-timeline">
-      {sortedHistory.map((item, index) => {
-        const statusDetails = getStatusDetails(item.status);
+      {!statusHistory || statusHistory.length === 0 ? (
+        <div className="timeline-empty">No status history available.</div>
+      ) : (
+        sortedHistory.map((item, index) => {
+          const statusDetails = getStatusDetails(item.status);
 
-        return (
-          <motion.div
-            key={`${item.status}-${item.date}`}
-            className="timeline-item"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-          >
-            <div className="timeline-icon">
-              <i className={`fas ${statusDetails.icon}`}></i>
-            </div>
-            <div className="timeline-content">
-              <div className="timeline-header">
-                <span className={`timeline-badge ${statusDetails.className}`}>
-                  {statusDetails.label}
-                </span>
-                <span className="timeline-date">
-                  {formatDateTime(item.date)}
-                </span>
+          return (
+            <motion.div
+              key={`${item.status}-${item.date}`}
+              className="timeline-item"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <div className="timeline-icon">
+                <i className={`fas ${statusDetails.icon}`}></i>
               </div>
-              {item.note && <p className="timeline-note">{item.note}</p>}
-            </div>
-          </motion.div>
-        );
-      })}
+              <div className="timeline-content">
+                <div className="timeline-header">
+                  <span className={`timeline-badge ${statusDetails.className}`}>
+                    {statusDetails.label}
+                  </span>
+                  <span className="timeline-date">
+                    {formatDateTime(item.date)}
+                  </span>
+                </div>
+                {item.note && <p className="timeline-note">{item.note}</p>}
+              </div>
+            </motion.div>
+          );
+        })
+      )}
     </div>
   );
 };

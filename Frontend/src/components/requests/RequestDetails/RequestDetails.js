@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import RequestStatusTimeline from "./RequestStatusTimeline";
 import RequestActionButtons from "./RequestActionButtons";
 import RequestComments from "./RequestComments";
+import requestService from "../../../services/requestService";
 
 const mapBackendToUI = (data) => {
   // Map backend fields to UI fields
@@ -14,15 +15,17 @@ const mapBackendToUI = (data) => {
     serviceName: data.service_type || data.serviceName,
     status: data.status,
     createdAt: data.created_at || data.createdAt,
+    scheduleType: data.schedule_type || data.scheduleType,
     scheduledDate: data.preferred_date || data.scheduledDate,
     scheduledTime: data.preferred_time || data.scheduledTime,
+    flexible_schedule_days: data.flexible_schedule_days || [],
+    flexible_time_slots: data.flexible_time_slots || [],
     address: `${data.region ? data.region + ", " : ""}${data.city || ""}`,
     pricing: {
-      rate: data.budget_min_hourly ? Number(data.budget_min_hourly) : 0,
+      min: data.budget_min_hourly ? Number(data.budget_min_hourly) : 0,
       type: data.budget_type || "hourly",
-      estimatedTotal: data.budget_max_hourly
-        ? Number(data.budget_max_hourly)
-        : 0,
+      max: data.budget_max_hourly ? Number(data.budget_max_hourly) : 0,
+      fixed: data.fixed_price_offer ? Number(data.fixed_price_offer) : 0,
       currency: "USD",
     },
     client: {
@@ -199,15 +202,15 @@ const RequestDetails = ({ request: requestProp, onCancelRequest }) => {
 
   const handleCancelRequest = async () => {
     try {
-      // In a real app, this would be an API call
-      // await axios.patch(`/api/requests/${requestId}`, { status: 'cancelled' });
+      // Call the backend API to cancel the request
+      await requestService.cancelRequest(request.id);
 
       // Update the local state
       setRequest((prev) => ({
         ...prev,
         status: "cancelled",
         statusHistory: [
-          ...prev.statusHistory,
+          ...(prev.statusHistory || []),
           {
             status: "cancelled",
             date: new Date().toISOString(),
@@ -218,11 +221,11 @@ const RequestDetails = ({ request: requestProp, onCancelRequest }) => {
 
       // Call the parent component's cancel handler if provided
       if (onCancelRequest) {
-        onCancelRequest(requestId);
+        onCancelRequest(request.id);
       }
 
       // Show a success message (would use a toast in a real app)
-      alert(`Request ${requestId} has been cancelled.`);
+      alert(`Request ${request.id} has been cancelled.`);
     } catch (err) {
       console.error("Error cancelling request:", err);
       alert("Failed to cancel request. Please try again.");
@@ -387,31 +390,56 @@ const RequestDetails = ({ request: requestProp, onCancelRequest }) => {
                 <span className="label">Service Name</span>
                 <span className="value">{request.serviceName}</span>
               </div>
-              {/* <div className="summary-item">
-                <span className="label">Category</span>
-                <span className="value">{request.serviceCategory}</span>
-              </div> */}
+              {/* Schedule Type */}
               <div className="summary-item">
-                <span className="label">Scheduled Date</span>
+                <span className="label">Schedule Type</span>
                 <span className="value">
-                  {formatDate(request.scheduledDate)}
+                  {request.scheduleType === "specific"
+                    ? "Specific Date & Time"
+                    : request.scheduleType === "flexible"
+                    ? "Flexible"
+                    : "-"}
+                  {console.log(request)}
+                  {console.log(request.scheduleType)}
                 </span>
               </div>
-              <div className="summary-item">
-                <span className="label">Scheduled Time</span>
-                <span className="value">{request.scheduledTime}</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">Duration</span>
-                <span className="value">{request.details.duration}</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">Rate</span>
-                <span className="value price">
-                  {formatCurrency(request.pricing.rate)} per{" "}
-                  {request.pricing.type}
-                </span>
-              </div>
+              {/* Schedule Details */}
+              {request.scheduleType === "specific" && (
+                <>
+                  <div className="summary-item">
+                    <span className="label">Scheduled Date</span>
+                    <span className="value">
+                      {request.scheduledDate || "-"}
+                    </span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="label">Scheduled Time</span>
+                    <span className="value">
+                      {request.scheduledTime || "-"}
+                    </span>
+                  </div>
+                </>
+              )}
+              {request.scheduleType === "flexible" && (
+                <>
+                  <div className="summary-item">
+                    <span className="label">Available Days</span>
+                    <span className="value">
+                      {Array.isArray(request.flexible_schedule_days)
+                        ? request.flexible_schedule_days.join(", ")
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="label">Preferred Time Slots</span>
+                    <span className="value">
+                      {Array.isArray(request.flexible_time_slots)
+                        ? request.flexible_time_slots.join(", ")
+                        : "-"}
+                    </span>
+                  </div>
+                </>
+              )}
               <div className="summary-item full-width">
                 <span className="label">Address</span>
                 <span className="value address">
@@ -426,128 +454,6 @@ const RequestDetails = ({ request: requestProp, onCancelRequest }) => {
           </motion.section>
 
           <motion.section
-            className="client-info card"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <h2>
-              <i className="fas fa-user"></i> Client Information
-            </h2>
-            <div className="info-grid">
-              <div className="info-item">
-                <span className="label">Name</span>
-                <span className="value">{request.client.name}</span>
-              </div>
-              <div className="info-item">
-                <span className="label">Phone</span>
-                <span className="value">
-                  <a
-                    href={`tel:${request.client.phone}`}
-                    className="phone-link"
-                  >
-                    <i className="fas fa-phone"></i> {request.client.phone}
-                  </a>
-                </span>
-              </div>
-              <div className="info-item">
-                <span className="label">Email</span>
-                <span className="value">
-                  <a
-                    href={`mailto:${request.client.email}`}
-                    className="email-link"
-                  >
-                    <i className="fas fa-envelope"></i> {request.client.email}
-                  </a>
-                </span>
-              </div>
-            </div>
-          </motion.section>
-
-          {request.serviceProvider && (
-            <motion.section
-              className="service-provider-info card"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.3 }}
-            >
-              <h2>
-                <i className="fas fa-user-md"></i> Service Provider Information
-              </h2>
-              <div className="info-grid">
-                <div className="info-item">
-                  <span className="label">Name</span>
-                  <span className="value">{request.serviceProvider.name}</span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Phone</span>
-                  <span className="value">
-                    <a
-                      href={`tel:${request.serviceProvider.phone}`}
-                      className="phone-link"
-                    >
-                      <i className="fas fa-phone"></i>{" "}
-                      {request.serviceProvider.phone}
-                    </a>
-                  </span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Specialization</span>
-                  <span className="value">
-                    {request.serviceProvider.specialization}
-                  </span>
-                </div>
-                <div className="info-item">
-                  <span className="label">Rating</span>
-                  <span className="value rating">
-                    <i className="fas fa-star"></i>{" "}
-                    {request.serviceProvider.rating}/5
-                  </span>
-                </div>
-              </div>
-            </motion.section>
-          )}
-
-          {request.serviceProvider &&
-            request.serviceProvider.qualifications && (
-              <motion.section
-                className="service-provider-qualifications card"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
-              >
-                <h2>
-                  <i className="fas fa-certificate"></i> Service Provider
-                  Qualifications
-                </h2>
-                <div className="qualifications-list">
-                  {request.serviceProvider.qualifications.map(
-                    (qualification, index) => (
-                      <div key={index} className="qualification-item">
-                        <i className="fas fa-check-circle"></i>
-                        <span>{qualification}</span>
-                      </div>
-                    )
-                  )}
-                </div>
-
-                <h3>
-                  <i className="fas fa-list-ul"></i> Services Provided
-                </h3>
-                <div className="services-provided-list">
-                  {request.serviceProvider.servicesProvided.map(
-                    (service, index) => (
-                      <div key={index} className="service-provided-item">
-                        <i className="fas fa-angle-right"></i>
-                        <span>{service}</span>
-                      </div>
-                    )
-                  )}
-                </div>
-              </motion.section>
-            )}
-
-          <motion.section
             className="pricing-details card"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -558,29 +464,45 @@ const RequestDetails = ({ request: requestProp, onCancelRequest }) => {
             </h2>
             <div className="pricing-info">
               <div className="pricing-item">
-                <span className="label">Rate</span>
-                <span className="value">
-                  {formatCurrency(request.pricing.rate)}
-                </span>
-              </div>
-              <div className="pricing-item">
-                <span className="label">Billing Type</span>
+                <span className="label">Budget Type</span>
                 <span className="value">
                   {request.pricing.type === "hourly"
-                    ? "Per Hour"
-                    : "Fixed Rate"}
+                    ? "Hourly Rate"
+                    : request.pricing.type === "fixed"
+                    ? "Fixed Price"
+                    : "-"}
                 </span>
               </div>
-              <div className="pricing-item">
-                <span className="label">Duration</span>
-                <span className="value">{request.details.duration}</span>
-              </div>
-              <div className="pricing-item total">
-                <span className="label">Estimated Total</span>
-                <span className="value">
-                  {formatCurrency(request.pricing.estimatedTotal)}
-                </span>
-              </div>
+              {request.pricing.type === "hourly" && (
+                <>
+                  <div className="pricing-item">
+                    <span className="label">Min Rate</span>
+                    <span className="value">
+                      {request.pricing.min
+                        ? formatCurrency(request.pricing.min)
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="pricing-item">
+                    <span className="label">Max Rate</span>
+                    <span className="value">
+                      {request.pricing.max
+                        ? formatCurrency(request.pricing.max)
+                        : "-"}
+                    </span>
+                  </div>
+                </>
+              )}
+              {request.pricing.type === "fixed" && (
+                <div className="pricing-item">
+                  <span className="label">Fixed Price</span>
+                  <span className="value">
+                    {request.pricing.fixed
+                      ? formatCurrency(request.pricing.fixed)
+                      : "-"}
+                  </span>
+                </div>
+              )}
               <div className="pricing-note">
                 <i className="fas fa-info-circle"></i>
                 <p>

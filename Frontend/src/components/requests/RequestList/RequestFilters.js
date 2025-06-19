@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { motion, AnimatePresence } from "framer-motion";
+import { serviceCategories } from "../../../services/api";
 
 const RequestFilters = ({
   filters,
@@ -10,12 +11,40 @@ const RequestFilters = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
+  const [serviceOptions, setServiceOptions] = useState([
+    { value: "all", label: "All Services" },
+  ]);
+  const [loadingServices, setLoadingServices] = useState(false);
+
+  // Fetch service categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingServices(true);
+      try {
+        const response = await serviceCategories.getCategories();
+        const categories = response.data || [];
+        setServiceOptions([
+          { value: "all", label: "All Services" },
+          ...categories.map((cat) => ({
+            value: cat.name,
+            label: cat.name,
+            icon: cat.icon || "fa-concierge-bell",
+          })),
+        ]);
+      } catch (error) {
+        setServiceOptions([{ value: "all", label: "All Services" }]);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Count active filters (non-default)
-  React.useEffect(() => {
+  useEffect(() => {
     let count = 0;
     if (filters.status !== "all") count++;
-    if (filters.serviceType !== "all") count++;
+    if (filters.service_type !== "all") count++;
     if (filters.dateRange !== "all") count++;
     if (sortOption !== "dateDesc") count++;
     setActiveFilters(count);
@@ -23,34 +52,12 @@ const RequestFilters = ({
 
   // Status filter options
   const statusOptions = [
-    { value: "all", label: "All Statuses" },
+    { value: "all", label: "All Status" },
     { value: "pending", label: "Pending", icon: "fa-clock" },
-    { value: "approved", label: "Approved", icon: "fa-check-circle" },
+    { value: "submitted", label: "Submitted", icon: "fa-check-circle" },
     { value: "completed", label: "Completed", icon: "fa-check-double" },
+    { value: "in_progress", label: "In Progress", icon: "fa-check-circle" },
     { value: "cancelled", label: "Cancelled", icon: "fa-times-circle" },
-  ];
-
-  // Service type filter options (these could come from API in real app)
-  const serviceOptions = [
-    { value: "all", label: "All Services" },
-    { value: "Cleaning", label: "Cleaning", icon: "fa-broom" },
-    { value: "Nursing", label: "Nursing", icon: "fa-user-md" },
-    { value: "Home Repair", label: "Home Repair", icon: "fa-tools" },
-    {
-      value: "Elderly Care",
-      label: "Elderly Care",
-      icon: "fa-hand-holding-heart",
-    },
-    {
-      value: "Physical Therapy",
-      label: "Physical Therapy",
-      icon: "fa-walking",
-    },
-    {
-      value: "Meal Preparation",
-      label: "Meal Preparation",
-      icon: "fa-utensils",
-    },
   ];
 
   // Sort options
@@ -71,7 +78,7 @@ const RequestFilters = ({
   const handleReset = () => {
     onFilterChange({
       status: "all",
-      serviceType: "all",
+      service_type: "all",
       dateRange: "all",
     });
     onSortChange("dateDesc");
@@ -146,14 +153,15 @@ const RequestFilters = ({
             </div>
 
             <div className="filter-group">
-              <label htmlFor="serviceType">Service Type</label>
+              <label htmlFor="service_type">Service Type</label>
               <div className="select-wrapper">
                 <select
-                  id="serviceType"
-                  name="serviceType"
-                  value={filters.serviceType}
+                  id="service_type"
+                  name="service_type"
+                  value={filters.service_type}
                   onChange={handleFilterChange}
                   className="filter-select"
+                  disabled={loadingServices}
                 >
                   {serviceOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -226,7 +234,7 @@ const RequestFilters = ({
 RequestFilters.propTypes = {
   filters: PropTypes.shape({
     status: PropTypes.string.isRequired,
-    serviceType: PropTypes.string.isRequired,
+    service_type: PropTypes.string.isRequired,
     dateRange: PropTypes.string.isRequired,
   }).isRequired,
   onFilterChange: PropTypes.func.isRequired,

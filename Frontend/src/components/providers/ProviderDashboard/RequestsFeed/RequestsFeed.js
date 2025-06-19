@@ -4,6 +4,7 @@ import RequestItem from "./RequestItem";
 import RequestFilters from "./RequestFilters";
 import { useAuth } from "../../../../contexts/AuthContext";
 import providerService from "../../../../services/providerService";
+import { serviceCategories as serviceCategoriesApi } from "../../../../services/api";
 
 const RequestsFeed = () => {
   const navigate = useNavigate();
@@ -23,23 +24,14 @@ const RequestsFeed = () => {
     minBudget: 0,
     showNewOnly: false,
   });
+  const [serviceCategories, setServiceCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   // Log initial mount and auth state
   useEffect(() => {
     console.log("RequestsFeed mounted");
     console.log("Auth state:", { isAuthenticated, user });
   }, []);
-
-  // Service categories for filtering
-  const serviceCategories = [
-    { value: "cleaning", label: "Cleaning" },
-    { value: "gardening", label: "Gardening" },
-    { value: "home_repair", label: "Home Repair" },
-    { value: "electrical", label: "Electrical" },
-    { value: "plumbing", label: "Plumbing" },
-    { value: "painting", label: "Painting" },
-    { value: "meal_preparation", label: "Meal Preparation" },
-  ];
 
   // Fetch available requests
   useEffect(() => {
@@ -61,11 +53,9 @@ const RequestsFeed = () => {
           throw new Error("User ID not available");
         }
 
-        // Log the request parameters
+        // Only fetch by providerId, page, limit
         const requestParams = {
           providerId: user.id,
-          serviceType: filters.serviceType,
-          showNewOnly: filters.showNewOnly,
           page: pagination.page,
           limit: pagination.limit,
         };
@@ -102,21 +92,35 @@ const RequestsFeed = () => {
         "Conditions met, calling fetchRequests with user_id:",
         user.id
       );
-    fetchRequests();
+      fetchRequests();
     } else {
       console.log("Skipping fetch - not authenticated or no user ID", {
         isAuthenticated,
         userId: user?.id,
       });
     }
-  }, [
-    filters.serviceType,
-    filters.showNewOnly,
-    pagination.page,
-    pagination.limit,
-    user?.id,
-    isAuthenticated,
-  ]);
+  }, [pagination.page, pagination.limit, user?.id, isAuthenticated]);
+
+  // Fetch service categories for filtering
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingCategories(true);
+      try {
+        const response = await serviceCategoriesApi.getCategories();
+        // Normalize to { value, label }
+        const categories = (response.data || []).map((cat) => ({
+          value: cat.name,
+          label: cat.name,
+        }));
+        setServiceCategories(categories);
+      } catch (error) {
+        setServiceCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Apply filters when they change
   useEffect(() => {
@@ -126,6 +130,16 @@ const RequestsFeed = () => {
 
     // Filter the requests based on criteria
     let result = [...requests];
+
+    // Filter by service type
+    if (filters.serviceType !== "all") {
+      result = result.filter((req) => req.service_type === filters.serviceType);
+    }
+
+    // Filter by show new only
+    if (filters.showNewOnly) {
+      result = result.filter((req) => req.status === "new");
+    }
 
     // Filter by timeframe
     if (filters.timeframe !== "any") {
@@ -247,15 +261,21 @@ const RequestsFeed = () => {
 
   return (
     <div className="requests-feed">
-          <RequestFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            serviceCategories={serviceCategories}
-          />
+      {loadingCategories ? (
+        <div className="loading-spinner">
+          <i className="fas fa-spinner fa-spin"></i> Loading filters...
+        </div>
+      ) : (
+        <RequestFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          serviceCategories={serviceCategories}
+        />
+      )}
 
-          {isLoading ? (
-            <div className="loading-spinner">
-              <i className="fas fa-spinner fa-spin"></i>
+      {isLoading ? (
+        <div className="loading-spinner">
+          <i className="fas fa-spinner fa-spin"></i>
           Loading requests...
         </div>
       ) : (
@@ -275,7 +295,7 @@ const RequestsFeed = () => {
                 />
               ))
             )}
-            </div>
+          </div>
 
           {/* Pagination */}
           {pagination.total > pagination.limit && (

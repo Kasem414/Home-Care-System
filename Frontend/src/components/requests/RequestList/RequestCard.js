@@ -19,17 +19,29 @@ const RequestCard = ({ request, onCancel }) => {
   // Status badge color classes and icons
   const getStatusDetails = (status) => {
     switch (status.toLowerCase()) {
-      case "pending":
+      case "submitted":
         return {
           className: "status-pending",
           icon: "fa-clock",
           label: "Pending",
         };
-      case "matched":
+      // case "submitted":
+      //   return {
+      //     className: "status-submitted",
+      //     icon: "fa-paper-plane",
+      //     label: "Submitted",
+      //   };
+      case "accepted":
         return {
-          className: "status-matched",
+          className: "status-accepted",
           icon: "fa-handshake",
-          label: "Matched",
+          label: "Accepted",
+        };
+      case "rejected":
+        return {
+          className: "status-rejected",
+          icon: "fa-times-circle",
+          label: "Rejected",
         };
       case "in_progress":
         return {
@@ -120,7 +132,7 @@ const RequestCard = ({ request, onCancel }) => {
         >
           <i className="fas fa-eye"></i> View Details
         </Link>
-        {request.status.toLowerCase() === "pending" && (
+        {["pending", "accepted"].includes(request.status.toLowerCase()) && (
           <motion.button
             className="btn btn-danger btn-sm"
             onClick={() => onCancel(request.id)}

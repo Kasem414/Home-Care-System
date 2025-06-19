@@ -89,7 +89,7 @@ const Navbar = () => {
             >
               Services
             </Link>
-            <Link
+            {/* <Link
               to="/learn-more"
               className={`navbar-item ${
                 isActive("/learn-more") ? "active" : ""
@@ -102,7 +102,7 @@ const Navbar = () => {
               className={`navbar-item ${isActive("/contact") ? "active" : ""}`}
             >
               Contact Us
-            </Link>
+            </Link> */}
 
             {/* Conditional navigation based on user role */}
             {isAuthenticated && user?.role === "service_provider" && (

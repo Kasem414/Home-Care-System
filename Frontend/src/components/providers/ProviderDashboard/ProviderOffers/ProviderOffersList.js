@@ -181,7 +181,7 @@ const ProviderOffersList = () => {
 
               <div className="offer-footer">
                 <Link
-                  to={`/requests/${offer.requestId}`}
+                  to={`/provider/requests/${offer.requestId}`}
                   className="btn btn-outlined"
                 >
                   View Request

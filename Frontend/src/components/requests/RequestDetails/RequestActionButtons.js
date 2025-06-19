@@ -13,21 +13,6 @@ const RequestActionButtons = ({ request, onCancelRequest }) => {
         return (
           <>
             <motion.button
-              className="btn btn-danger"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    "Are you sure you want to cancel this request?"
-                  )
-                ) {
-                  onCancelRequest(request.id);
-                }
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <i className="fas fa-ban"></i> Cancel Request
-            </motion.button>
-            <motion.button
               className="btn btn-secondary"
               onClick={() => {
                 alert("This would reschedule the request in a real app");
@@ -42,21 +27,6 @@ const RequestActionButtons = ({ request, onCancelRequest }) => {
       case "approved":
         return (
           <>
-            <motion.button
-              className="btn btn-danger"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    "Are you sure you want to cancel this request?"
-                  )
-                ) {
-                  onCancelRequest(request.id);
-                }
-              }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <i className="fas fa-ban"></i> Cancel Request
-            </motion.button>
             <motion.button
               className="btn btn-secondary"
               onClick={() => {
@@ -123,23 +93,28 @@ const RequestActionButtons = ({ request, onCancelRequest }) => {
         );
 
       default:
-        return (
-          <Link to="/requests" className="btn btn-secondary">
-            <i className="fas fa-arrow-left"></i> Back to Requests
-          </Link>
-        );
+        return null;
     }
   };
 
   return (
     <div className="action-buttons">
+      {/* Always show Cancel button */}
+      <motion.button
+        className="btn btn-danger"
+        onClick={() => {
+          if (window.confirm("Are you sure you want to cancel this request?")) {
+            onCancelRequest(request.id);
+          }
+        }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <i className="fas fa-ban"></i> Cancel Request
+      </motion.button>
       {renderActionButtons()}
-
-      {/* Always show these buttons */}
       <Link to="/requests" className="btn btn-outlined">
         <i className="fas fa-list"></i> View All Requests
       </Link>
-
       {request.serviceProvider && request.status !== "cancelled" && (
         <motion.a
           href={`tel:${request.serviceProvider.phone}`}

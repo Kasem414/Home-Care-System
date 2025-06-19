@@ -18,9 +18,6 @@ export const providerService = {
         },
         params: {
           providerId: params.providerId,
-          service_type:
-            params.serviceType !== "all" ? params.serviceType : undefined,
-          show_new_only: params.showNewOnly,
           page: params.page || 1,
           limit: params.limit || 10,
         },

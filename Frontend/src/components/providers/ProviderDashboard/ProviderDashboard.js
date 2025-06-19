@@ -63,12 +63,6 @@ const ProviderDashboard = () => {
             )}
           </button>
           <button
-            className={`tab-btn ${activeTab === "offers" ? "active" : ""}`}
-            onClick={() => setActiveTab("offers")}
-          >
-            <i className="fas fa-file-contract"></i> My Offers
-          </button>
-          <button
             className={`tab-btn ${activeTab === "schedule" ? "active" : ""}`}
             onClick={() => setActiveTab("schedule")}
           >

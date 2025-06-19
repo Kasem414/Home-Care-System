@@ -8,9 +8,9 @@ const ServicesPage = () => {
       name: "Plumbing Services",
       icon: "💧",
       services: [
-        { id: 1, name: "Plumbing", price: "$150/hr" },
-        { id: 2, name: "Electrical", price: "$200/hr" },
-        { id: 3, name: "Painting", price: "$100/visit" },
+        { id: 1, name: "Plumbing"},
+        { id: 2, name: "Electrical"},
+        { id: 3, name: "Painting"},
       ],
     },
     {
@@ -18,9 +18,9 @@ const ServicesPage = () => {
       name: "Gardening Services",
       icon: "🌳",
       services: [
-        { id: 4, name: "Gardening", price: "$120/hr" },
-        { id: 5, name: "Planting", price: "$90/hr" },
-        { id: 6, name: "Pruning", price: "$80/hr" },
+        { id: 4, name: "Gardening"},
+        { id: 5, name: "Planting"},
+        { id: 6, name: "Pruning"},
       ],
     },
     {
@@ -28,9 +28,9 @@ const ServicesPage = () => {
       name: "Home Services",
       icon: "🏠",
       services: [
-        { id: 7, name: "House Cleaning", price: "$80/hr" },
-        { id: 8, name: "Lawn Care", price: "$75/visit" },
-        { id: 9, name: "Home Repairs", price: "$95/hr" },
+        { id: 7, name: "House Cleaning"},
+        { id: 8, name: "Lawn Care"},
+        { id: 9, name: "Home Repairs"},
       ],
     },
   ];
