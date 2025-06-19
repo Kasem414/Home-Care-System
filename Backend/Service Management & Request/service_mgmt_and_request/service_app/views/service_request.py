@@ -54,9 +54,21 @@ class ServiceRequestViewSet(viewsets.ViewSet):
 
 class ServiceRequestCreateView(APIView):
     parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [AllowAny]
-
-    @swagger_auto_schema(request_body=ServiceRequestSerializer)
+        
+    @swagger_auto_schema(
+        request_body=ServiceRequestSerializer,
+        manual_parameters=[
+            openapi.Parameter('customer_id', openapi.IN_FORM, type=openapi.TYPE_INTEGER, required=True),
+            openapi.Parameter('service_type', openapi.IN_FORM, type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('city', openapi.IN_FORM, type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('region', openapi.IN_FORM, type=openapi.TYPE_STRING, required=True),
+            openapi.Parameter('preferred_date', openapi.IN_FORM, type=openapi.TYPE_STRING, format='date', required=False),
+            openapi.Parameter('preferred_time', openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
+            openapi.Parameter('attachments[]', openapi.IN_FORM, type=openapi.TYPE_FILE, required=False, description="Multiple file input"),
+        ],
+        consumes=["multipart/form-data"],
+        operation_description="Create a new service request with optional image attachments"
+    )
     def post(self, request):
         # user_id = request.data.get('customerId')
         # user_role = request.headers.get('X-User-Role')
