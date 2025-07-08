@@ -77,7 +77,7 @@ const RequestCard = ({ request, onCancel }) => {
   };
 
   const statusDetails = getStatusDetails(request.status);
-  const address = `${request.street_address}, ${request.city}, ${request.region}`;
+  const address = `${request.additional_info}, ${request.city}, ${request.region}`;
 
   return (
     <motion.div

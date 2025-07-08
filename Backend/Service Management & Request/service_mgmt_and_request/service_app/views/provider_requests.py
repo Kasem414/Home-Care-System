@@ -4,6 +4,7 @@ from rest_framework import status
 from django.db.models import Q
 from ..models import ServiceRequest, ServiceOffer, UserProfile
 from ..serializers.service_request_serializer import ServiceRequestSerializer
+from ..repositories.service_request_repository import ServiceRequestRepository
 from ..pagination import CustomPagePagination
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
@@ -64,8 +65,8 @@ class ProviderRequestListView(APIView):
             }, status=400)
 
         # Optional filters
-        service_type = request.query_params.get("service_type")
-        show_new_only = request.query_params.get("show_new_only") == "true"
+        service_type = request.query_params.get("serviceType")
+        show_new_only = request.query_params.get("showNewOnly") == "true"
 
         # Get provider profile (to filter by region/city if needed)
         try:
@@ -76,22 +77,25 @@ class ProviderRequestListView(APIView):
                 "status_code": 404
             }, status=404)
 
-        queryset = ServiceRequest.objects.all()
+        queryset = ServiceRequestRepository.get_all()
 
         # Filter by service type
         if service_type:
             queryset = queryset.filter(service_type__name__iexact=service_type)
 
         # Optional: region/city match (if needed)
-        # queryset = queryset.filter(
-        #     city__iexact=provider_profile.city,
-        #     region__iexact=provider_profile.region
-        # )
+        queryset = queryset.filter(
+            city__iexact=provider_profile.city,
+            region__iexact=provider_profile.region
+        )
 
         # Exclude already offered requests
         if show_new_only:
         #  Filter base
             queryset = queryset.filter(status="submitted")
+            # Find all request_ids that this provider has already made offers on, and exclude them.
+            # values_list() is a Django QuerySet method that returns a list (or tuples) 
+            # of specific field values from the database, instead of returning full model instances.
             offered_ids = ServiceOffer.objects.filter(provider_id=provider_id).values_list('request_id', flat=True)
             queryset = queryset.exclude(id__in=offered_ids)
 

@@ -17,7 +17,6 @@ pagination_parameters = [
 
 
 class ServiceOfferViewSet(viewsets.ViewSet):
-    permission_classes = [AllowAny]  
     @swagger_auto_schema(request_body=ServiceOfferSerializer)
     def create(self, request):
         serializer = ServiceOfferSerializer(data=request.data)
@@ -75,7 +74,7 @@ class ServiceOfferViewSet(viewsets.ViewSet):
         serializer = ServiceOfferSerializer(offer, data=request.data,partial=True)
         if serializer.is_valid():
             updated_offer = ServiceOfferRepository.update_offer(pk, serializer.validated_data)
-            updated_data = ServiceOfferSerializer(updated_offer,context={'request': request})
+            # updated_data = ServiceOfferSerializer(updated_offer,context={'request': request})
             payload = {
                 "event_type": "Offer_Updated",
                 "id": updated_offer.id,

@@ -53,3 +53,6 @@ class ServiceOfferRepository:
             Q(auto_expire_at__gt=timezone.now()) &
             Q(status="pending")
         )
+    @staticmethod
+    def get_offer_by_request(request_id):
+        return  ServiceOffer.objects.filter(request_id=request_id)

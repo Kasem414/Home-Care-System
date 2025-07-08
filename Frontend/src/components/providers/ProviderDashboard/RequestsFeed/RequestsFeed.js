@@ -80,7 +80,7 @@ const RequestsFeed = () => {
         console.error("Error in fetchRequests:", err);
         setError(
           err.message ||
-            "Failed to load available requests. Please try again later."
+          "Failed to load available requests. Please try again later."
         );
       } finally {
         setIsLoading(false);
@@ -138,7 +138,7 @@ const RequestsFeed = () => {
 
     // Filter by show new only
     if (filters.showNewOnly) {
-      result = result.filter((req) => req.status === "new");
+      result = result.filter((req) => req.status === "submitted");
     }
 
     // Filter by timeframe

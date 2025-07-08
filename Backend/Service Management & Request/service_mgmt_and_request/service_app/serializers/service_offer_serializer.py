@@ -24,16 +24,21 @@ class ServiceOfferSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'createdAt', 'status','auto_expire_at','serviceType']
 
     def get_serviceType(self, obj):
+        """
+        This method is called to get the value of 'serviceType'
+        It accesses: obj.request.service_type.name
+        If anything goes wrong (e.g. request is missing), return None
+        """
         try:
             return obj.request.service_type.name
         except:
             return None
-    def create(self, validated_data):
-        return ServiceOffer.objects.create(**validated_data)
+    # def create(self, validated_data):
+    #     return ServiceOffer.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     for key, value in validated_data.items():
+    #         setattr(instance, key, value)
+    #     instance.save()
+    #     return instance
 

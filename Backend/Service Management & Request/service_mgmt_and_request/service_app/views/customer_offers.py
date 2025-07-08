@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from service_app.serializers.service_offer_serializer import ServiceOfferSerializer
 from service_app.models import ServiceOffer,ServiceRequest
+from service_app.repositories.service_offer_repository import ServiceOfferRepository
 from service_app.pagination import CustomPagePagination
 from service_app.repositories.service_request_repository import ServiceRequestRepository
 from service_app.events.event_publisher import publish_event
@@ -52,7 +53,7 @@ class CustomerOffersView(APIView):
                 "status_code": status.HTTP_400_BAD_REQUEST
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        offers = ServiceOffer.objects.filter(request_id=request_id)
+        offers = ServiceOfferRepository.get_offer_by_request(request_id=request_id)
 
         paginator = CustomPagePagination()
         paginated_offers = paginator.paginate_queryset(offers, request)
@@ -71,7 +72,7 @@ class RequestOffersListView(APIView):
                 "status_code": status.HTTP_404_NOT_FOUND
             }, status=status.HTTP_404_NOT_FOUND)
 
-        offers_qs = ServiceOffer.objects.filter(request=service_request).order_by('-created_at')
+        offers_qs = ServiceOfferRepository.get_offer_by_request(request_id=service_request).order_by('-created_at')
 
         paginator = CustomPagePagination()
         paginated_offers = paginator.paginate_queryset(offers_qs, request)

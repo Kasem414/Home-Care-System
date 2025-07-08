@@ -13,7 +13,7 @@
             ],
             "django": true,
             "autoStartBrowser": false,
-            "program": "${workspaceFolder}\\Service Management & Request\\service_mgmt_and_request\\manage.py"
+            "program": "${workspaceFolder}\\Backend\\Service Management & Request\\service_mgmt_and_request\\manage.py"
             // "program": "${workspaceFolder}\\User_Management\\manage.py"
         },
         {
@@ -25,7 +25,7 @@
             ],
             "django": true,
             "autoStartBrowser": false,
-            "program": "${workspaceFolder}\\Service Management & Request\\service_mgmt_and_request\\manage.py"
+            "program": "${workspaceFolder}\\Backend\\Service Management & Request\\service_mgmt_and_request\\manage.py"
             // "program": "${workspaceFolder}\\User_Management\\manage.py"
         }
     ]

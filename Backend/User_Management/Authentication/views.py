@@ -8,9 +8,14 @@ from .serializers import RegisterSerializer,LoginSerializer, RegisterServiceProv
 from rest_framework.exceptions import AuthenticationFailed
 
 class BaseAuthView(APIView):
-    def __init__(self):    
+    # 👇 Initialize the parent class (important in DRF)
+    def __init__(self):   
+        # ✅ Dependency Injection (manual)
+        # Create an instance of UserRepository (data access logic)
+        # Inject it into AuthService (business/auth logic)
+        # Store the service instance for use in all child views
         self.AuthService = AuthService(UserRepository())
-
+        # This avoids repeating the same setup in every view (e.g., login, register, etc.)
 class RegisterView(BaseAuthView):
     def post(self, request):
         print(123)

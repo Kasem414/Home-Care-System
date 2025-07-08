@@ -302,8 +302,8 @@ const CreateOfferPage = () => {
                 <i className="fas fa-calendar"></i>
                 <span>
                   Requested for:{" "}
-                  {new Date(request.scheduledDate).toLocaleDateString()} at{" "}
-                  {request.scheduledTime}
+                  {new Date(request.preferred_date).toLocaleDateString()} at{" "}
+                  {request.preferred_time}
                 </span>
               </div>
               <div className="request-detail">

@@ -23,7 +23,7 @@ pagination_parameters = [
 
 
 class ServiceRequestViewSet(viewsets.ViewSet):
-    permission_classes = [AllowAny]
+    
 
     @swagger_auto_schema(
         manual_parameters=pagination_parameters,
@@ -53,6 +53,7 @@ class ServiceRequestViewSet(viewsets.ViewSet):
 
 
 class ServiceRequestCreateView(APIView):
+    # These parsers allow handling form data and file uploads (multipart requests)
     parser_classes = [MultiPartParser, FormParser]
         
     @swagger_auto_schema(
@@ -76,15 +77,16 @@ class ServiceRequestCreateView(APIView):
         # if  not user_id:
         #     return Response({'message': 'Only customers can submit requests.', 'status_code': status.HTTP_403_FORBIDDEN},
         #                      status=status.HTTP_403_FORBIDDEN)
-
+        # Clone the submitted form data so it can be edited if needed
         form_data = request.data.copy()
         # form_data['customer_id'] = user_id
         serializer = ServiceRequestSerializer(data=form_data, context={'request': request})
         if serializer.is_valid():
             request_instance = ServiceRequestRepository.create_service_request(serializer.validated_data)
-
+            # Handle file uploads (attachments[])
             files = request.FILES.getlist('attachments[]')
             for file in files:
+                # Save each attachment related to the created service request
                 ServiceRequestAttachmentRepository.create_attachment(request_instance, file)
             # Build event payload
             event_data = {
@@ -98,6 +100,10 @@ class ServiceRequestCreateView(APIView):
                  },
                  "timestamp": datetime.utcnow().isoformat()
              }
+            """
+                This sends a message with the routing_key = "service_request.created".
+                RabbitMQ will deliver it to the correct queue if a queue is bound to that routing key via the exchange.
+            """
                 # Publish event
             publish_event(payload=event_data, routing_key="service_request.created")
             return Response({
