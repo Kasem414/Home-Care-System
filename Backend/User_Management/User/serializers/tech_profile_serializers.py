@@ -10,7 +10,8 @@ class CreateTechnicalProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TechnicalProfile
-        fields = ('user_id', 'category', 'rate', 'work_state', 'service_ids')
+        fields = ('user_id', 'serviceCategories', 'serviceRegions', 'employeeCount', 
+                  'bio', 'availability', 'yearsInBusiness', 'service_ids')
 
 class UpdateTechnicalProfileSerializer(serializers.ModelSerializer):
     service_ids = serializers.ListField(
@@ -20,7 +21,8 @@ class UpdateTechnicalProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TechnicalProfile
-        fields = ('category', 'rate', 'work_state', 'service_ids')
+        fields = ('serviceCategories', 'serviceRegions', 'employeeCount', 
+                  'bio', 'availability', 'yearsInBusiness', 'service_ids')
 
 class TechnicalProfileListSerializer(serializers.ModelSerializer):
     class Meta:
